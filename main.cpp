@@ -101,13 +101,13 @@ int main()
 	shader->use();
 
 
-	// Draw something
+	// Generate buffers
 	GLuint VAO, VBO;
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
-	// Simple cube
+	// Simple cube object
 	std::vector<glm::vec3> vertices = {
 		glm::vec3(-1.0f,-1.0f,-1.0f),
 		glm::vec3(-1.0f,-1.0f,1.0f),
@@ -147,6 +147,7 @@ int main()
 		glm::vec3(1.0f,-1.0f,1.0f)
 	};
 
+	// Buffer object data
 	glBindVertexArray(VAO);
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
@@ -156,13 +157,10 @@ int main()
 	glBindVertexArray(0);
 
 
-
-
-	//Broadcast the uniform values to the shaders
+	// Broadcast the uniform values to the shaders
 	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
 	GLuint viewLoc = glGetUniformLocation(shader->program, "view");
 	GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-
 
 
 
@@ -186,8 +184,7 @@ int main()
 		// Apply transformations
 		glm::mat4 model;
 		glm::mat4 view = camera->getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom()), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
-
+		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
 
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));

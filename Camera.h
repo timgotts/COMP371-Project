@@ -1,23 +1,15 @@
 #pragma once
 
 
-
 #include <vector>
-
-//#include <iostream>
-
-
-
-#define GLEW_STATIC
-
-#include "GL\glew.h"
-
 
 
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>
 #include <GLM\gtc\quaternion.hpp>
 
+
+#define PI 3.14159265358979323846
 
 enum CameraMovement 
 {
@@ -37,7 +29,7 @@ enum CameraMovement
 
 const GLfloat SPEED = 14.0f;
 const GLfloat SENSITIVITY = 0.0025f;
-const GLfloat ROLL_SPEED = 0.0005f;
+const GLfloat ROLL_SPEED = 0.0025f;
 const GLfloat ZOOM = 45.0f;
 
 
@@ -48,8 +40,8 @@ class Camera
 
 public:
 
-	Camera(glm::vec4 position = glm::vec4(0.0f, 0.0f, -10.0f, 0.0f), glm::quat cameraQuat = glm::quat(glm::vec3(0.0f, 0.0f, 0.0f)))
-		: front(glm::vec3(0.0f, -1.0f, 0.0f)), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM) 
+	Camera(glm::vec4 position = glm::vec4(0.0f, 0.0f, 10.0f, 0.0f), glm::quat cameraQuat = glm::angleAxis(float(PI), glm::vec3(0.0f, 1.0f, 0.0f)))
+		: movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM), targetZoom(ZOOM)
 	{
 
 		this->position = position;
@@ -146,65 +138,77 @@ public:
 	}
 
 
-
+	
 	void processMouseScroll(GLfloat yOffset) 
 	{
 		if (yOffset > 0) 
 		{
-			smoothZoom += 3;
+			targetZoom -= 3;
 		}
 		else if (yOffset < 0) 
 		{
-			smoothZoom -= 3;
+			targetZoom += 3;
+		}
+
+		if (targetZoom <= 5.0f) {
+			targetZoom = 5.0f;
+		}
+
+		if (targetZoom >= 45.0f) {
+			targetZoom = 45.0f;
 		}
 	}
 
 
 
-	GLfloat getSmoothedZoom() 
+	GLfloat getSmoothedZoom(float deltaTime) 
 	{
-		if (smoothZoom > 0) 
+		if (targetZoom > zoom) 
 		{
-			if (this->zoom >= 5.0f && this->zoom <= 45.0f) 
+			if (zoom >= 5.0f && zoom <= 45.0f) 
 			{
-				this->zoom -= 1.2f;
+				zoom += 45.0f * deltaTime;
 			}
 
-			if (this->zoom <= 5.0f) 
+			if (zoom > targetZoom) 				
 			{
-				this->zoom = 5.0f;
+				zoom = targetZoom;
 			}
 
-			if (this->zoom >= 45.0f) 
+			if (zoom <= 5.0f) 
 			{
-				this->zoom = 45.0f;
+				zoom = 5.0f;
 			}
 
-			smoothZoom--;
+			if (zoom >= 45.0f) 
+			{
+				zoom = 45.0f;
+			}
 
 		}
 
-		else if (smoothZoom < 0) 
+		else if (targetZoom < zoom) 
 		{
-			if (this->zoom >= 5.0f && this->zoom <= 45.0f) 
+			if (zoom >= 5.0f && zoom <= 45.0f) 
 			{
-				this->zoom += 1.2f;
+				zoom -= 45.0f * deltaTime;
 			}
 
-			if (this->zoom <= 5.0f) 
+			if (zoom <= 5.0f) 
 			{
-				this->zoom = 5.0f;
+				zoom = 5.0f;
 			}
 
-			if (this->zoom >= 45.0f) 
+			if (zoom >= 45.0f) 
 			{
-				this->zoom = 45.0f;
+				zoom = 45.0f;
 			}
 
-			smoothZoom++;
 		}
 
 		this->mouseSensitivity = SENSITIVITY * (this->zoom / 45);
+
+		std::cout << zoom << std::endl;
 
 		return this->zoom;
 	}
@@ -220,7 +224,7 @@ private:
 	glm::quat cameraQuat;
 	glm::vec3 eyeVector;
 
-	GLfloat keyPitch, keyYaw, keyRoll;
+	GLfloat keyPitch = 0.0f, keyYaw = 0.0f, keyRoll = 0.0f;
 
 	glm::mat4 viewMatrix;
 
@@ -228,18 +232,18 @@ private:
 	GLfloat mouseSensitivity;
 
 	GLfloat zoom;
-	GLint smoothZoom = 0;
+	GLint targetZoom;
 
 	void updateView() 
 	{
-		
+
 		// Temporary frame quaternion from pitch, yaw, roll
 		glm::quat key_quat = glm::quat(glm::vec3(keyPitch, keyYaw, keyRoll));
 
 		// Reset frame keys;
-		keyPitch = 0;
-		keyYaw = 0;
-		keyRoll = 0;
+		keyPitch = 0.0f;
+		keyYaw = 0.0f;
+		keyRoll = 0.0f;
 
 		cameraQuat = key_quat * cameraQuat;
 		cameraQuat = glm::normalize(cameraQuat);
