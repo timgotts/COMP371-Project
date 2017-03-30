@@ -255,3 +255,7 @@ paket-files/
 *.sln
 *.vcxproj
 *.filters
+
+INCLUDE
+LIBS
+build
