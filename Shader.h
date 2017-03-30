@@ -2,6 +2,8 @@
 
 #include <string>
 #include <fstream>
+#pragma once
+
 #include <sstream>
 #include <iostream>
 

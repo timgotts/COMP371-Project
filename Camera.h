@@ -29,9 +29,8 @@ enum CameraMovement
 
 const GLfloat SPEED = 14.0f;
 const GLfloat SENSITIVITY = 0.0025f;
-const GLfloat ROLL_SPEED = 0.0025f;
+const GLfloat ROLL_SPEED = 1.5f;
 const GLfloat ZOOM = 45.0f;
-
 
 
 class Camera 
@@ -40,7 +39,7 @@ class Camera
 
 public:
 
-	Camera(glm::vec4 position = glm::vec4(0.0f, 0.0f, 10.0f, 0.0f), glm::quat cameraQuat = glm::angleAxis(float(PI), glm::vec3(0.0f, 1.0f, 0.0f)))
+	Camera(glm::vec4 position = glm::vec4(0.0f, 0.0f, 30.0f, 0.0f), glm::quat cameraQuat = glm::angleAxis(float(PI), glm::vec3(0.0f, 1.0f, 0.0f)))
 		: movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM), targetZoom(ZOOM)
 	{
 
@@ -95,13 +94,13 @@ public:
 
 		if (ROLL_LEFT == command) 
 		{
-			keyRoll = -ROLL_SPEED;
+			keyRoll = -ROLL_SPEED * deltaTime;
 			this->updateView();
 		}
 
 		if (ROLL_RIGHT == command) 
 		{
-			keyRoll = +ROLL_SPEED;
+			keyRoll = +ROLL_SPEED * deltaTime;
 			this->updateView();
 		}
 
@@ -207,8 +206,6 @@ public:
 		}
 
 		this->mouseSensitivity = SENSITIVITY * (this->zoom / 45);
-
-		std::cout << zoom << std::endl;
 
 		return this->zoom;
 	}
