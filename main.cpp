@@ -4,11 +4,13 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <GLM\gtc\type_ptr.hpp>
+#include <random>
 
 #include "Camera.h"
 #include "Shader.h"
+#include "Cube.h"
 
-
+#define PI 3.14159265358979323846
 
 // Global variables
 const int WIDTH = 800, HEIGHT = 600;
@@ -24,6 +26,8 @@ bool firstMouse = true;
 bool keys[1024];
 
 Camera* camera = new Camera();
+
+std::vector<Renderable*> objects;
 
 
 
@@ -96,72 +100,14 @@ int main()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
-	// Compile and load shaders
-	Shader * shader = new Shader("res/shaders/main.vs", "res/shaders/main.fs");
-	shader->use();
-
-
-	// Generate buffers
-	GLuint VAO, VBO;
-
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-
-	// Simple cube object
-	std::vector<glm::vec3> vertices = {
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,-1.0f,1.0f),
-		glm::vec3(-1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,1.0f,-1.0f),
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,1.0f,-1.0f),
-		glm::vec3(1.0f,-1.0f,1.0f),
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(1.0f,-1.0f,-1.0f),
-		glm::vec3(1.0f,1.0f,-1.0f),
-		glm::vec3(1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,1.0f,1.0f),
-		glm::vec3(-1.0f,1.0f,-1.0f),
-		glm::vec3(1.0f,-1.0f,1.0f),
-		glm::vec3(-1.0f,-1.0f,1.0f),
-		glm::vec3(-1.0f,-1.0f,-1.0f),
-		glm::vec3(-1.0f,1.0f,1.0f),
-		glm::vec3(-1.0f,-1.0f,1.0f),
-		glm::vec3(1.0f,-1.0f,1.0f),
-		glm::vec3(1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,-1.0f,-1.0f),
-		glm::vec3(1.0f,1.0f,-1.0f),
-		glm::vec3(1.0f,-1.0f,-1.0f),
-		glm::vec3(1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,-1.0f,1.0f),
-		glm::vec3(1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,1.0f,-1.0f),
-		glm::vec3(-1.0f,1.0f,-1.0f),
-		glm::vec3(1.0f,1.0f,1.0f),
-		glm::vec3(-1.0f,1.0f,-1.0f),
-		glm::vec3(-1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,1.0f,1.0f),
-		glm::vec3(-1.0f,1.0f,1.0f),
-		glm::vec3(1.0f,-1.0f,1.0f)
-	};
-
-	// Buffer object data
-	glBindVertexArray(VAO);
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-
-	// Broadcast the uniform values to the shaders
-	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-	GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-	GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-
+	// Randomly generate some cube objects
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(0, 1);
+	for (int i = 0; i < 200; ++i)
+	{
+		objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+	}
 
 
 	// GAME LOOP
@@ -176,26 +122,19 @@ int main()
 		glfwPollEvents();
 		doMovement();
 
-
+		// Clear frame buffer
 		glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-		// Apply transformations
-		glm::mat4 model;
+		// Apply camera tranformations
 		glm::mat4 view = camera->getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);		
 
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-
-		// Draw something
-		glBindVertexArray(VAO);
-			glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-		glBindVertexArray(0);
-
+		// Render objects
+		for (auto obj : objects)
+		{
+			obj->render(view, projection);
+		}
 
 		glfwSwapBuffers(window);
 	}
@@ -203,11 +142,12 @@ int main()
 
 
 	glfwDestroyWindow(window);
-	glDeleteVertexArrays(1, &VAO);
-	glDeleteBuffers(1, &VBO);
+	//TODO: object buffer cleanup
+	//glDeleteVertexArrays(1, &VAO);
+	//glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 
-}
+} // ________________________________ END MAIN ________________________________
 
 
 
@@ -238,6 +178,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 }
 
 
+
 void cursorPosCallback(GLFWwindow* window, double xPos, double yPos) 
 {
 	mX = xPos;
@@ -263,7 +204,6 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 
 
 
-
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) 
 {
 	camera->processMouseScroll(yOffset);
@@ -279,6 +219,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	}
 }
 
+
+
 void windowResizeCallback(GLFWwindow* window, int width, int height) 
 {
 
@@ -290,6 +232,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height)
 }
 
 
+
 void doMovement() 
 {
 	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
@@ -297,21 +240,15 @@ void doMovement()
 		camera->processKeyboard(FORWARD, deltaTime);
 	}
 
-
-
 	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN]) 
 	{
 		camera->processKeyboard(BACKWARD, deltaTime);
 	}
 
-
-
 	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT]) 
 	{
 		camera->processKeyboard(LEFT, deltaTime);
 	}
-
-
 
 	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) 
 	{
