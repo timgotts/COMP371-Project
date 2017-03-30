@@ -11,11 +11,14 @@ class TerrainChunk
     
     int getSize();
     
-    int** getHeightMap();
+    float** getHeightMap();
     
     int getPosX();
     
     int getPosY();
+    
+    float getHeightAt(int x, int y);
+    void setHeightAt(int x, int y, float height);
     
     private:
     //width and height of chunk
@@ -25,7 +28,7 @@ class TerrainChunk
     const int posX, posY;
     
     //heightmap grid
-    int** heightMap;
+    float** heightMap;
     
     
     
@@ -41,7 +44,9 @@ class Terrain : public Renderable
     //gets chunk at position, returns null pointer if out of bounds
     TerrainChunk* getChunkAt(int posX, int posY);
     
-    int getHeightAt(int x, int y);
+    float getHeightAt(int x, int y);
+    void setHeightAt(int x,int y,  float  height);
+    
     
     private:
     
