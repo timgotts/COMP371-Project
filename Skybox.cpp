@@ -2,6 +2,7 @@
 #include <GLM\gtc\matrix_transform.hpp>
 #include <soil\soil.h>
 
+
 Skybox::Skybox()
 {
 	vertices = { glm::vec3(-1.0f,  1.0f, -1.0f),
@@ -68,12 +69,12 @@ Skybox::Skybox()
 
 	// Prepare skybox cubemap
 	std::vector<const GLchar*> faces;
-	faces.push_back("res/textures/skybox-right.jpg");
-	faces.push_back("res/textures/skybox-left.jpg");
-	faces.push_back("res/textures/skybox-top.jpg");
-	faces.push_back("res/textures/skybox-bottom.jpg");
-	faces.push_back("res/textures/skybox-back.jpg");
-	faces.push_back("res/textures/skybox-front.jpg");
+	faces.push_back("res/textures/aqua9_rt.jpg");
+	faces.push_back("res/textures/aqua9_lf.jpg");
+	faces.push_back("res/textures/aqua9_up.jpg");
+	faces.push_back("res/textures/aqua9_dn.jpg");
+	faces.push_back("res/textures/aqua9_bk.jpg");
+	faces.push_back("res/textures/aqua9_ft.jpg");
 
 	glActiveTexture(GL_TEXTURE1);
 
@@ -124,12 +125,7 @@ GLuint Skybox::loadCubemap(std::vector<const GLchar*> faces)
 	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 	for (GLuint i = 0; i < faces.size(); i++)
 	{
-		std::cout << "Creating skybox texture..." << faces[i] << std::endl;
 		image = SOIL_load_image(faces[i], &width, &height, 0, SOIL_LOAD_RGB);
-		if (!image)
-		{
-			std::cout << "Failed to load texture: " << faces[i] << std::endl;
-		}
 		glTexImage2D(
 			GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
 			GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, image
