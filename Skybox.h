@@ -8,7 +8,6 @@
 
 #include "Renderable.h"
 #include "Shader.h"
-#include "objloader.hpp"
 
 class Skybox: public Renderable
 {
