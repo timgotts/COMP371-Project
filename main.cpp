@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Skybox.h"
 
 #define PI 3.14159265358979323846
 
@@ -28,6 +29,7 @@ bool keys[1024];
 Camera* camera = new Camera();
 
 std::vector<Renderable*> objects;
+Skybox* skybox;
 
 
 
@@ -109,8 +111,14 @@ int main()
 		objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
 	}
 
+	// Generate skybox
+	skybox = new Skybox();
+	
+	// Draw as wireframe
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// GAME LOOP
+
 	while (!glfwWindowShouldClose(window)) {
 		
 		// Update frame deltaTime
@@ -130,12 +138,18 @@ int main()
 		glm::mat4 view = camera->getViewMatrix();
 		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);		
 
+		//Render skybox
+		skybox->render(view, projection);
+
 		// Render objects
 		for (auto obj : objects)
 		{
 			obj->render(view, projection);
 		}
+		
 
+
+		glfwSwapInterval(1);
 		glfwSwapBuffers(window);
 	}
 
