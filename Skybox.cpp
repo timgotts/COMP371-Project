@@ -69,12 +69,8 @@ Skybox::Skybox()
 
 	// Prepare skybox cubemap
 	std::vector<const GLchar*> faces;
-	faces.push_back("res/textures/aqua9_rt.jpg");
-	faces.push_back("res/textures/aqua9_lf.jpg");
 	faces.push_back("res/textures/aqua9_up.jpg");
 	faces.push_back("res/textures/aqua9_dn.jpg");
-	faces.push_back("res/textures/aqua9_bk.jpg");
-	faces.push_back("res/textures/aqua9_ft.jpg");
 
 	glActiveTexture(GL_TEXTURE1);
 
