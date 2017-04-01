@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "Cube.h"
 #include "Skybox.h"
+#include "Rock.h"
 
 #define PI 3.14159265358979323846
 
@@ -106,9 +107,16 @@ int main()
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(0, 1);
+	//for (int i = 0; i < 200; ++i)
+	//{
+	//	objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+	//}
+
 	for (int i = 0; i < 200; ++i)
 	{
-		objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+		objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), 
+			glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f),
+			glm::vec3(dis(gen)*2.f, 1.f, dis(gen)*2.5)));
 	}
 
 	// Generate skybox
