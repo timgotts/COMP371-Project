@@ -49,6 +49,11 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
     
 }
 
+void TerrainChunk::render(GLM::MAT4 VIEW, GLM::MAT4 PROJ)
+{
+    
+}
+
 Terrain::Terrain(int size) : size(size)
 {
     

@@ -3,7 +3,7 @@
 #include "Renderable.h"
 
 //Terrain Chunk, contains a heightmap
-class TerrainChunk
+class TerrainChunk : public Renderable
 {
     public:
     
@@ -20,6 +20,8 @@ class TerrainChunk
     float getHeightAt(int x, int y);
     void setHeightAt(int x, int y, float height);
     
+    void render(glm::mat4 view, glm::mat4 proj);
+    
     private:
     //width and height of chunk
     const int size;
@@ -34,7 +36,7 @@ class TerrainChunk
     
 };
 
-class Terrain : public Renderable
+class Terrain
 {
     public:
     Terrain(int size);
