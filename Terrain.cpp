@@ -5,13 +5,29 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY) : size(size), posX(posX
     
     heightMap = new float*[size];
     
+    int currentIndice = 0;
+    
     for(int x = 0; x < size; x++)
     {
         heightMap[x] = new float[size];
         
         for(int y = 0; y < size; y++)
         {
-            heightMap[x][y] = 0.0f;
+            float height = 0.0f;
+            heightMap[x][y] = height;
+            
+            int coordX = posX * size + x;;
+            int coordY = posY * size + y;;
+            
+            vertices.push_back({coordX, coordY, height});
+            if(x > 0 && y > 0)
+            {
+                indices.push_back(currentIndice);
+                indices.push_back(currentIndice-1);
+                indices.push_back(currentIndice-size-1);
+            }
+            
+            currentIndice++;
         }
     }
     
