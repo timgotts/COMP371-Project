@@ -105,19 +105,19 @@ int main()
 
 
 	//Randomly generate some fish!
-	//std::random_device rd;
-	//std::mt19937 gen(rd());
-	//std::uniform_real_distribution<> dis(0, 1);
-	//for (int i = 0; i < 200; ++i)
-	//{
-	//	objects.push_back(new Fish(
-	//		glm::vec3(2.0f + dis(gen) * 20.0f, 1.0f + dis(gen) * 10.0f, 1.0f + dis(gen) * 20.0f),				// Scale
-	//		glm::vec3(dis(gen), dis(gen), dis(gen)),															// Rotation
-	//		glm::vec3(dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f)));	// Position
-	//}
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> dis(0, 1);
+	for (int i = 0; i < 200; ++i)
+	{
+		objects.push_back(new Fish(
+			glm::vec3(1.0f + dis(gen) * 2.0f, 1.0f, 1.0f),				// Scale
+			glm::vec3(dis(gen)*PI, dis(gen)*PI, dis(gen)*PI),															// Rotation
+			glm::vec3(dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f)));	// Position
+	}
 
 
-	objects.push_back(new Fish(glm::vec3(20.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
+	//objects.push_back(new Fish(glm::vec3(20.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 
 	// Generate skybox
 	skybox = new Skybox();
@@ -152,7 +152,7 @@ int main()
 		// Render objects
 		for (auto obj : objects)
 		{
-			obj->animate(deltaTime);
+			//obj->animate(deltaTime);
 			obj->render(view, projection);
 		}
 		

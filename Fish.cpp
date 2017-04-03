@@ -152,10 +152,10 @@ void Fish::render(glm::mat4 view, glm::mat4 projection)
 void Fish::animate(float deltaTime)
 {
 	time += dis(gen) * deltaTime;
-	float speed = 1.0;
+	float speed = 3.0;
 
-	//model = glm::rotate(model, sin(time) / 100, glm::vec3(0.0f, 1.0f, 0.0f));
-	//model = glm::rotate(model, sin(time*1.23275f) / 200, glm::vec3(0.0f, 0.0f, 1.0f));
-	//model = glm::rotate(model, float((dis(gen) - 0.5) / 100), glm::vec3(0.0f, 1.0f, 0.0f));
-	//model = glm::translate(model, glm::vec3(speed *deltaTime, 0.0f, 0.0f));
+	model = glm::rotate(model, sin(time) / 100, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, sin(time*1.23275f) / 200, glm::vec3(0.0f, 0.0f, 1.0f));
+	model = glm::rotate(model, float((dis(gen) - 0.5) / 100), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(speed *deltaTime, 0.0f, 0.0f));
 }
