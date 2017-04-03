@@ -9,12 +9,13 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Fish.h"
 #include "Skybox.h"
 
 #define PI 3.14159265358979323846
 
 // Global variables
-const int WIDTH = 800, HEIGHT = 600;
+const int WIDTH = 1600, HEIGHT = 900;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 float deltaTime, lastFrame;
@@ -99,17 +100,24 @@ int main()
 
 	glPointSize(3);
 
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
-	// Randomly generate some cube objects
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(0, 1);
-	for (int i = 0; i < 200; ++i)
-	{
-		objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
-	}
+	//Randomly generate some fish!
+	//std::random_device rd;
+	//std::mt19937 gen(rd());
+	//std::uniform_real_distribution<> dis(0, 1);
+	//for (int i = 0; i < 200; ++i)
+	//{
+	//	objects.push_back(new Fish(
+	//		glm::vec3(2.0f + dis(gen) * 20.0f, 1.0f + dis(gen) * 10.0f, 1.0f + dis(gen) * 20.0f),				// Scale
+	//		glm::vec3(dis(gen), dis(gen), dis(gen)),															// Rotation
+	//		glm::vec3(dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f)));	// Position
+	//}
+
+
+	objects.push_back(new Fish(glm::vec3(20.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 
 	// Generate skybox
 	skybox = new Skybox();
@@ -144,6 +152,7 @@ int main()
 		// Render objects
 		for (auto obj : objects)
 		{
+			obj->animate(deltaTime);
 			obj->render(view, projection);
 		}
 		
@@ -230,6 +239,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
 	{
 		// SHOOT HARPOON
+		// TAKE PHOTO
 	}
 }
 

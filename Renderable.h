@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include <GL\glew.h>
 #include <GLM\glm.hpp>
 
@@ -22,6 +23,7 @@ public:
 	Shader * shader;
 
 	virtual void render(glm::mat4 view, glm::mat4 proj) {};
+	virtual void animate(float deltaTime) {};
 
 private:
 
