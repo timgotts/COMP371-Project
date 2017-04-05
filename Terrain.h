@@ -2,6 +2,13 @@
 
 #include "Renderable.h"
 
+
+#include <GL\glew.h>
+#include <GLM\glm.hpp>
+#include <GLM\gtc\matrix_transform.hpp>
+#include <GLM\gtc\type_ptr.hpp>
+
+
 //Terrain Chunk, contains a heightmap
 class TerrainChunk : public Renderable
 {
@@ -36,10 +43,14 @@ class TerrainChunk : public Renderable
     
 };
 
-class Terrain
+class Terrain : public Renderable
 {
     public:
     Terrain(int size);
+    
+    
+    void render(glm::mat4 view, glm::mat4 proj);
+    
     
     int getSize();
     

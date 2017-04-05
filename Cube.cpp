@@ -83,6 +83,7 @@ Cube::Cube(float edgeLength, glm::vec3 eulerXYZ, glm::vec3 position)
     
     // Compile and load shaders
     shader = new Shader("res/shaders/main.vs", "res/shaders/main.fs");
+    
 }
 
 

@@ -13,23 +13,64 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY) : size(size), posX(posX
         
         for(int y = 0; y < size; y++)
         {
-            float height = 0.0f;
+            
+            float coordX = posX * (size-1) + x;;
+            float coordY = posY * (size-1) + y;;
+            
+            float height = sin(coordX/10) + cos(coordY/10);
+            
             heightMap[x][y] = height;
             
-            int coordX = posX * size + x;;
-            int coordY = posY * size + y;;
-            
-            vertices.push_back({coordX, coordY, height});
+            vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
             {
                 indices.push_back(currentIndice);
                 indices.push_back(currentIndice-1);
                 indices.push_back(currentIndice-size-1);
+                
+                indices.push_back(currentIndice);
+                indices.push_back(currentIndice-size);
+                indices.push_back(currentIndice-size-1);
+                
             }
             
             currentIndice++;
         }
     }
+    
+    
+    // Generate buffers
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    
+    // Buffer object data
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
+    
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    
+    // Apply translation to model matrix
+    
+    // Apply scale to model matrix
+    
+    // Apply rotations to model matrix
+    
+    
+    
+    
+    
+    // Compile and load shaders
+    shader = new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
+    
     
 }
 
@@ -65,9 +106,23 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
     
 }
 
-void TerrainChunk::render(glm::mat4 vie, glm::mat4 proj)
+void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
 {
+    shader->use();
     
+    // Broadcast the uniform values to the shaders
+    GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
+    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+    
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    
+    // Draw object
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 Terrain::Terrain(int size) : size(size)
@@ -145,3 +200,15 @@ void Terrain::setHeightAt(int x, int y, float  height)
     }
 }
 
+
+void Terrain::render(glm::mat4 view, glm::mat4 proj)
+{
+    for(int x = 0; x < size; x++)
+    {
+        for(int y = 0; y < size; y++)
+        {
+            getChunkAt(x,y)->render(view,proj);
+        }
+    }
+}
+    

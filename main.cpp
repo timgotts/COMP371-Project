@@ -10,6 +10,7 @@
 #include "Shader.h"
 #include "Cube.h"
 #include "Skybox.h"
+#include "Terrain.h"
 
 #define PI 3.14159265358979323846
 
@@ -30,6 +31,7 @@ Camera* camera = new Camera();
 
 std::vector<Renderable*> objects;
 Skybox* skybox;
+Terrain* terrain;
 
 
 
@@ -113,7 +115,7 @@ int main()
     
     // Generate skybox
     skybox = new Skybox();
-    
+    terrain = new Terrain(25);
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
@@ -140,7 +142,7 @@ int main()
         
         //Render skybox
         skybox->render(view, projection);
-        
+        terrain->render(view, projection);
         // Render objects
         for (auto obj : objects)
         {
