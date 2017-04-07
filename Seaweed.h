@@ -13,11 +13,13 @@
 class Seaweed : public Renderable
 {
 public:
+	//Non-default constructor
 	Seaweed(float rotAngle, glm::vec3 position);
-
+	//Seaweed's render function
 	void render(glm::mat4 view, glm::mat4 projection);
 
 	//Indices for the ebo
 	int *indicesEBO;
+	//Lenght of the index needed for our VBO in the render function
 	int indexLength;
 };

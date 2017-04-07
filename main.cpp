@@ -111,17 +111,22 @@ int main()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
- /*   for (int i = 0; i < 200; ++i)
+  /*  for (int i = 0; i < 200; ++i)
     {
         objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
     }  */
     
+	for (int i = 0; i < 20; ++i)
+	{
+		objects.push_back(new Seaweed(90.0, glm::vec3(dis(gen) * 20.0f - 10.0f, 0.0, dis(gen) * 20.0f - 10.0f)));
+	}  
+
     // Generate skybox
     skybox = new Skybox();
     terrain = new Terrain(25);
 
 	//Seaweed initialization
-	seaweed = new Seaweed(90.0, glm::vec3(0, 0, 0));
+	seaweed = new Seaweed(90.0, glm::vec3(3, 0, -2));
 
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

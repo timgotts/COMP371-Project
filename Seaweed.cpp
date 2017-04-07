@@ -11,7 +11,7 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 	int numPoints;
 	string line;
 	input >> curveType;
-	cout << curveType << endl;
+	//cout << curveType << endl;
 
 	float x = 0;
 	float y = 0;
@@ -31,7 +31,7 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 		//Gets te number or rows and skips lines
 		getline(input, line);
 		input >> numPoints;
-		cout << numPoints << endl;
+	//	cout << numPoints << endl;
 		getline(input, line);
 
 		//Getting profile the actual data
@@ -47,7 +47,7 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 		//Getting the trajectory data
 		int numPoints2;
 		input >> numPoints2;
-		cout << "\n\n TRAJECTORY" << endl;
+		//cout << "\n\n TRAJECTORY" << endl;
 		for (int i = 0; i < numPoints2; i++)
 		{
 			input >> x;
@@ -102,8 +102,6 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 			}
 		}
 	
-		
-		cout << "FINSIHED!" << endl;
 
 		//VAO, VBO, and EBO initialization
 		glGenVertexArrays(1, &VAO);
