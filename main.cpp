@@ -33,6 +33,8 @@ std::vector<Renderable*> objects;
 Skybox* skybox;
 Terrain* terrain;
 
+//Declare Seaweed
+
 
 
 // Free function signatures
