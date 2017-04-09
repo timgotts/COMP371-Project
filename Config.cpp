@@ -47,7 +47,6 @@ void ConfigSection::readSection(std::ifstream &file)
             std::string sectionName = line.substr(1);
             if(sectionName != "end")
             {
-                std::cout << "Found section " << sectionName << std::endl;
                 ConfigSection* section = new ConfigSection();
                 subSectons[sectionName] = section;
                 section->readSection(file);
@@ -63,7 +62,6 @@ void ConfigSection::readSection(std::ifstream &file)
             {
                 std::string key = line.substr(0, valueSeperatorLocation);
                 std::string value = line.substr(valueSeperatorLocation+1);
-                std::cout << "Found value " << key << ":" << value  << std::endl;
                 
                 values[key] = value;
             }

@@ -135,21 +135,22 @@ Terrain::Terrain()
 {
     
     Config config("res/config/Terrain.config");
-    
     size = config.getConfig()->getInt("size");
-    
-    ConfigSection* generatorConfig = config.getConfig()->getSection("generator");
-    
-    ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
-    pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
-    
-    double amplitude = generatorConfig->getInt("amplitude");
-    
-    std::cout << "Generating with amplitude " << amplitude  << " "<< pointsPerChunk << std::endl;
     
     chunks = new TerrainChunk**[size];
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(1, 0.05, amplitude, 2, 4);
+    
+    ConfigSection* generatorConfig = config.getConfig()->getSection("generator");
+    
+    double persistence = generatorConfig->getDouble("persistence");
+    double frequency = generatorConfig->getDouble("frequency");
+    double amplitude = generatorConfig->getDouble("amplitude");
+    int octaves = generatorConfig->getInt("octaves");
+    
+    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, 4);
+    
+    ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
+    pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
     
     for(int x = 0; x < size; x++)
     {
