@@ -36,10 +36,21 @@ void ConfigSection::readSection(std::ifstream &file)
     while(getline(file, line))
     {
         const auto strBegin = line.find_first_not_of(" \t");
+        if(strBegin == std::string::npos)
+        {
+            continue;
+        }
+        
         const auto strEnd = line.find_last_not_of(" \t");
         const auto strRange = strEnd - strBegin + 1;
         
         line = line.substr(strBegin, strRange);
+        
+        std::size_t commentSymbolLocation = line.find("#");
+        if(commentSymbolLocation != std::string::npos)
+        {
+            continue;
+        }
         
         std::size_t sectionSymbolLocation = line.find(">");
         if(sectionSymbolLocation != std::string::npos)
