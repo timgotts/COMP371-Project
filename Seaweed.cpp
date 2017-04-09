@@ -1,5 +1,7 @@
 #include "Seaweed.h"
 using namespace std;
+
+
 Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 {
 	//Reading vertices for the profile and trajectory curve from a file
@@ -128,8 +130,10 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 		//unbind the VAO
 		glBindVertexArray(0);
 
+		
 		//Translate the weed to a position
 		model = glm::translate(model, -position);
+		
 		//Apply the 90 degree rotation
 		model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
 
@@ -140,8 +144,13 @@ Seaweed::Seaweed(float rotAngle, glm::vec3 position)
 		shader = new Shader("res/shaders/seaweed.vs", "res/shaders/seaweed.fs");	}
 }
 
+
+
 void Seaweed::render(glm::mat4 view, glm::mat4 projection)
 {
+	
+	//Sin functiont to move the vertices based on time.
+	//GLfloat timeMove = sin(glfwGetTime());
 	//enabling the shader
 	shader->use();
 
@@ -149,7 +158,7 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
 	GLuint viewMatrixLoc = glGetUniformLocation(shader->program, "view");
 	GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
 
-	//model = glm::scale(model, glm::vec3(1.0f));
+	//model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
 
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model)); 
 	glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(view));

@@ -6,7 +6,7 @@
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>
 #include <GLM\gtc\type_ptr.hpp>
-
+#include <GLFW\glfw3.h>
 #include "Renderable.h"
 #include "Shader.h"
 
