@@ -84,8 +84,10 @@ void Seaweed::calculateSweep()
 	vector < glm::vec3> profile;
 	vector < glm::vec3> trajectory;
 
+	//The colour modifiers
 	float colMod1 = 0;
 	float colMod2 = 0;
+
 	//The Original GREEn seaweed
 	if (amount % 2 == 0)
 	{
@@ -291,7 +293,7 @@ void Seaweed::calculateSweep()
 			glm::vec3(-0.07, 0, 0.756875)
 		};
 		rotAngle = 180.0;
-		colMod1 = 0.39;
+		colMod1 = 0.5;
 		colMod2 = 0.1;
 	}
 
@@ -320,7 +322,7 @@ void Seaweed::calculateSweep()
 			verticesVBO[pos + 2] = profile.at(i).z + trajectory.at(k).z;
 			verticesVBO[pos + 3] = colour * colMod1;
 			verticesVBO[pos + 4] = colour *colMod2;
-			verticesVBO[pos + 5] = 0;
+			verticesVBO[pos + 5] = 0.0;
 			//increment the pos value in order to find the next set of vertices
 
 			pos += 6;

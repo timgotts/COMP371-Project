@@ -28,9 +28,11 @@ public:
 	//Indices for the ebo
 	 int *indicesEBO;
 
+	 //Length of the verticesVBO
 	 int totalLength;
-	//Lenght of the index needed for our VBO in the render function
+	//Length of the indicesEBO
 	 int indexLength;
 
+	//Added for now to generate different seaweed
 	static int amount;
 };

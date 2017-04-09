@@ -115,13 +115,13 @@ int main()
           objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
       }*/
     
-	
+#if 0	
     //Seaweed generation
     for (int i = 0; i < 20; ++i)
     {
         objects.push_back(new Seaweed(glm::vec3(dis(gen) * 20.0f - 10.0f, 0.0, dis(gen) * 20.0f - 10.0f)));
     }
-
+#endif
     
     // Generate skybox
     skybox = new Skybox();
