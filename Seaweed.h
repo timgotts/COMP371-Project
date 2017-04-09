@@ -29,9 +29,9 @@ public:
 	//Final vertices for the seaweed
 	 GLfloat* verticesVBO;
 
-	 int totalLength;
+	 int totalLength= 622080;
 	//Indices for the ebo
 	 int *indicesEBO;
 	//Lenght of the index needed for our VBO in the render function
-	 int indexLength;
+	 int indexLength= 618222;
 };
