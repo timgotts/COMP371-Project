@@ -11,6 +11,6 @@ out vec4 color;
 void main()
 
 {
-	color = vec4(0, pow((vPos.y + 1) / 2, 2), pow((vPos.z + 1) / 2, 2), 1.0f);
+	color = vec4(1.0f+vPos.y,0.4f,0.10f, 1.0f);
 }
 
