@@ -1,20 +1,20 @@
 #pragma once
 
 #include "Renderable.h"
-
+#include "TerrainGenerator.h"
+#include "Config.h"
 
 #include <GL\glew.h>
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>
 #include <GLM\gtc\type_ptr.hpp>
 
-
 //Terrain Chunk, contains a heightmap
 class TerrainChunk : public Renderable
 {
     public:
     
-    TerrainChunk(int size, int posX, int posY);
+    TerrainChunk(int size, int posX, int posY, float offset, PerlinNoiseGenerator* pn);
     
     int getSize();
     
@@ -46,7 +46,7 @@ class TerrainChunk : public Renderable
 class Terrain : public Renderable
 {
     public:
-    Terrain(int size);
+    Terrain();
     
     
     void render(glm::mat4 view, glm::mat4 proj);
@@ -64,9 +64,9 @@ class Terrain : public Renderable
     private:
     
     //number of chunks on x,y
-    const int size;
+    int size;
     
-    const int pointsPerChunk = 9;
+    int pointsPerChunk;
     
     //chunk grid
     TerrainChunk*** chunks;

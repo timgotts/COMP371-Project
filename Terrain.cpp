@@ -1,6 +1,6 @@
 #include "Terrain.h"
 
-TerrainChunk::TerrainChunk(int size, int posX, int posY) : size(size), posX(posX), posY(posY)
+TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNoiseGenerator* pn) : size(size), posX(posX), posY(posY)
 {
     
     heightMap = new float*[size];
@@ -14,14 +14,20 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY) : size(size), posX(posX
         for(int y = 0; y < size; y++)
         {
             
-            float coordX = posX * (size-1) + x;;
-            float coordY = posY * (size-1) + y;;
+            float coordX = (posX * (size-1) + x);
+            float coordY = (posY * (size-1) + y);
             
-            float height = sin(coordX/10) + cos(coordY/10);
+            float rcoordX = 3*((posX-offset) * (size-1) + x);
+            float rcoordY = 3*((posY-offset) * (size-1) + y);
+            
+            
+            float height = pn->getHeightAt(coordX, coordY);
             
             heightMap[x][y] = height;
             
-            vertices.push_back({coordX, height, coordY });
+            
+            
+            vertices.push_back({rcoordX, height, rcoordY });
             if(x > 0 && y > 0)
             {
                 indices.push_back(currentIndice);
@@ -125,10 +131,28 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     glBindVertexArray(0);
 }
 
-Terrain::Terrain(int size) : size(size)
+Terrain::Terrain()
 {
     
+    Config config("res/config/Terrain.config");
+    
+    size = config.getConfig()->getInt("size");
+    
     chunks = new TerrainChunk**[size];
+    
+    ConfigSection* generatorConfig = config.getConfig()->getSection("generator");
+    
+    double persistence = generatorConfig->getDouble("persistence");
+    double frequency = generatorConfig->getDouble("frequency");
+    double amplitude = generatorConfig->getDouble("amplitude");
+    int octaves = generatorConfig->getInt("octaves");
+    
+    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, 4);
+    
+    ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
+    
+    pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
+    
     
     for(int x = 0; x < size; x++)
     {
@@ -136,10 +160,11 @@ Terrain::Terrain(int size) : size(size)
         
         for(int y = 0; y < size; y++)
         {
-            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y);
+            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin);
         }
     }
     
+    std::cout << "terrain finished" << std::endl;
 }
 
 
