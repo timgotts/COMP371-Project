@@ -123,7 +123,7 @@ int main()
 
     // Generate skybox
     skybox = new Skybox();
-    terrain = new Terrain(75);
+    terrain = new Terrain();
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     

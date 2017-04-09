@@ -131,12 +131,25 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     glBindVertexArray(0);
 }
 
-Terrain::Terrain(int size) : size(size)
+Terrain::Terrain()
 {
+    
+    Config config("res/config/Terrain.config");
+    
+    size = config.getConfig()->getInt("size");
+    
+    ConfigSection* generatorConfig = config.getConfig()->getSection("generator");
+    
+    ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
+    pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
+    
+    double amplitude = generatorConfig->getInt("amplitude");
+    
+    std::cout << "Generating with amplitude " << amplitude  << " "<< pointsPerChunk << std::endl;
     
     chunks = new TerrainChunk**[size];
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(1, 0.05, 30, 2, 4);
+    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(1, 0.05, amplitude, 2, 4);
     
     for(int x = 0; x < size; x++)
     {
