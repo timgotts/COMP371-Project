@@ -16,6 +16,8 @@ class Renderable
     
     std::vector<glm::vec3> vertices;
     std::vector<GLuint> indices;
+
+	
     
     glm::mat4 model;
     
