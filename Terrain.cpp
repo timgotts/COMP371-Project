@@ -114,6 +114,7 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
 
 void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
 {
+    std::cout << "RENDER" << std::endl;
     shader->use();
     
     // Broadcast the uniform values to the shaders
@@ -161,6 +162,7 @@ Terrain::Terrain()
         }
     }
     
+    std::cout << "terrain finished" << std::endl;
 }
 
 
