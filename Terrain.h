@@ -54,6 +54,8 @@ class Terrain : public Renderable
     
     int getSize();
     
+    int getPointsPerChunk();
+    
     //gets chunk at position, returns null pointer if out of bounds
     TerrainChunk* getChunkAt(int posX, int posY);
     
