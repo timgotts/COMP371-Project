@@ -35,7 +35,7 @@ Seaweed::Seaweed( glm::vec3 position)
     
     
     //Translate the weed to a position
-    model = glm::translate(model, -position);
+    model = glm::translate(model, position);
     
     //Apply the 90 degree rotation
     model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
