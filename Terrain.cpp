@@ -201,8 +201,6 @@ float Terrain::getHeightAt(int x, int y)
     {
         //position relative to the chunk
         
-        std::cout << "> " << relX << " " << relY << std::endl; 
-        
         return chunk->getHeightAt(relX, relY);
     }
     else

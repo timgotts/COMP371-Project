@@ -135,8 +135,6 @@ int main()
             
             float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
             
-            std::cout << x << " " << y << " " << z << std::endl;
-            
             objects.push_back(new Seaweed(glm::vec3(x, y, z)));
         }
     }
