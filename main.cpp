@@ -5,12 +5,13 @@
 #include <GLFW\glfw3.h>
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
-
+#include <time.h>
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
 #include "Skybox.h"
 #include "Terrain.h"
+#include "Seaweed.h"
 
 #define PI 3.14159265358979323846
 
@@ -35,6 +36,7 @@ Terrain* terrain;
 
 
 
+
 // Free function signatures
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void cursorPosCallback(GLFWwindow* window, double xPos, double yPos);
@@ -51,6 +53,7 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main() 
 {
+    srand (time(NULL));
     
     // Create GLFW window
     glfwInit();
@@ -108,16 +111,41 @@ int main()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(0, 1);
-    for (int i = 0; i < 200; ++i)
+    /*  for (int i = 0; i < 200; ++i)
+      {
+          objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+      }*/
+
+#if 0
+    //Seaweed generation
+    for (int i = 0; i < 20; ++i)
     {
-        objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+        objects.push_back(new Seaweed(glm::vec3(dis(gen) * 20.0f - 10.0f, 0.0, dis(gen) * 20.0f - 10.0f)));
     }
+#endif
     
     // Generate skybox
     skybox = new Skybox();
-    terrain = new Terrain(75);
+    terrain = new Terrain();
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+    int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
+    for(int x = 0; x < terrainSize; x++)
+    {
+        for(int z = 0; z < terrainSize; z++)
+        {
+            if(rand()%20 > 0)
+            {
+                continue;
+            }
+            
+            float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+            
+            objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+        }
+    }
+    
     
     // GAME LOOP
     

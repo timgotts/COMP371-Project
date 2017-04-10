@@ -1,7 +1,7 @@
 #include "Skybox.h"
 #include <GLM\gtc\matrix_transform.hpp>
 #include <soil\soil.h>
-
+//hygg
 Skybox::Skybox()
 {
     vertices = { glm::vec3(-1.0f,  1.0f, -1.0f),
@@ -68,12 +68,12 @@ Skybox::Skybox()
     
     // Prepare skybox cubemap
     std::vector<const GLchar*> faces;
-    faces.push_back("res/textures/aqua9_ft.jpg");
-    faces.push_back("res/textures/aqua9_bk.jpg");
-    faces.push_back("res/textures/aqua9_up.jpg");
-    faces.push_back("res/textures/aqua9_dn.jpg");
-    faces.push_back("res/textures/aqua9_rt.jpg");
-    faces.push_back("res/textures/aqua9_lf.jpg");
+    faces.push_back("res/textures/uw_ft.jpg");
+    faces.push_back("res/textures/uw_bk.jpg");
+    faces.push_back("res/textures/uw_up.jpg");
+    faces.push_back("res/textures/uw_dn.jpg");
+    faces.push_back("res/textures/uw_rt.jpg");
+    faces.push_back("res/textures/uw_lf.jpg");
     
     glActiveTexture(GL_TEXTURE1);
     

@@ -17,9 +17,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
-            float rcoordX = 3*((posX-offset) * (size-1) + x);
-            float rcoordY = 3*((posY-offset) * (size-1) + y);
-            
             
             float height = pn->getHeightAt(coordX, coordY);
             
@@ -27,7 +24,7 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             
             
             
-            vertices.push_back({rcoordX, height, rcoordY });
+            vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
             {
                 indices.push_back(currentIndice);
@@ -131,12 +128,28 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     glBindVertexArray(0);
 }
 
-Terrain::Terrain(int size) : size(size)
+Terrain::Terrain()
 {
+    
+    Config config("res/config/Terrain.config");
+    
+    size = config.getConfig()->getInt("size");
     
     chunks = new TerrainChunk**[size];
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(1, 0.05, 30, 2, 4);
+    ConfigSection* generatorConfig = config.getConfig()->getSection("generator");
+    
+    double persistence = generatorConfig->getDouble("persistence");
+    double frequency = generatorConfig->getDouble("frequency");
+    double amplitude = generatorConfig->getDouble("amplitude");
+    int octaves = generatorConfig->getInt("octaves");
+    
+    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, rand());
+    
+    ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
+    
+    pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
+    
     
     for(int x = 0; x < size; x++)
     {
@@ -148,12 +161,18 @@ Terrain::Terrain(int size) : size(size)
         }
     }
     
+    std::cout << "terrain finished" << std::endl;
 }
 
 
 int Terrain::getSize()
 {
     return size;
+}
+
+int Terrain::getPointsPerChunk()
+{
+    return pointsPerChunk;
 }
 
 TerrainChunk* Terrain::getChunkAt(int posX, int posY)
@@ -168,16 +187,19 @@ TerrainChunk* Terrain::getChunkAt(int posX, int posY)
 
 float Terrain::getHeightAt(int x, int y)
 {
+    
+    int relX = x % (pointsPerChunk - 1);
+    int relY = y % (pointsPerChunk - 1);
+    
+    
     //chunk position
-    int chunkX = x % pointsPerChunk;
-    int chunkY = y % pointsPerChunk;
+    int chunkX = x / (pointsPerChunk-1);
+    int chunkY = y / (pointsPerChunk-1);
     
     TerrainChunk* chunk;
-    if((chunk = getChunkAt(x,y)) != nullptr)
+    if((chunk = getChunkAt(chunkX,chunkY)) != nullptr)
     {
         //position relative to the chunk
-        int relX = x - chunkX * pointsPerChunk;
-        int relY = y - chunkY * pointsPerChunk;
         
         return chunk->getHeightAt(relX, relY);
     }
