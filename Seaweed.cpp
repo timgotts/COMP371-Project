@@ -16,11 +16,11 @@ Seaweed::Seaweed( glm::vec3 position)
     glBindVertexArray(VAO);
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(*verticesVBO)*totalLength, verticesVBO, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*totalLength, verticesVBO, GL_STATIC_DRAW);
     
     //EBO Binding
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*indicesEBO)*indexLength, indicesEBO, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indexLength, indicesEBO, GL_STATIC_DRAW);
     
     //For the vertices (vertex shader)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
