@@ -1,8 +1,8 @@
 #include "Seaweed.h"
-#include <fstream>
 using namespace std;
 
 int Seaweed::amount = 0;
+
 Seaweed::Seaweed( glm::vec3 position)
 {
 	
@@ -49,13 +49,11 @@ Seaweed::Seaweed( glm::vec3 position)
 		amount++;
 }
 
-
-
 void Seaweed::render(glm::mat4 view, glm::mat4 projection)
 {
 	
 	//Sin functiont to move the vertices based on time.
-	//GLfloat timeMove = sin(glfwGetTime());
+	GLfloat timeMove = sin(glfwGetTime());
 	//enabling the shader
 	shader->use();
 
@@ -74,9 +72,6 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
 	glDrawElements(GL_TRIANGLES, indexLength, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
-
-
-
 
 void Seaweed::calculateSweep()
 {

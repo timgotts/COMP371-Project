@@ -16,6 +16,11 @@ public:
 
 	//Non-default constructor
 	Seaweed( glm::vec3 position);
+
+	//Function which animates the seaweed moving
+	void animate();
+	
+	//Angle of rotation
 	float rotAngle;
 	//Seaweed's render function
 	void render(glm::mat4 view, glm::mat4 projection);
