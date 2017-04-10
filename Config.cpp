@@ -57,22 +57,23 @@ void ConfigSection::readSection(std::ifstream &file)
         
         //std::cout << line << std::endl;
         
-        std::size_t sectionSymbolLocation = line.find(">");
+        std::size_t sectionSymbolLocation = line.find("<");
         if(sectionSymbolLocation != std::string::npos && sectionSymbolLocation == 0)
         {
             std::string sectionName = line.substr(1);
-            if(sectionName != "end")
-            {
-                ConfigSection* section = new ConfigSection();
-                subSectons[sectionName] = section;
-                section->readSection(file);
-            }else
-            {
-                return;
-            }
+            
+            ConfigSection* section = new ConfigSection();
+            subSectons[sectionName] = section;
+            section->readSection(file);
+            
             
         }else
         {
+            std::size_t endSectionSymbolLocation = line.find(">");
+            if(endSectionSymbolLocation != std::string::npos && endSectionSymbolLocation == 0)
+            {
+                return;
+            }
             std::size_t valueSeperatorLocation = line.find("=");
             if(valueSeperatorLocation != std::string::npos)
             {
