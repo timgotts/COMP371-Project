@@ -100,7 +100,7 @@ void Seaweed::calculateSweep()
     float colMod2 = 0;
     
     //The Original GREEn seaweed
-   // if (amount % 2 == 0)
+    if (amount % 2 == 0)
     {
         profile =
         {
