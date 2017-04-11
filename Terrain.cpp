@@ -14,11 +14,22 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
         for(int y = 0; y < size; y++)
         {
             
+            
+            
+            
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
             
             float height = pn->getHeightAt(coordX, coordY);
+            
+            
+            if(rand()%20 == 0)
+            {
+                
+                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
+                
+            }
             
             heightMap[x][y] = height;
             
@@ -40,7 +51,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             currentIndice++;
         }
     }
-    
     
     // Generate buffers
     glGenVertexArrays(1, &VAO);
@@ -126,6 +136,13 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    
+    
+    for(auto entity : entities)
+    {
+        entity->render(view, projection);
+    }
+    
 }
 
 Terrain::Terrain()
@@ -134,6 +151,7 @@ Terrain::Terrain()
     Config config("res/config/Terrain.config");
     
     size = config.getConfig()->getInt("size");
+    renderDistance = config.getConfig()->getInt("renderDistance");
     
     chunks = new TerrainChunk**[size];
     
@@ -184,6 +202,10 @@ TerrainChunk* Terrain::getChunkAt(int posX, int posY)
     
     return chunks[posX][posY];
 }
+TerrainChunk* Terrain::getChunkAtReal(int posX, int posY)
+{
+    return getChunkAt(posX/(pointsPerChunk-1), posY / (pointsPerChunk-1));
+}
 
 float Terrain::getHeightAt(int x, int y)
 {
@@ -231,14 +253,53 @@ void Terrain::setHeightAt(int x, int y, float  height)
 }
 
 
-void Terrain::render(glm::mat4 view, glm::mat4 proj)
+void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
 {
-    for(int x = 0; x < size; x++)
+    TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
+    if(chunk != nullptr)
     {
-        for(int y = 0; y < size; y++)
+        
+        int midX = chunk->getPosX();
+        int midY = chunk->getPosY();
+        
+        if(midX < renderDistance)
         {
-            getChunkAt(x,y)->render(view,proj);
+            midX = renderDistance;
+        }
+        
+        if(midY < renderDistance)
+        {
+            midY = renderDistance;
+        }
+        
+        if((size-midX) < renderDistance)
+        {
+            midX = size-renderDistance;
+        }
+        
+        if((size-midY) < renderDistance)
+        {
+            midY = size-renderDistance;
+        }
+        
+        for(int x = midX - renderDistance; x < midX + renderDistance; x++)
+        {
+            for(int y = midY-renderDistance; y < midY+renderDistance; y++)
+            {
+                getChunkAt(x,y)->render(view,proj);
+            }
+        }
+        
+    }
+    else
+    {
+        for(int x = 0; x < size; x++)
+        {
+            for(int y = 0; y < size; y++)
+            {
+                getChunkAt(x,y)->render(view,proj);
+            }
         }
     }
-}
     
+}
