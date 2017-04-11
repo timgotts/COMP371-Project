@@ -15,7 +15,7 @@
 #define PI 3.14159265358979323846
 
 // Global variables
-const int WIDTH = 800, HEIGHT = 600;
+const int WIDTH = 1600, HEIGHT = 900;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 float deltaTime, lastFrame;
@@ -59,7 +59,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "371_Assignment2", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "371_Project", nullptr, nullptr);
 
 	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 
@@ -107,16 +107,17 @@ int main()
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(0, 1);
+	std::uniform_real_distribution<> scale(0.5, 0.75);
 	//for (int i = 0; i < 200; ++i)
 	//{
 	//	objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
 	//}
 
-	for (int i = 0; i < 200; ++i)
+	for (int i = 0; i < 50; ++i)
 	{
 		objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), 
 			glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f),
-			glm::vec3(dis(gen)*2.f, 1.f, dis(gen)*2.5)));
+			glm::vec3(scale(gen)*2.f, 1.f, scale(gen)*2.5f)));
 	}
 
 	// Generate skybox

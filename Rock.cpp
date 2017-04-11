@@ -33,9 +33,23 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 		10,1,6,		11,0,9,		2,11,9,
 		5,2,9,		11,2,7 
 	};
+	static const GLfloat color[] = { 
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588,
+		0.6588, 0.6588, 0.6588
+	};
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(-0.5, 0.5);
+	std::uniform_real_distribution<> dis(-0.3, 0.3);
 	for (int i=0; i<vertices.size(); i++)
 	{
 		vertices.at(i).x += dis(gen);
@@ -43,6 +57,15 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 		vertices.at(i).z += dis(gen);
 		//point.y += dis(gen)* 
 	}
+
+	GLuint colorbuffer;
+	glGenBuffers(1, &colorbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	// Generate buffers
 	glGenVertexArrays(1, &VAO);
@@ -79,7 +102,7 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 
 
 	// Compile and load shaders
-	shader = new Shader("res/shaders/main.vs", "res/shaders/main.fs");
+	shader = new Shader("res/shaders/rock.vs", "res/shaders/rock.fs");
 }
 
 void Rock::render(glm::mat4 view, glm::mat4 projection)
