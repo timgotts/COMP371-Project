@@ -8,39 +8,78 @@
 
 Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 {
+	int colorType = rand() % 10;
+	double color;
 	float const X = 0.525731112119133606f;
 	float const Z = 0.850650808352039932f;
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> colorDis(0.15, 0.6);
-	double color = colorDis(gen);
 
-	vertices = { 
-		glm::vec3(-X,0,Z),
-		glm::vec3(color, color, color),
-		glm::vec3(X,0,Z),
-		glm::vec3(color, color, color),
-		glm::vec3(-X,0,-Z),
-		glm::vec3(color, color, color),
-		glm::vec3(X,0,-Z),
-		glm::vec3(color, color, color),
-		glm::vec3(0,Z,X),
-		glm::vec3(color, color, color),
-		glm::vec3(0,Z,-X),
-		glm::vec3(color, color, color),
-		glm::vec3(0,-Z,X),
-		glm::vec3(color, color, color),
-		glm::vec3(0.0,-Z,-X),
-		glm::vec3(color, color, color),
-		glm::vec3(Z,X,0),
-		glm::vec3(color, color, color),
-		glm::vec3(-Z,X,0),
-		glm::vec3(color, color, color),
-		glm::vec3(Z,-X,0),
-		glm::vec3(color, color, color),
-		glm::vec3(-Z,-X,0),
-		glm::vec3(color, color, color)
-	};
+	if (colorType >= 7) 
+	{
+		std::uniform_real_distribution<> colorDis(0.15, 0.5);
+		color = colorDis(gen);
+
+		vertices = {
+			glm::vec3(-X,0,Z),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(X,0,Z),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(-X,0,-Z),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(X,0,-Z),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(0,Z,X),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(0,Z,-X),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(0,-Z,X),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(0.0,-Z,-X),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(Z,X,0),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(-Z,X,0),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(Z,-X,0),
+			glm::vec3(color, color / 2, 0.0),
+			glm::vec3(-Z,-X,0),
+			glm::vec3(color, color / 2, 0.0),
+		};
+	}
+	else
+	{
+		std::uniform_real_distribution<> colorDis(0.15, 0.4);
+		color = colorDis(gen);
+
+		vertices = {
+			glm::vec3(-X,0,Z),
+			glm::vec3(color, color, color),
+			glm::vec3(X,0,Z),
+			glm::vec3(color, color, color),
+			glm::vec3(-X,0,-Z),
+			glm::vec3(color, color, color),
+			glm::vec3(X,0,-Z),
+			glm::vec3(color, color, color),
+			glm::vec3(0,Z,X),
+			glm::vec3(color, color, color),
+			glm::vec3(0,Z,-X),
+			glm::vec3(color, color, color),
+			glm::vec3(0,-Z,X),
+			glm::vec3(color, color, color),
+			glm::vec3(0.0,-Z,-X),
+			glm::vec3(color, color, color),
+			glm::vec3(Z,X,0),
+			glm::vec3(color, color, color),
+			glm::vec3(-Z,X,0),
+			glm::vec3(color, color, color),
+			glm::vec3(Z,-X,0),
+			glm::vec3(color, color, color),
+			glm::vec3(-Z,-X,0),
+			glm::vec3(color, color, color)
+		};
+	}
+
 	indices = 
 	{
 		1,4,0, 		4,9,0,		4,5,9,
@@ -52,15 +91,12 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 		5,2,9,		11,2,7 
 	};
 
-	//std::random_device rd;
-	//std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-0.3, 0.3);
 	for (int i=0; i<vertices.size(); i+=2)
 	{
 		vertices.at(i).x += dis(gen);
 		vertices.at(i).y += dis(gen);
 		vertices.at(i).z += dis(gen);
-		//point.y += dis(gen)* 
 	}
 
 	// Generate buffers
