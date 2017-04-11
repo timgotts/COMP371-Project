@@ -3,7 +3,7 @@
 #include "Renderable.h"
 #include "TerrainGenerator.h"
 #include "Config.h"
-
+#include "Seaweed.h"
 #include <GL\glew.h>
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>

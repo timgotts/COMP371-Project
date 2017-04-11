@@ -14,11 +14,22 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
         for(int y = 0; y < size; y++)
         {
             
+            
+            
+            
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
             
             float height = pn->getHeightAt(coordX, coordY);
+            
+            
+            if(rand()%20 == 0)
+            {
+                
+                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
+                
+            }
             
             heightMap[x][y] = height;
             

@@ -130,27 +130,6 @@ int main()
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
-    int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
-    for(int x = 0; x < terrainSize; x++)
-    {
-        for(int z = 0; z < terrainSize; z++)
-        {
-            if(rand()%20 > 0)
-            {
-                continue;
-            }
-            
-            float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
-            
-            TerrainChunk* chunk = terrain->getChunkAtReal(x,z);
-            if(chunk!=nullptr)
-            {
-                chunk->getEntities().push_back(new Seaweed(glm::vec3(x, y, z)));
-            }
-            
-        }
-    }
-    
     
     // GAME LOOP
     
