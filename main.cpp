@@ -184,7 +184,7 @@ int main()
         
         //Render skybox
         skybox->render(view, projection);
-        terrain->render(view, projection);
+        terrain->render(camera->getPosition(), view, projection);
         // Render objects
         for (auto obj : objects)
         {
