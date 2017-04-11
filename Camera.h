@@ -235,16 +235,14 @@ private:
 	{
 
 		// Temporary frame quaternion from pitch, yaw, roll
-		glm::quat yaw_quat = glm::quat(glm::vec3(0.0f, keyYaw, 0.0f));
-		glm::quat pitch_quat = glm::quat(glm::vec3(keyPitch, 0.0f, 0.0f));
-		glm::quat roll_quat = glm::quat(glm::vec3(0.0f, 0.0f, keyRoll));
+		glm::quat key_quat = glm::quat(glm::vec3(keyPitch, keyYaw, keyRoll));
 
 		// Reset frame keys;
 		keyPitch = 0.0f;
 		keyYaw = 0.0f;
 		keyRoll = 0.0f;
 
-		cameraQuat = roll_quat * pitch_quat * cameraQuat * yaw_quat;
+		cameraQuat = key_quat * cameraQuat;
 		cameraQuat = glm::normalize(cameraQuat);
 
 		glm::mat4 rotation = glm::mat4_cast(cameraQuat);

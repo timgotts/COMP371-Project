@@ -6,38 +6,38 @@
 
 #include "Fish.h"
 
-std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_real_distribution<> dis(0, 1);
 
 
-Fish::Fish(glm::vec3 scale, glm::vec3 eulerXYZ, glm::vec3 position)
+
+
+Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), totalTime(0.0f)
 {
+
 	vertices = {
-		glm::vec3(-0.4, 0.0, 0.0),	// 0. Center tail
-		glm::vec3(-0.5, 0.5, 0.0),	// 1. Top tail
-		glm::vec3(-0.4, 0.45, 0.0),	// 2.	
-		glm::vec3(-0.2, 0.2, 0.0),	// 3.
-		glm::vec3(0.0, 0.4, 0.0),	// 4.
-		glm::vec3(0.2, 0.5, 0.0),	// 5.
-		glm::vec3(0.4, 0.4, 0.0),	// 6.
-		glm::vec3(0.5, 0.0, 0.0),	// 7. Nose
-		glm::vec3(0.4, -0.4, 0.0),	// 8.
-		glm::vec3(0.2, -0.5, 0.0),	// 9.
-		glm::vec3(0.0, -0.4, 0.0),	// 10.
-		glm::vec3(-0.2, -0.2, 0.0),	// 11.
+		glm::vec3(-0.4, 0.0, 0.0),		// 0. Center tail
+		glm::vec3(-0.5, 0.5, 0.0),		// 1. Top tail
+		glm::vec3(-0.4, 0.45, 0.0),		// 2.	
+		glm::vec3(-0.2, 0.2, 0.0),		// 3.
+		glm::vec3(0.0, 0.4, 0.0),		// 4.
+		glm::vec3(0.2, 0.5, 0.0),		// 5.
+		glm::vec3(0.4, 0.4, 0.0),		// 6.
+		glm::vec3(0.5, 0.0, 0.0),		// 7. Nose
+		glm::vec3(0.4, -0.4, 0.0),		// 8.
+		glm::vec3(0.2, -0.5, 0.0),		// 9.
+		glm::vec3(0.0, -0.4, 0.0),		// 10.
+		glm::vec3(-0.2, -0.2, 0.0),		// 11.
 		glm::vec3(-0.4, -0.45, 0.0),	// 12.
-		glm::vec3(-0.5, -0.5, 0.0),	// 13. Bottom tail
+		glm::vec3(-0.5, -0.5, 0.0),		// 13. Bottom tail
 		glm::vec3(-0.2, 0.0, -0.05),	// 14.
-		glm::vec3(0.0, 0.2, -0.1),	// 15.
-		glm::vec3(0.2, 0.2, -0.1),	// 16.
-		glm::vec3(0.2, -0.2, -0.1),	// 17.
-		glm::vec3(0.0, -0.2, -0.1),	// 18.
-		glm::vec3(-0.2, 0.0, 0.05),	// 19.
-		glm::vec3(0.0, -0.2, 0.1),	// 20.
-		glm::vec3(0.2, -0.2, 0.1),	// 21.
-		glm::vec3(0.2, 0.2, 0.1),	// 22.
-		glm::vec3(0.0, 0.2, 0.1),	// 23.
+		glm::vec3(0.0, 0.2, -0.1),		// 15.
+		glm::vec3(0.2, 0.2, -0.1),		// 16.
+		glm::vec3(0.2, -0.2, -0.1),		// 17.
+		glm::vec3(0.0, -0.2, -0.1),		// 18.
+		glm::vec3(-0.2, 0.0, 0.05),		// 19.
+		glm::vec3(0.0, -0.2, 0.1),		// 20.
+		glm::vec3(0.2, -0.2, 0.1),		// 21.
+		glm::vec3(0.2, 0.2, 0.1),		// 22.
+		glm::vec3(0.0, 0.2, 0.1),		// 23.
 	};
 
 	indices = {
@@ -107,20 +107,29 @@ Fish::Fish(glm::vec3 scale, glm::vec3 eulerXYZ, glm::vec3 position)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	// Apply translation to model matrix
-	model = glm::translate(model, -position);
-
-	// Apply rotations to model matrix
-	model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-	// Apply scale to model matrix
-	model = glm::scale(model, glm::vec3(scale.x, 1.0f, 1.0f));
-	model = glm::scale(model, glm::vec3(1.0f, scale.y, 1.0f));
-	model = glm::scale(model, glm::vec3(1.0f, 1.0f, scale.z));
 
 
+	// Random devices and distributions
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::poisson_distribution<> p(1000);
+	std::uniform_real_distribution<> u(0, 1);
+	std::uniform_real_distribution<> u1(0.5, 1.5);
+	std::uniform_real_distribution<> u2(1.0, 3.0);
+
+	// Pseudorandomize animation and scale variables
+	float pRand = float(p(gen)) / 1000.0f;
+
+	scale = glm::vec3(pRand * u2(gen) * 1.5, pRand * u2(gen), pRand * u2(gen) *1.5);
+	velocity = pRand * u2(gen) * 3.0f;
+	initYaw = u(gen) * 360.0f;
+	oscRate = u1(gen);
+	oscOffset = u(gen) * 3.14159265;
+
+
+
+	// Update orientation vectors
+	updateVectors();
 
 
 
@@ -129,6 +138,8 @@ Fish::Fish(glm::vec3 scale, glm::vec3 eulerXYZ, glm::vec3 position)
 
 
 }
+
+
 
 void Fish::render(glm::mat4 view, glm::mat4 projection)
 {
@@ -149,13 +160,49 @@ void Fish::render(glm::mat4 view, glm::mat4 projection)
 	glBindVertexArray(0);
 }
 
+
+
 void Fish::animate(float deltaTime)
 {
-	time += dis(gen) * deltaTime;
-	float speed = 3.0;
+	
+	totalTime += deltaTime;
 
-	model = glm::rotate(model, sin(time) / 100, glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::rotate(model, sin(time*1.23275f) / 200, glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::rotate(model, float((dis(gen) - 0.5) / 100), glm::vec3(0.0f, 1.0f, 0.0f));
-	model = glm::translate(model, glm::vec3(speed *deltaTime, 0.0f, 0.0f));
+	// Short swimming yaw oscillation
+	yawOsc = sin((totalTime*2.5 + oscOffset)*oscRate) * 25.0f;
+
+	// Long trajectory yaw oscillation
+	yawDir = 180*sin((totalTime*0.1 + oscOffset)*oscRate) + initYaw;
+
+	yaw = yawOsc + yawDir;
+
+	// Short pitch oscillation
+	pitch = sin((totalTime + oscOffset)*oscRate) * 20.0f;
+	updateVectors();
+	position += front * velocity * deltaTime;
+
+	// Model transformations
+	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
+
+	tempModel = glm::rotate(tempModel, glm::radians(-yaw), glm::vec3(0.0f, 1.0f, 0.0f));
+	tempModel = glm::rotate(tempModel, glm::radians(pitch), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	tempModel = glm::scale(tempModel, scale);
+
+	model = tempModel;
+
+}
+
+
+
+void Fish::updateVectors()
+{
+	// Same as LearnOpenGL camera
+	glm::vec3 tempFront;
+	tempFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	tempFront.y = sin(glm::radians(pitch));
+	tempFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+	front = glm::normalize(tempFront);
+	right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));
+	up = glm::normalize(glm::cross(right, front));
 }

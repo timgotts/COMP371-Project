@@ -54,127 +54,13 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main() 
 {
-
-	// Create GLFW window
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "371_Assignment2", nullptr, nullptr);
-
-	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
-
-	if (window == nullptr) 
-	{
-		std::cout << "Failed to create GLFW window!" << std::endl;
-		glfwTerminate();
-		exit(1);
-	}
-
-	glfwMakeContextCurrent(window);
-
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-
-	// Set callback functions
-	glfwSetKeyCallback(window, keyCallback);
-	glfwSetMouseButtonCallback(window, mouseButtonCallback);
-	glfwSetCursorPosCallback(window, cursorPosCallback);
-	glfwSetWindowSizeCallback(window, windowResizeCallback);
-	glfwSetScrollCallback(window, scrollCallback);
-
-
-	// Initialize GLEW and OpenGL settings
-	glewExperimental = GL_TRUE;
-
-	if (glewInit() != GLEW_OK) 
-	{
-		std::cout << "Failed to initialize GLEW" << std::endl;
-		exit(1);
-	}
-
-	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	glPointSize(3);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-	//Randomly generate some fish!
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> dis(0, 1);
-	for (int i = 0; i < 200; ++i)
-	{
-		objects.push_back(new Fish(
-			glm::vec3(1.0f + dis(gen) * 2.0f, 1.0f, 1.0f),				// Scale
-			glm::vec3(dis(gen)*PI, dis(gen)*PI, dis(gen)*PI),															// Rotation
-			glm::vec3(dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f, dis(gen) * 100.0f - 50.0f)));	// Position
-	}
-
-
-	//objects.push_back(new Fish(glm::vec3(20.0f, 10.0f, 10.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
-
-	// Generate skybox
-	skybox = new Skybox();
-	
-	// Draw as wireframe
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	// GAME LOOP
-
-	while (!glfwWindowShouldClose(window)) {
-		
-		// Update frame deltaTime
-		GLfloat currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
-		// Process events
-		glfwPollEvents();
-		doMovement();
-
-		// Clear frame buffer
-		glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		// Apply camera tranformations
-		glm::mat4 view = camera->getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);		
-
-		//Render skybox
-		skybox->render(view, projection);
-
-		// Render objects
-		for (auto obj : objects)
-		{
-			//obj->animate(deltaTime);
-			obj->render(view, projection);
-		}
-		
-
-
-		glfwSwapInterval(1);
-		glfwSwapBuffers(window);
-	}
+ 
+	srand (time(NULL));
 
 
 
-	glfwDestroyWindow(window);
-	//TODO: object buffer cleanup
-	//glDeleteVertexArrays(1, &VAO);
-	//glDeleteBuffers(1, &VBO);
-	glfwTerminate();
 
-    srand (time(NULL));
+	// ___________________________ SETTINGS ___________________________
     
     // Create GLFW window
     glfwInit();
@@ -227,41 +113,55 @@ int main()
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
+	// ___________________________ END SETTINGS ___________________________
     
-    // Randomly generate some cube objects
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, 1);
-    /*  for (int i = 0; i < 200; ++i)
-      {
-          objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
-      }*/
+
+
+
+
+	// ____________________________ CREATING SCENE ____________________________
+
+	// Randomly generate some fish objects
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> u1(-1, 1);
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
+	}
+
+
+	// Generate skybox
+	skybox = new Skybox();
+
+	// Generate terrain
+	terrain = new Terrain();
+
+	// Place Seaweed
+	int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk() - 1);
+	for (int x = 0; x < terrainSize; x++)
+	{
+		for (int z = 0; z < terrainSize; z++)
+		{
+			if (rand() % 20 > 0)
+			{
+				continue;
+			}
+
+			float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+
+			objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+		}
+	}
+
+	// ____________________________ END CREATING SCENE ____________________________
+
+
+
     
     
-    // Generate skybox
-    skybox = new Skybox();
-    terrain = new Terrain();
-    // Draw as wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
-    int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
-    for(int x = 0; x < terrainSize; x++)
-    {
-        for(int z = 0; z < terrainSize; z++)
-        {
-            if(rand()%20 > 0)
-            {
-                continue;
-            }
-            
-            float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
-            
-            objects.push_back(new Seaweed(glm::vec3(x, y, z)));
-        }
-    }
-    
-    
-    // GAME LOOP
+	// ___________________________ GAME LOOP ___________________________
     
     while (!glfwWindowShouldClose(window)) {
         
@@ -288,7 +188,8 @@ int main()
         // Render objects
         for (auto obj : objects)
         {
-            obj->render(view, projection);
+			obj->animate(deltaTime);
+			obj->render(view, projection);
         }
         
         
@@ -297,8 +198,11 @@ int main()
         glfwSwapBuffers(window);
     }
     
+	// ___________________________ END GAME LOOP ___________________________
     
     
+
+
     glfwDestroyWindow(window);
     //TODO: object buffer cleanup
     //glDeleteVertexArrays(1, &VAO);
@@ -306,7 +210,10 @@ int main()
     glfwTerminate();
     
     
-} // ________________________________ END MAIN ________________________________
+} 
+
+// ________________________________ END MAIN ________________________________
+
 
 
 
