@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Fish.h"
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Seaweed.h"
@@ -16,7 +17,7 @@
 #define PI 3.14159265358979323846
 
 // Global variables
-const int WIDTH = 800, HEIGHT = 600;
+const int WIDTH = 1600, HEIGHT = 900;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 float deltaTime, lastFrame;
@@ -53,7 +54,13 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main() 
 {
-    srand (time(NULL));
+ 
+	srand (time(NULL));
+
+
+
+
+	// ___________________________ SETTINGS ___________________________
     
     // Create GLFW window
     glfwInit();
@@ -106,32 +113,55 @@ int main()
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
+	// ___________________________ END SETTINGS ___________________________
     
-    // Randomly generate some cube objects
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(0, 1);
-    /*  for (int i = 0; i < 200; ++i)
-      {
-          objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
-      }*/
+
+
+
+
+	// ____________________________ CREATING SCENE ____________________________
+
+	// Randomly generate some fish objects
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> u1(-1, 1);
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
+	}
+
+
+	// Generate skybox
+	skybox = new Skybox();
+
+	// Generate terrain
+	terrain = new Terrain();
+
+	// Place Seaweed
+	int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk() - 1);
+	for (int x = 0; x < terrainSize; x++)
+	{
+		for (int z = 0; z < terrainSize; z++)
+		{
+			if (rand() % 20 > 0)
+			{
+				continue;
+			}
+
+			float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+
+			objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+		}
+	}
+
+	// ____________________________ END CREATING SCENE ____________________________
+
+
+
     
-#if 0
-    //Seaweed generation
-    for (int i = 0; i < 20; ++i)
-    {
-        objects.push_back(new Seaweed(glm::vec3(dis(gen) * 20.0f - 10.0f, 0.0, dis(gen) * 20.0f - 10.0f)));
-    }
-#endif
     
-    // Generate skybox
-    skybox = new Skybox();
-    terrain = new Terrain();
-    // Draw as wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    
-    
-    // GAME LOOP
+	// ___________________________ GAME LOOP ___________________________
     
     while (!glfwWindowShouldClose(window)) {
         
@@ -158,7 +188,8 @@ int main()
         // Render objects
         for (auto obj : objects)
         {
-            obj->render(view, projection);
+			obj->animate(deltaTime);
+			obj->render(view, projection);
         }
         
         
@@ -167,8 +198,11 @@ int main()
         glfwSwapBuffers(window);
     }
     
+	// ___________________________ END GAME LOOP ___________________________
     
     
+
+
     glfwDestroyWindow(window);
     //TODO: object buffer cleanup
     //glDeleteVertexArrays(1, &VAO);
@@ -176,7 +210,10 @@ int main()
     glfwTerminate();
     
     
-} // ________________________________ END MAIN ________________________________
+} 
+
+// ________________________________ END MAIN ________________________________
+
 
 
 
@@ -242,10 +279,11 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) 
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
-    {
-        // SHOOT HARPOON
-    }
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
+	{
+		// SHOOT HARPOON
+		// TAKE PHOTO
+	}
 }
 
 

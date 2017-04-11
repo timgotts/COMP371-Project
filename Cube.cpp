@@ -1,5 +1,8 @@
 #pragma once
 
+#include <GLM\gtc\matrix_transform.hpp>
+#include <GLM\gtc\type_ptr.hpp>
+
 #include "Cube.h"
 
 
