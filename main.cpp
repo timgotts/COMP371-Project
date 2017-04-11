@@ -177,7 +177,6 @@ int main()
         
         
         
-        glfwSwapInterval(1);
         glfwSwapBuffers(window);
     }
     
