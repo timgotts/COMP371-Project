@@ -16,11 +16,11 @@ Seaweed::Seaweed( glm::vec3 position)
     glBindVertexArray(VAO);
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(*verticesVBO)*totalLength, verticesVBO, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*totalLength, verticesVBO, GL_STATIC_DRAW);
     
     //EBO Binding
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(*indicesEBO)*indexLength, indicesEBO, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indexLength, indicesEBO, GL_STATIC_DRAW);
     
     //For the vertices (vertex shader)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
@@ -37,7 +37,7 @@ Seaweed::Seaweed( glm::vec3 position)
     //Translate the weed to a position
     model = glm::translate(model, position);
     
-    //Apply the 90 degree rotation
+    //Apply the a rotation
     model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
     
     //Have to add a scale matrix
@@ -54,9 +54,19 @@ Seaweed::Seaweed( glm::vec3 position)
 void Seaweed::render(glm::mat4 view, glm::mat4 projection)
 {
     //Sin functiont to move the vertices based on time.
-    //GLfloat timeMove = sin(glfwGetTime());
+    GLfloat timeMove = (sin(glfwGetTime()))/2;
     //enabling the shader
     shader->use();
+
+
+	/*glm::mat4 shear = 
+	{
+		1, timeMove, 0, 0,
+		0, 1, timeMove ,0,
+		0, 0, 1, 0,
+		0, 0, 0, 0
+
+	}; */
     
     GLuint transformLoc = glGetUniformLocation(shader->program, "model");
     GLuint viewMatrixLoc = glGetUniformLocation(shader->program, "view");
@@ -64,6 +74,8 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
     
     //model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
     
+	//model = model*shear;
+
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model)); 
     glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
