@@ -10,18 +10,36 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 {
 	float const X = 0.525731112119133606f;
 	float const Z = 0.850650808352039932f;
-	vertices = { glm::vec3(-X,0,Z),
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> colorDis(0.15, 0.6);
+	double color = colorDis(gen);
+
+	vertices = { 
+		glm::vec3(-X,0,Z),
+		glm::vec3(color, color, color),
 		glm::vec3(X,0,Z),
+		glm::vec3(color, color, color),
 		glm::vec3(-X,0,-Z),
+		glm::vec3(color, color, color),
 		glm::vec3(X,0,-Z),
+		glm::vec3(color, color, color),
 		glm::vec3(0,Z,X),
+		glm::vec3(color, color, color),
 		glm::vec3(0,Z,-X),
+		glm::vec3(color, color, color),
 		glm::vec3(0,-Z,X),
+		glm::vec3(color, color, color),
 		glm::vec3(0.0,-Z,-X),
+		glm::vec3(color, color, color),
 		glm::vec3(Z,X,0),
+		glm::vec3(color, color, color),
 		glm::vec3(-Z,X,0),
+		glm::vec3(color, color, color),
 		glm::vec3(Z,-X,0),
-		glm::vec3(-Z,-X,0)
+		glm::vec3(color, color, color),
+		glm::vec3(-Z,-X,0),
+		glm::vec3(color, color, color)
 	};
 	indices = 
 	{
@@ -33,39 +51,17 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 		10,1,6,		11,0,9,		2,11,9,
 		5,2,9,		11,2,7 
 	};
-	static const GLfloat color[] = { 
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588,
-		0.6588, 0.6588, 0.6588
-	};
-	std::random_device rd;
-	std::mt19937 gen(rd());
+
+	//std::random_device rd;
+	//std::mt19937 gen(rd());
 	std::uniform_real_distribution<> dis(-0.3, 0.3);
-	for (int i=0; i<vertices.size(); i++)
+	for (int i=0; i<vertices.size(); i+=2)
 	{
 		vertices.at(i).x += dis(gen);
 		vertices.at(i).y += dis(gen);
 		vertices.at(i).z += dis(gen);
 		//point.y += dis(gen)* 
 	}
-
-	GLuint colorbuffer;
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(color), color, GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(2);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
 	// Generate buffers
 	glGenVertexArrays(1, &VAO);
@@ -80,8 +76,11 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
