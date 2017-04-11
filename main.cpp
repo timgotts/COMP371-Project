@@ -115,7 +115,7 @@ int main()
       {
           objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
       }*/
-
+    
 #if 0
     //Seaweed generation
     for (int i = 0; i < 20; ++i)
@@ -142,7 +142,12 @@ int main()
             
             float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
             
-            objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+            TerrainChunk* chunk = terrain->getChunkAtReal(x,z);
+            if(chunk!=nullptr)
+            {
+                chunk->getEntities().push_back(new Seaweed(glm::vec3(x, y, z)));
+            }
+            
         }
     }
     
@@ -170,7 +175,7 @@ int main()
         
         //Render skybox
         skybox->render(view, projection);
-        terrain->render(view, projection);
+        terrain->render(camera->getPosition(), view, projection);
         // Render objects
         for (auto obj : objects)
         {
