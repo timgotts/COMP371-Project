@@ -259,32 +259,35 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
     if(chunk != nullptr)
     {
         
-        int midX = chunk->getPosX();
-        int midY = chunk->getPosY();
+        int minX = chunk->getPosX()-renderDistance;
+        int minY = chunk->getPosY()-renderDistance;
         
-        if(midX < renderDistance)
+        int maxX = chunk->getPosX()+renderDistance;
+        int maxY = chunk->getPosY()+renderDistance;
+        
+        if(minX < 0)
         {
-            midX = renderDistance;
+            minX = 0;
+        }
+        if(minY < 0)
+        {
+            minY = 0;
         }
         
-        if(midY < renderDistance)
+        if(maxX > size-1)
         {
-            midY = renderDistance;
+            maxX = size-1;
         }
         
-        if((size-midX) < renderDistance)
+        if(maxY > size-1)
         {
-            midX = size-renderDistance;
+            maxY = size-1;
         }
         
-        if((size-midY) < renderDistance)
-        {
-            midY = size-renderDistance;
-        }
         
-        for(int x = midX - renderDistance; x < midX + renderDistance; x++)
+        for(int x = minX; x < maxX; x++)
         {
-            for(int y = midY-renderDistance; y < midY+renderDistance; y++)
+            for(int y = minY; y < maxY; y++)
             {
                 getChunkAt(x,y)->render(view,proj);
             }
