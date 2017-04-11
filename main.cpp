@@ -5,12 +5,18 @@
 #include <GLFW\glfw3.h>
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
-
+#include <time.h>
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Fish.h"
 #include "Skybox.h"
+<<<<<<< HEAD
 #include "Rock.h"
+=======
+#include "Terrain.h"
+#include "Seaweed.h"
+>>>>>>> refs/remotes/origin/master
 
 #define PI 3.14159265358979323846
 
@@ -31,6 +37,8 @@ Camera* camera = new Camera();
 
 std::vector<Renderable*> objects;
 Skybox* skybox;
+Terrain* terrain;
+
 
 
 
@@ -48,8 +56,15 @@ void doMovement();
 
 
 // ________________________________ MAIN ________________________________
-int main() 
+int main()
 {
+
+	srand(time(NULL));
+
+
+
+
+	// ___________________________ SETTINGS ___________________________
 
 	// Create GLFW window
 	glfwInit();
@@ -59,11 +74,15 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
+<<<<<<< HEAD
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "371_Project", nullptr, nullptr);
+=======
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Aquinea", nullptr, nullptr);
+>>>>>>> refs/remotes/origin/master
 
 	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 
-	if (window == nullptr) 
+	if (window == nullptr)
 	{
 		std::cout << "Failed to create GLFW window!" << std::endl;
 		glfwTerminate();
@@ -86,7 +105,7 @@ int main()
 	// Initialize GLEW and OpenGL settings
 	glewExperimental = GL_TRUE;
 
-	if (glewInit() != GLEW_OK) 
+	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		exit(1);
@@ -102,10 +121,18 @@ int main()
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+	// ___________________________ END SETTINGS ___________________________
 
-	// Randomly generate some cube objects
+
+
+
+
+	// ____________________________ CREATING SCENE ____________________________
+
+	// Randomly generate some fish objects
 	std::random_device rd;
 	std::mt19937 gen(rd());
+<<<<<<< HEAD
 	std::uniform_real_distribution<> dis(0, 1);
 	std::uniform_real_distribution<> scale(0.5, 0.75);
 	//for (int i = 0; i < 200; ++i)
@@ -118,18 +145,49 @@ int main()
 		objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), 
 			glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f),
 			glm::vec3(scale(gen)*2.f, 1.f, scale(gen)*2.5f)));
+=======
+	std::uniform_real_distribution<> u1(-1, 1);
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
+>>>>>>> refs/remotes/origin/master
 	}
+
 
 	// Generate skybox
 	skybox = new Skybox();
-	
-	// Draw as wireframe
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	// GAME LOOP
+	// Generate terrain
+	terrain = new Terrain();
+
+	// Place Seaweed
+	int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk() - 1);
+	for (int x = 0; x < terrainSize; x++)
+	{
+		for (int z = 0; z < terrainSize; z++)
+		{
+			if (rand() % 20 > 0)
+			{
+				continue;
+			}
+
+			float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+
+			objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+		}
+	}
+
+	// ____________________________ END CREATING SCENE ____________________________
+
+
+
+
+
+	// ___________________________ GAME LOOP ___________________________
 
 	while (!glfwWindowShouldClose(window)) {
-		
+
 		// Update frame deltaTime
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
@@ -145,22 +203,26 @@ int main()
 
 		// Apply camera tranformations
 		glm::mat4 view = camera->getViewMatrix();
-		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);		
+		glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
 
 		//Render skybox
 		skybox->render(view, projection);
-
+		terrain->render(camera->getPosition(), view, projection);
 		// Render objects
 		for (auto obj : objects)
 		{
+			obj->animate(deltaTime);
 			obj->render(view, projection);
 		}
-		
+
 
 
 		glfwSwapInterval(1);
 		glfwSwapBuffers(window);
 	}
+
+	// ___________________________ END GAME LOOP ___________________________
+
 
 
 
@@ -170,7 +232,11 @@ int main()
 	//glDeleteBuffers(1, &VBO);
 	glfwTerminate();
 
-} // ________________________________ END MAIN ________________________________
+
+}
+
+// ________________________________ END MAIN ________________________________
+
 
 
 
@@ -178,7 +244,7 @@ int main()
 
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) 
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
@@ -186,13 +252,13 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
 
 
-	if (key >= 0 && key < 1024) 
+	if (key >= 0 && key < 1024)
 	{
-		if (action == GLFW_PRESS) 
+		if (action == GLFW_PRESS)
 		{
 			keys[key] = true;
 		}
-		else if (action == GLFW_RELEASE) 
+		else if (action == GLFW_RELEASE)
 		{
 			keys[key] = false;
 		}
@@ -202,7 +268,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
 
 
-void cursorPosCallback(GLFWwindow* window, double xPos, double yPos) 
+void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 {
 	mX = xPos;
 	mY = yPos;
@@ -227,24 +293,25 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 
 
 
-void scrollCallback(GLFWwindow* window, double xOffset, double yOffset) 
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
 	camera->processMouseScroll(yOffset);
 }
 
 
 
-void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) 
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) 
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
 		// SHOOT HARPOON
+		// TAKE PHOTO
 	}
 }
 
 
 
-void windowResizeCallback(GLFWwindow* window, int width, int height) 
+void windowResizeCallback(GLFWwindow* window, int width, int height)
 {
 
 	SCREEN_WIDTH = width;
@@ -256,59 +323,59 @@ void windowResizeCallback(GLFWwindow* window, int width, int height)
 
 
 
-void doMovement() 
+void doMovement()
 {
 	if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
 	{
 		camera->processKeyboard(FORWARD, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN]) 
+	if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
 	{
 		camera->processKeyboard(BACKWARD, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT]) 
+	if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
 	{
 		camera->processKeyboard(LEFT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT]) 
+	if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
 	{
 		camera->processKeyboard(RIGHT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_SPACE]) 
+	if (keys[GLFW_KEY_SPACE])
 	{
 		camera->processKeyboard(UP, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_LEFT_CONTROL]) 
+	if (keys[GLFW_KEY_LEFT_CONTROL])
 	{
 		camera->processKeyboard(DOWN, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_Q]) 
+	if (keys[GLFW_KEY_Q])
 	{
 		camera->processKeyboard(ROLL_LEFT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_E]) 
+	if (keys[GLFW_KEY_E])
 	{
 		camera->processKeyboard(ROLL_RIGHT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_LEFT_SHIFT]) 
+	if (keys[GLFW_KEY_LEFT_SHIFT])
 	{
 		camera->processKeyboard(SPRINT, deltaTime);
 	}
 
-	if (keys[GLFW_KEY_LEFT_ALT]) 
+	if (keys[GLFW_KEY_LEFT_ALT])
 	{
 		camera->processKeyboard(CRAWL, deltaTime);
 	}
 
-	if (!keys[GLFW_KEY_LEFT_ALT] && !keys[GLFW_KEY_LEFT_SHIFT]) 
+	if (!keys[GLFW_KEY_LEFT_ALT] && !keys[GLFW_KEY_LEFT_SHIFT])
 	{
 		camera->processKeyboard(WALK, deltaTime);
 	}
