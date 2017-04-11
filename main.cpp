@@ -5,7 +5,7 @@
 #include <GLFW\glfw3.h>
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
-
+#include <time.h>
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
@@ -53,6 +53,7 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main() 
 {
+    srand (time(NULL));
     
     // Create GLFW window
     glfwInit();
@@ -114,8 +115,8 @@ int main()
       {
           objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
       }*/
-    
-#if 0	
+
+#if 0
     //Seaweed generation
     for (int i = 0; i < 20; ++i)
     {
@@ -128,6 +129,23 @@ int main()
     terrain = new Terrain();
     // Draw as wireframe
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
+    int terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
+    for(int x = 0; x < terrainSize; x++)
+    {
+        for(int z = 0; z < terrainSize; z++)
+        {
+            if(rand()%20 > 0)
+            {
+                continue;
+            }
+            
+            float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+            
+            objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+        }
+    }
+    
     
     // GAME LOOP
     
