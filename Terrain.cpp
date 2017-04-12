@@ -291,9 +291,9 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
         }
         
         
-        for(int x = minX; x < maxX; x++)
+        for(int x = minX; x <= maxX; x++)
         {
-            for(int y = minY; y < maxY; y++)
+            for(int y = minY; y <= maxY; y++)
             {
                 getChunkAt(x,y)->render(view,proj);
             }
