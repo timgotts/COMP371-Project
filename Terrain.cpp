@@ -14,20 +14,28 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
         for(int y = 0; y < size; y++)
         {
             
+            
+            
+            
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
-            float rcoordX = 3*((posX-offset) * (size-1) + x);
-            float rcoordY = 3*((posY-offset) * (size-1) + y);
-            
             
             float height = pn->getHeightAt(coordX, coordY);
+            
+            
+            if(rand()%20 == 0)
+            {
+                
+                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
+                
+            }
             
             heightMap[x][y] = height;
             
             
             
-            vertices.push_back({rcoordX, height, rcoordY });
+            vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
             {
                 indices.push_back(currentIndice);
@@ -43,7 +51,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             currentIndice++;
         }
     }
-    
     
     // Generate buffers
     glGenVertexArrays(1, &VAO);
@@ -129,6 +136,13 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+    
+    
+    for(auto entity : entities)
+    {
+        entity->render(view, projection);
+    }
+    
 }
 
 Terrain::Terrain()
@@ -137,6 +151,7 @@ Terrain::Terrain()
     Config config("res/config/Terrain.config");
     
     size = config.getConfig()->getInt("size");
+    renderDistance = config.getConfig()->getInt("renderDistance");
     
     chunks = new TerrainChunk**[size];
     
@@ -147,7 +162,7 @@ Terrain::Terrain()
     double amplitude = generatorConfig->getDouble("amplitude");
     int octaves = generatorConfig->getInt("octaves");
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, 4);
+    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, rand());
     
     ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
     
@@ -173,6 +188,11 @@ int Terrain::getSize()
     return size;
 }
 
+int Terrain::getPointsPerChunk()
+{
+    return pointsPerChunk;
+}
+
 TerrainChunk* Terrain::getChunkAt(int posX, int posY)
 {
     if(posX < 0 || posY < 0 || posX >= size || posY >= size)
@@ -182,19 +202,26 @@ TerrainChunk* Terrain::getChunkAt(int posX, int posY)
     
     return chunks[posX][posY];
 }
+TerrainChunk* Terrain::getChunkAtReal(int posX, int posY)
+{
+    return getChunkAt(posX/(pointsPerChunk-1), posY / (pointsPerChunk-1));
+}
 
 float Terrain::getHeightAt(int x, int y)
 {
+    
+    int relX = x % (pointsPerChunk - 1);
+    int relY = y % (pointsPerChunk - 1);
+    
+    
     //chunk position
-    int chunkX = x % pointsPerChunk;
-    int chunkY = y % pointsPerChunk;
+    int chunkX = x / (pointsPerChunk-1);
+    int chunkY = y / (pointsPerChunk-1);
     
     TerrainChunk* chunk;
-    if((chunk = getChunkAt(x,y)) != nullptr)
+    if((chunk = getChunkAt(chunkX,chunkY)) != nullptr)
     {
         //position relative to the chunk
-        int relX = x - chunkX * pointsPerChunk;
-        int relY = y - chunkY * pointsPerChunk;
         
         return chunk->getHeightAt(relX, relY);
     }
@@ -226,14 +253,56 @@ void Terrain::setHeightAt(int x, int y, float  height)
 }
 
 
-void Terrain::render(glm::mat4 view, glm::mat4 proj)
+void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
 {
-    for(int x = 0; x < size; x++)
+    TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
+    if(chunk != nullptr)
     {
-        for(int y = 0; y < size; y++)
+        
+        int minX = chunk->getPosX()-renderDistance;
+        int minY = chunk->getPosY()-renderDistance;
+        
+        int maxX = chunk->getPosX()+renderDistance;
+        int maxY = chunk->getPosY()+renderDistance;
+        
+        if(minX < 0)
         {
-            getChunkAt(x,y)->render(view,proj);
+            minX = 0;
+        }
+        if(minY < 0)
+        {
+            minY = 0;
+        }
+        
+        if(maxX > size-1)
+        {
+            maxX = size-1;
+        }
+        
+        if(maxY > size-1)
+        {
+            maxY = size-1;
+        }
+        
+        
+        for(int x = minX; x <= maxX; x++)
+        {
+            for(int y = minY; y <= maxY; y++)
+            {
+                getChunkAt(x,y)->render(view,proj);
+            }
+        }
+        
+    }
+    else
+    {
+        for(int x = 0; x < size; x++)
+        {
+            for(int y = 0; y < size; y++)
+            {
+                getChunkAt(x,y)->render(view,proj);
+            }
         }
     }
-}
     
+}

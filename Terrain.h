@@ -3,7 +3,7 @@
 #include "Renderable.h"
 #include "TerrainGenerator.h"
 #include "Config.h"
-
+#include "Seaweed.h"
 #include <GL\glew.h>
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>
@@ -24,6 +24,11 @@ class TerrainChunk : public Renderable
     
     int getPosY();
     
+    std::vector<Renderable*>& getEntities()
+    {
+        return entities;
+    }
+    
     float getHeightAt(int x, int y);
     void setHeightAt(int x, int y, float height);
     
@@ -32,6 +37,8 @@ class TerrainChunk : public Renderable
     private:
     //width and height of chunk
     const int size;
+    
+    std::vector<Renderable*> entities;;
     
     //chunk position
     const int posX, posY;
@@ -43,19 +50,23 @@ class TerrainChunk : public Renderable
     
 };
 
-class Terrain : public Renderable
+class Terrain
 {
     public:
     Terrain();
     
     
-    void render(glm::mat4 view, glm::mat4 proj);
+    void render(glm::vec3 position, glm::mat4 view, glm::mat4 proj);
     
     
     int getSize();
     
+    int getPointsPerChunk();
+    
     //gets chunk at position, returns null pointer if out of bounds
     TerrainChunk* getChunkAt(int posX, int posY);
+    
+    TerrainChunk* getChunkAtReal(int posX, int posY);
     
     float getHeightAt(int x, int y);
     void setHeightAt(int x,int y,  float  height);
@@ -65,6 +76,8 @@ class Terrain : public Renderable
     
     //number of chunks on x,y
     int size;
+    
+    int renderDistance;
     
     int pointsPerChunk;
     

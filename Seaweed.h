@@ -12,14 +12,27 @@
 
 class Seaweed : public Renderable
 {
-public:
-	//Non-default constructor
-	Seaweed(float rotAngle, glm::vec3 position);
-	//Seaweed's render function
-	void render(glm::mat4 view, glm::mat4 projection);
-
-	//Indices for the ebo
-	int *indicesEBO;
-	//Lenght of the index needed for our VBO in the render function
-	int indexLength;
+    public:
+    
+    //Non-default constructor
+    Seaweed( glm::vec3 position);
+    float rotAngle;
+    //Seaweed's render function
+    void render(glm::mat4 view, glm::mat4 projection);
+    
+    //Calulates the seaweeds translational sweep, which only happens once per seaweed type.
+    void calculateSweep();
+    
+    //Final vertices for the seaweed
+    GLfloat* verticesVBO;
+    //Indices for the ebo
+    GLuint* indicesEBO;
+    
+    //Length of the verticesVBO
+    int totalLength;
+    //Length of the indicesEBO
+    int indexLength;
+    
+    //Added for now to generate different seaweed
+    static int amount;
 };
