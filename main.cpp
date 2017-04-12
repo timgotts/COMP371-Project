@@ -9,14 +9,11 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Rock.h"
 #include "Fish.h"
 #include "Skybox.h"
-<<<<<<< HEAD
-#include "Rock.h"
-=======
 #include "Terrain.h"
 #include "Seaweed.h"
->>>>>>> refs/remotes/origin/master
 
 #define PI 3.14159265358979323846
 
@@ -74,11 +71,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-<<<<<<< HEAD
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "371_Project", nullptr, nullptr);
-=======
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Aquinea", nullptr, nullptr);
->>>>>>> refs/remotes/origin/master
 
 	glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
 
@@ -132,28 +125,16 @@ int main()
 	// Randomly generate some fish objects
 	std::random_device rd;
 	std::mt19937 gen(rd());
-<<<<<<< HEAD
-	std::uniform_real_distribution<> dis(0, 1);
-	std::uniform_real_distribution<> scale(0.5, 0.75);
-	//for (int i = 0; i < 200; ++i)
-	//{
-	//	objects.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
-	//}
-
-	for (int i = 0; i < 50; ++i)
-	{
-		objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), 
-			glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f),
-			glm::vec3(scale(gen)*2.f, 1.f, scale(gen)*2.5f)));
-=======
 	std::uniform_real_distribution<> u1(-1, 1);
 
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 100; ++i)
 	{
 		objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
->>>>>>> refs/remotes/origin/master
 	}
 
+	// uniform distribution for the rocks
+	std::uniform_real_distribution<> dis(0, 1);
+	std::uniform_real_distribution<> scaler(0.5, 0.75);
 
 	// Generate skybox
 	skybox = new Skybox();
@@ -173,8 +154,16 @@ int main()
 			}
 
 			float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
+			
+			// randomly place a rock ***** Need condition so they dont sit on a peak (looks weird) *****
+			if (rand() % 10 > 7)
+			{
+				objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI),
+										   glm::vec3(-x,-y,-z),
+										   glm::vec3(scaler(gen)*2.f, 1.f, scaler(gen)*2.5)));
 
-			objects.push_back(new Seaweed(glm::vec3(x, y, z)));
+			}
+			//objects.push_back(new Seaweed(glm::vec3(x, y, z)));
 		}
 	}
 
@@ -184,7 +173,7 @@ int main()
 
 
 
-	// ___________________________ GAME LOOP ___________________________
+	// ____________________________ GAME LOOP _____________________________________
 
 	while (!glfwWindowShouldClose(window)) {
 

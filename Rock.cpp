@@ -8,18 +8,24 @@
 
 Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 {
+	// randomize whether colour will be shade of brown or grey
 	int colorType = rand() % 10;
+	// initialize placeholder for colour float value
 	double color;
+
 	float const X = 0.525731112119133606f;
 	float const Z = 0.850650808352039932f;
 	std::random_device rd;
 	std::mt19937 gen(rd());
 
+	// brown rock
 	if (colorType >= 7) 
 	{
+		// pick a shade
 		std::uniform_real_distribution<> colorDis(0.15, 0.5);
 		color = colorDis(gen);
 
+		// set vertices and color values (x,x/2,0 for brown)
 		vertices = {
 			glm::vec3(-X,0,Z),
 			glm::vec3(color, color / 2, 0.0),
@@ -47,11 +53,13 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 			glm::vec3(color, color / 2, 0.0),
 		};
 	}
-	else
+	else // grey rock
 	{
+		// pick a shade
 		std::uniform_real_distribution<> colorDis(0.15, 0.4);
 		color = colorDis(gen);
-
+		
+		// set vertices and color values (x=y=z for grey)
 		vertices = {
 			glm::vec3(-X,0,Z),
 			glm::vec3(color, color, color),
@@ -91,6 +99,7 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 		5,2,9,		11,2,7 
 	};
 
+	// nudge the vertices randomly to create rock-like shape
 	std::uniform_real_distribution<> dis(-0.3, 0.3);
 	for (int i=0; i<vertices.size(); i+=2)
 	{
@@ -131,9 +140,6 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 	model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
-
-
-
 
 
 	// Compile and load shaders
