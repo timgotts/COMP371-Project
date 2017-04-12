@@ -156,13 +156,11 @@ int main()
 			float y = terrain->getHeightAt((int)abs(x), (int)abs(z)) + 1;
 			
 			// randomly place a rock ***** Need condition so they dont sit on a peak (looks weird) *****
-			if (rand() % 10 > 7)
+			/*if (rand() % 10 > 7)
 			{
-				objects.push_back(new Rock(glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI),
-										   glm::vec3(-x,-y,-z),
-										   glm::vec3(scaler(gen)*2.f, 1.f, scaler(gen)*2.5)));
+				objects.push_back(new Rock(glm::vec3(-x, -y, -z)));
 
-			}
+			}*/
 			//objects.push_back(new Seaweed(glm::vec3(x, y, z)));
 		}
 	}

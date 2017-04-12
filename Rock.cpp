@@ -5,8 +5,9 @@
 #include <GLM/gtc/matrix_transform.inl>
 #include <random>
 
+#define PI 3.14159265358979323846
 
-Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
+Rock::Rock(glm::vec3 position)
 {
 	// randomize whether colour will be shade of brown or grey
 	int colorType = rand() % 10;
@@ -15,8 +16,12 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 
 	float const X = 0.525731112119133606f;
 	float const Z = 0.850650808352039932f;
+	
 	std::random_device rd;
 	std::mt19937 gen(rd());
+	// uniform distribution for the rocks
+	std::uniform_real_distribution<> dis(0, 1);
+	std::uniform_real_distribution<> scaler(0.5, 0.75);
 
 	// brown rock
 	if (colorType >= 7) 
@@ -100,12 +105,12 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 	};
 
 	// nudge the vertices randomly to create rock-like shape
-	std::uniform_real_distribution<> dis(-0.3, 0.3);
+	std::uniform_real_distribution<> nudge(-0.3, 0.3);
 	for (int i=0; i<vertices.size(); i+=2)
 	{
-		vertices.at(i).x += dis(gen);
-		vertices.at(i).y += dis(gen);
-		vertices.at(i).z += dis(gen);
+		vertices.at(i).x += nudge(gen);
+		vertices.at(i).y += nudge(gen);
+		vertices.at(i).z += nudge(gen);
 	}
 
 	// Generate buffers
@@ -134,9 +139,12 @@ Rock::Rock(glm::vec3 eulerXYZ, glm::vec3 position, glm::vec3 scale)
 	model = glm::translate(model, -position);
 
 	// Apply scale to model matrix
+	glm::vec3 scale(scaler(gen)*2.f, 1.f, scaler(gen)*2.5);
 	model = glm::scale(model, glm::vec3(scale.x, scale.y, scale.z));
 
 	// Apply rotations to model matrix
+	glm::vec3 eulerXYZ(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI);
+
 	model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
