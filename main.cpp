@@ -9,6 +9,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Rock.h"
 #include "Fish.h"
 #include "Skybox.h"
 #include "Terrain.h"
@@ -54,8 +55,7 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main()
 {
-    
-    srand(time(NULL));
+	srand(time(NULL));
     
     
     
