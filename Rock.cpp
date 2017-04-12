@@ -21,7 +21,7 @@ Rock::Rock(glm::vec3 position)
 	std::mt19937 gen(rd());
 	// uniform distribution for the rocks
 	std::uniform_real_distribution<> dis(0, 1);
-	std::uniform_real_distribution<> scaler(0.5, 0.75);
+	//std::uniform_real_distribution<> scaler(0.5, 2);
 
 	// brown rock
 	if (colorType >= 7) 
@@ -139,8 +139,15 @@ Rock::Rock(glm::vec3 position)
 	model = glm::translate(model, -position);
 
 	// Apply scale to model matrix
-	glm::vec3 scale(scaler(gen)*2.f, 1.f, scaler(gen)*2.5);
-	model = glm::scale(model, glm::vec3(scale.x, scale.y, scale.z));
+	if (rand() % 100 == 99)
+	{
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+	}
+	else
+	{
+		float scaler = rand() % 4;
+		model = glm::scale(model, glm::vec3(scaler, scaler, scaler));
+	}
 
 	// Apply rotations to model matrix
 	glm::vec3 eulerXYZ(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI);
