@@ -140,9 +140,16 @@ Rock::Rock(glm::vec3 position)
     // Apply translation to model matrix
     model = glm::translate(model, -position);
     
-    // Apply scale to model matrix
-    glm::vec3 scale(scaler(gen)*2.f, 1.f, scaler(gen)*2.5);
-    model = glm::scale(model, glm::vec3(scale.x, scale.y, scale.z));
+	// Apply scale to model matrix
+	if (rand() % 100 == 99)
+	{
+		model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+	}
+	else
+	{
+		float scaler = rand() % 4;
+		model = glm::scale(model, glm::vec3(scaler, scaler, scaler));
+	}
     
     // Apply rotations to model matrix
     glm::vec3 eulerXYZ(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI);
