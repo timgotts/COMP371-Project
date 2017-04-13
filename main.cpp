@@ -14,6 +14,8 @@
 #include "Terrain.h"
 #include "Seaweed.h"
 #include "LightSource.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
 
 #define PI 3.14159265358979323846
 
@@ -30,14 +32,15 @@ bool firstMouse = true;
 
 bool keys[1024];
 
-Camera* camera = new Camera();
+Camera camera = Camera();
 
 std::vector<Renderable*> objects;
 std::vector<Cube*> cubes;
 Skybox* skybox;
+DirectionalLight sun;
+SpotLight spotLight;
+std::vector<PointLight> pointLights;
 Terrain* terrain;
-
-
 
 
 // Free function signatures
@@ -139,7 +142,18 @@ int main()
 		cubes.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
 	}
 
-	objects.push_back(new LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(0, 0, 0)));
+	
+	//Create some point lights
+	for (int i=0; i<4; i++)
+	{
+		pointLights.push_back(PointLight(glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+		objects.push_back(new LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), pointLights.at(i).position));
+	}
+
+	sun = DirectionalLight();
+	spotLight = SpotLight(camera.getPosition(), camera.getFront());
+
+
     
     // Generate skybox
     skybox = new Skybox();
@@ -165,15 +179,19 @@ int main()
         // Process events
         glfwPollEvents();
         doMovement();
+		spotLight.UpdatePosition(camera.getPosition(),camera.getFront());
         
         // Clear frame buffer
         glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Apply camera tranformations
-        glm::mat4 view = camera->getViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
+        glm::mat4 view = camera.getViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
+
+
+
         //Render skybox
         //skybox->render(view, projection);
         //terrain->render(camera->getPosition(), view, projection);
@@ -186,7 +204,7 @@ int main()
 
 		for (auto cube : cubes)
 		{
-			cube->render(view, projection,camera->getPosition());
+			cube->render(view, projection, camera, pointLights, sun, spotLight);
 		}
         
         
@@ -260,7 +278,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
     lastX = xPos;
     lastY = yPos;
     
-    camera->processMouseMovement(xOffset, yOffset);
+    camera.processMouseMovement(xOffset, yOffset);
 }
 
 
@@ -268,7 +286,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-    camera->processMouseScroll(yOffset);
+    camera.processMouseScroll(yOffset);
 }
 
 
@@ -300,57 +318,57 @@ void doMovement()
 {
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
-        camera->processKeyboard(FORWARD, deltaTime);
+        camera.processKeyboard(FORWARD, deltaTime);
     }
     
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
-        camera->processKeyboard(BACKWARD, deltaTime);
+        camera.processKeyboard(BACKWARD, deltaTime);
     }
     
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
-        camera->processKeyboard(LEFT, deltaTime);
+        camera.processKeyboard(LEFT, deltaTime);
     }
     
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
-        camera->processKeyboard(RIGHT, deltaTime);
+        camera.processKeyboard(RIGHT, deltaTime);
     }
     
     if (keys[GLFW_KEY_SPACE])
     {
-        camera->processKeyboard(UP, deltaTime);
+        camera.processKeyboard(UP, deltaTime);
     }
     
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
-        camera->processKeyboard(DOWN, deltaTime);
+        camera.processKeyboard(DOWN, deltaTime);
     }
     
     if (keys[GLFW_KEY_Q])
     {
-        camera->processKeyboard(ROLL_LEFT, deltaTime);
+        camera.processKeyboard(ROLL_LEFT, deltaTime);
     }
     
     if (keys[GLFW_KEY_E])
     {
-        camera->processKeyboard(ROLL_RIGHT, deltaTime);
+        camera.processKeyboard(ROLL_RIGHT, deltaTime);
     }
     
     if (keys[GLFW_KEY_LEFT_SHIFT])
     {
-        camera->processKeyboard(SPRINT, deltaTime);
+        camera.processKeyboard(SPRINT, deltaTime);
     }
     
     if (keys[GLFW_KEY_LEFT_ALT])
     {
-        camera->processKeyboard(CRAWL, deltaTime);
+        camera.processKeyboard(CRAWL, deltaTime);
     }
     
     if (!keys[GLFW_KEY_LEFT_ALT] && !keys[GLFW_KEY_LEFT_SHIFT])
     {
-        camera->processKeyboard(WALK, deltaTime);
+        camera.processKeyboard(WALK, deltaTime);
     }
     
 }

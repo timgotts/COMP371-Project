@@ -60,6 +60,11 @@ class Camera
         return viewMatrix;
         
     }
+
+	glm::vec3 getFront()
+    {
+		return front;
+    }
     
     
     void processKeyboard(CameraMovement command, GLfloat deltaTime) 
