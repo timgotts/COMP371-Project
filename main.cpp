@@ -6,6 +6,8 @@
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
 #include <time.h>
+#include <string>
+
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
@@ -14,6 +16,7 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Seaweed.h"
+#include "Timer.h"
 
 #define PI 3.14159265358979323846
 
@@ -47,7 +50,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 
-
+void timerStart();
+void timerEnd();
 
 
 
@@ -123,25 +127,34 @@ int main()
     
     
     // Generate skybox
+    Timer::start("skybox");
     skybox = new Skybox();
+    Timer::stop("Skybox");
     
     // Generate terrain
+    Timer::start("terrain");
     terrain = new Terrain();
+    Timer::stop("Terrain");
     
     
-    // Randomly generate some fish objects
+    
+    //generate some fish objects
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(0, 1);
     
     float terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
     
-    for (int i = 0; i < 1000; ++i)
+    
+    
+    Timer::start("fish");
+    for (int i = 0; i < 300; ++i)
     {
         objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f, u1(gen) * terrainSize)));
     }
+    Timer::stop("Fish");
     
-    
+    Timer::start("seaweed");
     for(int i = 0; i < 1000; i++)
     {
         float x = u1(gen) * terrainSize;
@@ -154,7 +167,9 @@ int main()
         if(chunk != nullptr)
             chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
     }
+    Timer::stop("seaweed");
     
+    Timer::start("rock");
     for(int i = 0; i < 1000; i++)
     {
         float x = u1(gen) * terrainSize;
@@ -167,7 +182,7 @@ int main()
         if(chunk != nullptr)
             chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
     }
-    
+    Timer::stop("rock");
     // ____________________________ END CREATING SCENE ____________________________
     
     
