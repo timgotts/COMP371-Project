@@ -6,6 +6,8 @@
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
 #include <time.h>
+#include <string>
+
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
@@ -14,6 +16,7 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Seaweed.h"
+#include "Timer.h"
 
 #define PI 3.14159265358979323846
 
@@ -47,7 +50,8 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 
-
+void timerStart();
+void timerEnd();
 
 
 
@@ -126,17 +130,25 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(-1, 1);
     
-    for (int i = 0; i < 1000; ++i)
+
+
+	Timer::start("fish");
+    for (int i = 0; i < 300; ++i)
     {
         objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
     }
+	Timer::stop("Fish");
     
     
     // Generate skybox
+	Timer::start("skybox");
     skybox = new Skybox();
+	Timer::stop("Skybox");
     
     // Generate terrain
+	Timer::start("terrain");
     terrain = new Terrain();
+	Timer::stop("Terrain");
     
     // ____________________________ END CREATING SCENE ____________________________
     
