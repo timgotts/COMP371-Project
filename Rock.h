@@ -7,12 +7,14 @@
 
 class Rock : public Renderable
 {
-public:
-
-	Rock(glm::vec3 position);
-
-	void render(glm::mat4 view, glm::mat4 projection);
-
-private:
-
+    public:
+    
+    Rock(glm::vec3 position);
+    
+    void render(glm::mat4 view, glm::mat4 projection);
+    
+    static Shader* rockShader;
+    
+    private:
+    
 };
