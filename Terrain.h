@@ -35,6 +35,8 @@ class TerrainChunk : public Renderable
     
     void render(glm::mat4 view, glm::mat4 proj);
     
+    void addEntity(Renderable* r);
+    
     private:
     //width and height of chunk
     const int size;

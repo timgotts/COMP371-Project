@@ -25,20 +25,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             
             float height = pn->getHeightAt(coordX, coordY);
             
-            
-            if (rand() % 20 == 0)
-            {
-                
-                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
-                
-            }
-            // randomly place a rock ***** Need condition so they dont sit on a peak (looks weird) *****
-            else if (rand() % 57 == 0)
-            {
-                entities.push_back(new Rock(glm::vec3(-coordX, -height, -coordY)));
-                
-            }
-            
             heightMap[x][y] = height;
             
             
@@ -94,6 +80,11 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
         chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
     shader = chunkShader;
     
+}
+
+void TerrainChunk::addEntity(Renderable* r)
+{
+    entities.push_back(r);
 }
 
 int TerrainChunk::getPosX()

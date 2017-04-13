@@ -55,7 +55,7 @@ void doMovement();
 // ________________________________ MAIN ________________________________
 int main()
 {
-	srand(time(NULL));
+    srand(time(NULL));
     
     
     
@@ -121,22 +121,52 @@ int main()
     
     // ____________________________ CREATING SCENE ____________________________
     
-    // Randomly generate some fish objects
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> u1(-1, 1);
-    
-    for (int i = 0; i < 1000; ++i)
-    {
-        objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
-    }
-    
     
     // Generate skybox
     skybox = new Skybox();
     
     // Generate terrain
     terrain = new Terrain();
+    
+    
+    // Randomly generate some fish objects
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> u1(0, 1);
+    
+    float terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
+    
+    for (int i = 0; i < 1000; ++i)
+    {
+        objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f, u1(gen) * terrainSize)));
+    }
+    
+    
+    for(int i = 0; i < 1000; i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
+    }
+    
+    for(int i = 0; i < 1000; i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+    }
     
     // ____________________________ END CREATING SCENE ____________________________
     
