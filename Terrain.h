@@ -47,6 +47,7 @@ class TerrainChunk : public Renderable
     //heightmap grid
     float** heightMap;
     
+    static Shader* chunkShader;
     
     
 };
