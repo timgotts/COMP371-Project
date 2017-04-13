@@ -91,7 +91,7 @@ Config::Config(std::string path)
     std::ifstream file(path);
     if(file.is_open())
     {
-        std::cout << "Loading " << path << std::endl;
+        //std::cout << "Loading " << path << std::endl;
         mainSection.readSection(file);
         
         

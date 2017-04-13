@@ -179,7 +179,7 @@ Terrain::Terrain()
         }
     }
     
-    std::cout << "terrain finished" << std::endl;
+    //std::cout << "terrain finished" << std::endl;
 }
 
 
