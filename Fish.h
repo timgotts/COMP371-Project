@@ -13,6 +13,9 @@ public:
 	void render(glm::mat4 view, glm::mat4 projection);
 	void animate(float deltaTime);
 
+	static std::vector<glm::vec3> vertices;
+	static std::vector<GLuint> indices;
+
 private:
 
 	// Position and orientation	
