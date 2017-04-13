@@ -4,6 +4,7 @@
 #include "TerrainGenerator.h"
 #include "Config.h"
 #include "Seaweed.h"
+#include "Rock.h"
 #include <GL\glew.h>
 #include <GLM\glm.hpp>
 #include <GLM\gtc\matrix_transform.hpp>
@@ -34,6 +35,8 @@ class TerrainChunk : public Renderable
     
     void render(glm::mat4 view, glm::mat4 proj);
     
+    void addEntity(Renderable* r);
+    
     private:
     //width and height of chunk
     const int size;
@@ -46,6 +49,7 @@ class TerrainChunk : public Renderable
     //heightmap grid
     float** heightMap;
     
+    static Shader* chunkShader;
     
     
 };

@@ -1,5 +1,7 @@
 #include "Terrain.h"
 
+Shader* TerrainChunk::chunkShader = nullptr;
+
 TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNoiseGenerator* pn) : size(size), posX(posX), posY(posY)
 {
     
@@ -22,14 +24,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             
             
             float height = pn->getHeightAt(coordX, coordY);
-            
-            
-            if(rand()%20 == 0)
-            {
-                
-                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
-                
-            }
             
             heightMap[x][y] = height;
             
@@ -82,9 +76,15 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     
     // Compile and load shaders
-    shader = new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
+    if(chunkShader == nullptr)
+        chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
+    shader = chunkShader;
     
-    
+}
+
+void TerrainChunk::addEntity(Renderable* r)
+{
+    entities.push_back(r);
 }
 
 int TerrainChunk::getPosX()
@@ -259,32 +259,35 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
     if(chunk != nullptr)
     {
         
-        int midX = chunk->getPosX();
-        int midY = chunk->getPosY();
+        int minX = chunk->getPosX()-renderDistance;
+        int minY = chunk->getPosY()-renderDistance;
         
-        if(midX < renderDistance)
+        int maxX = chunk->getPosX()+renderDistance;
+        int maxY = chunk->getPosY()+renderDistance;
+        
+        if(minX < 0)
         {
-            midX = renderDistance;
+            minX = 0;
+        }
+        if(minY < 0)
+        {
+            minY = 0;
         }
         
-        if(midY < renderDistance)
+        if(maxX > size-1)
         {
-            midY = renderDistance;
+            maxX = size-1;
         }
         
-        if((size-midX) < renderDistance)
+        if(maxY > size-1)
         {
-            midX = size-renderDistance;
+            maxY = size-1;
         }
         
-        if((size-midY) < renderDistance)
-        {
-            midY = size-renderDistance;
-        }
         
-        for(int x = midX - renderDistance; x < midX + renderDistance; x++)
+        for(int x = minX; x <= maxX; x++)
         {
-            for(int y = midY-renderDistance; y < midY+renderDistance; y++)
+            for(int y = minY; y <= maxY; y++)
             {
                 getChunkAt(x,y)->render(view,proj);
             }
