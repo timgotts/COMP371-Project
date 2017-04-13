@@ -13,6 +13,7 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Seaweed.h"
+#include "LightSource.h"
 
 #define PI 3.14159265358979323846
 
@@ -32,6 +33,7 @@ bool keys[1024];
 Camera* camera = new Camera();
 
 std::vector<Renderable*> objects;
+std::vector<Cube*> cubes;
 Skybox* skybox;
 Terrain* terrain;
 
@@ -125,18 +127,25 @@ int main()
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(-1, 1);
+	std::uniform_real_distribution<> dis(0, 1);
     
-    for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 3; ++i)
     {
         objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
     }
-    
+
+	for (int i = 0; i < 150; ++i)
+	{
+		cubes.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+	}
+
+	objects.push_back(new LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(0, 0, 0)));
     
     // Generate skybox
     skybox = new Skybox();
     
     // Generate terrain
-    terrain = new Terrain();
+    //terrain = new Terrain();
     
     // ____________________________ END CREATING SCENE ____________________________
     
@@ -166,14 +175,19 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         //Render skybox
-        skybox->render(view, projection);
-        terrain->render(camera->getPosition(), view, projection);
+        //skybox->render(view, projection);
+        //terrain->render(camera->getPosition(), view, projection);
         // Render objects
         for (auto obj : objects)
         {
             obj->animate(deltaTime);
             obj->render(view, projection);
         }
+
+		for (auto cube : cubes)
+		{
+			cube->render(view, projection,camera->getPosition());
+		}
         
         
         
