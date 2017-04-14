@@ -188,26 +188,39 @@ Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), 
 
 
 
-	// Compile and load shaders
-	shader = new Shader("res/shaders/fish.vs", "res/shaders/fish.fs");
+	// Assign material 
+	material = Material(glm::vec3(0.28f, 0.24f, 0.545f), glm::vec3(0.75f,0.75f, 0.75f), glm::vec3(0.5f, 0.5f, 0.5f), 64.0f);
 
 
 }
 
 
 
-void Fish::render(glm::mat4 view, glm::mat4 projection)
+void Fish::render(Shader* shader)
 {
-	shader->use();
+
+	//shader->use();
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
 
 	// Broadcast the uniform values to the shaders
 	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-	GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-	GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+	//GLuint viewLoc = glGetUniformLocation(shader->program, "view");
+	//GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+	//glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 	// Draw object
 	glBindVertexArray(VAO);

@@ -7,8 +7,6 @@
 
 #define PI 3.14159265358979323846
 
-Shader* Rock::rockShader = nullptr;
-
 glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
 	//Edge1, Edge2
@@ -186,9 +184,6 @@ Rock::Rock(glm::vec3 position)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
-    
 	// Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
@@ -222,25 +217,40 @@ Rock::Rock(glm::vec3 position)
     model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
     
     
-    // Compile and load shaders
-    if(rockShader == nullptr)
-        rockShader = new Shader("res/shaders/rock.vs", "res/shaders/rock.fs"); 
-    
-    shader = rockShader;
+	// Assign material
+	material = Material();
 }
 
-void Rock::render(glm::mat4 view, glm::mat4 projection)
+void Rock::render(Shader* shader)
 {
-    shader->use();
+    //shader->use();
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+
     
     // Broadcast the uniform values to the shaders
-    GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+
+
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+
+    //GLuint viewLoc = glGetUniformLocation(shader->program, "view");
+    //GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
     
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    //glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    //glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     
     // Draw object
     glBindVertexArray(VAO);

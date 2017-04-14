@@ -2,7 +2,6 @@
 #include <fstream>
 using namespace std;
 
-Shader* Seaweed::seaweedShader;
 int Seaweed::amount = 0;
 
 
@@ -23433,7 +23432,6 @@ Seaweed::Seaweed( glm::vec3 position)
     //VAO, VBO, and EBO initialization
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     //Binding the VAO
     glBindVertexArray(VAO);
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
@@ -23474,27 +23472,37 @@ Seaweed::Seaweed( glm::vec3 position)
     model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
     
     //Have to add a scale matrix
-    
-    
-    //Compile the seaweed's shaders and load.
-	if (seaweedShader == nullptr)
-	{
-
-        seaweedShader = new Shader("res/shaders/seaweed.vs", "res/shaders/seaweed.fs");	
-	}
-    shader = seaweedShader;
+   
     
     amount++;
+	material = Material(glm::vec3(0.007f,0.51f,0.5f), glm::vec3(0.14f, 0.25f, 0.9f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
 }
 
 
 
-void Seaweed::render(glm::mat4 view, glm::mat4 projection)
+void Seaweed::render(Shader* shader)
 {
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
     //Sin functiont to move the vertices based on time.
     GLfloat timeMove = (sin(glfwGetTime()))/2;
     //enabling the shader
-    shader->use();
+    //shader->use();
     
     
     /*glm::mat4 shear = 
@@ -23506,17 +23514,12 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
      
     }; */
     
-    GLuint transformLoc = glGetUniformLocation(shader->program, "model");
-    GLuint viewMatrixLoc = glGetUniformLocation(shader->program, "view");
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+
+
     
     //model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
     
     //model = model*shear;
-    
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model)); 
-    glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     
     //Draw the seaweed
     glBindVertexArray(VAO);
