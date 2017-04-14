@@ -6,9 +6,12 @@
 #include <GLM\gtc\type_ptr.hpp>
 #include <random>
 #include <time.h>
+#include <string>
+
 #include "Camera.h"
 #include "Shader.h"
 #include "Cube.h"
+#include "Rock.h"
 #include "Fish.h"
 #include "Skybox.h"
 #include "Terrain.h"
@@ -16,6 +19,10 @@
 #include "LightSource.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
+#include "Timer.h"
+=======
+
+
 
 #define PI 3.14159265358979323846
 
@@ -54,12 +61,9 @@ void doMovement();
 
 
 
-
-
 // ________________________________ MAIN ________________________________
 int main()
 {
-    
     srand(time(NULL));
     
     
@@ -67,6 +71,8 @@ int main()
     
     // ___________________________ SETTINGS ___________________________
     
+
+
     // Create GLFW window
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -76,6 +82,7 @@ int main()
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Aquinea", nullptr, nullptr);
+	glfwHideWindow(window);
     
     glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
     
@@ -98,25 +105,25 @@ int main()
     glfwSetWindowSizeCallback(window, windowResizeCallback);
     glfwSetScrollCallback(window, scrollCallback);
     
-    
-    // Initialize GLEW and OpenGL settings
-    glewExperimental = GL_TRUE;
-    
-    if (glewInit() != GLEW_OK)
-    {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-        exit(1);
-    }
-    
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glPointSize(3);
-    
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// Initialize GLEW and OpenGL settings
+	glewExperimental = GL_TRUE;
+
+	if (glewInit() != GLEW_OK)
+	{
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		exit(1);
+	}
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glPointSize(3);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     // ___________________________ END SETTINGS ___________________________
     
@@ -126,9 +133,23 @@ int main()
     
     // ____________________________ CREATING SCENE ____________________________
     
-    // Randomly generate some fish objects
+    
+    // Generate skybox
+    Timer::start("skybox");
+    skybox = new Skybox();
+    Timer::stop("Skybox");
+    
+    // Generate terrain
+    Timer::start("terrain");
+    terrain = new Terrain();
+    Timer::stop("Terrain");
+    
+    
+    
+    //generate some fish objects
     std::random_device rd;
     std::mt19937 gen(rd());
+<<<<<<< HEAD
     std::uniform_real_distribution<> u1(-1, 1);
 	std::uniform_real_distribution<> dis(0, 1);
     
@@ -154,21 +175,63 @@ int main()
 	spotLight = SpotLight(camera.getPosition(), camera.getFront());
 
 
+=======
+    std::uniform_real_distribution<> u1(0, 1);
     
-    // Generate skybox
-    skybox = new Skybox();
+    float terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
     
+>>>>>>> refs/remotes/origin/master
+    
+    
+<<<<<<< HEAD
     // Generate terrain
     //terrain = new Terrain();
+=======
+    Timer::start("fish");
+    for (int i = 0; i < 300; ++i)
+    {
+        objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
+    }
+    Timer::stop("Fish");
+>>>>>>> refs/remotes/origin/master
     
+    Timer::start("seaweed");
+    for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
+    }
+    Timer::stop("seaweed");
+    
+    Timer::start("rock");
+    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+    }
+    Timer::stop("rock");
     // ____________________________ END CREATING SCENE ____________________________
     
     
-    
+	camera->setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
     
     
     // ___________________________ GAME LOOP ___________________________
-    
+	glfwShowWindow(window);
     while (!glfwWindowShouldClose(window)) {
         
         // Update frame deltaTime

@@ -2,6 +2,8 @@
 #include <fstream>
 using namespace std;
 
+Shader* Seaweed::seaweedShader;
+
 int Seaweed::amount = 0;
 Seaweed::Seaweed( glm::vec3 position)
 {
@@ -16,11 +18,11 @@ Seaweed::Seaweed( glm::vec3 position)
     glBindVertexArray(VAO);
     // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*totalLength, verticesVBO, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*totalLength, verticesVBO, GL_STATIC_DRAW);
     
     //EBO Binding
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indexLength, indicesEBO, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*indexLength, indicesEBO, GL_STATIC_DRAW);
     
     //For the vertices (vertex shader)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
@@ -44,7 +46,9 @@ Seaweed::Seaweed( glm::vec3 position)
     
     
     //Compile the seaweed's shaders and load.
-    shader = new Shader("res/shaders/seaweed.vs", "res/shaders/seaweed.fs");	
+    if(seaweedShader == nullptr)
+        seaweedShader = new Shader("res/shaders/seaweed.vs", "res/shaders/seaweed.fs");	
+    shader = seaweedShader;
     
     amount++;
 }
@@ -57,16 +61,16 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
     GLfloat timeMove = (sin(glfwGetTime()))/2;
     //enabling the shader
     shader->use();
-
-
-	/*glm::mat4 shear = 
-	{
-		1, timeMove, 0, 0,
-		0, 1, timeMove ,0,
-		0, 0, 1, 0,
-		0, 0, 0, 0
-
-	}; */
+    
+    
+    /*glm::mat4 shear = 
+    {
+     1, timeMove, 0, 0,
+     0, 1, timeMove ,0,
+     0, 0, 1, 0,
+     0, 0, 0, 0
+     
+    }; */
     
     GLuint transformLoc = glGetUniformLocation(shader->program, "model");
     GLuint viewMatrixLoc = glGetUniformLocation(shader->program, "view");
@@ -74,8 +78,8 @@ void Seaweed::render(glm::mat4 view, glm::mat4 projection)
     
     //model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
     
-	//model = model*shear;
-
+    //model = model*shear;
+    
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model)); 
     glUniformMatrix4fv(viewMatrixLoc, 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -315,6 +319,13 @@ void Seaweed::calculateSweep()
     //A position which we will need to keep for the indices
     int pos = 0;
     int counterEBO = 0;
+
+	//ofstream write;
+	//write.open("VBO.txt");
+
+	//ofstream write2;
+	//read.open("EBO.txt");
+
     
     //gets the size of the EBO
     indexLength = (profile.size() - 1)*(trajectory.size() - 1) * 6;
@@ -336,7 +347,8 @@ void Seaweed::calculateSweep()
             verticesVBO[pos + 5] = 0.0;
             
             //increment the pos value in order to find the next set of vertices
-            
+			//write << verticesVBO[pos] << ", " << verticesVBO[pos + 1] << ", " << verticesVBO[pos + 2] << ", " << verticesVBO[pos + 3] << ", " << verticesVBO[pos + 4] << ", " << verticesVBO[pos + 5] << endl;
+
             pos += 6;
             //If we are after the first iteration of i and k, then it means we are ontop.
             //Now we have to store the indices for the EBO in order to draw the triangles
@@ -351,6 +363,8 @@ void Seaweed::calculateSweep()
                 indicesEBO[counterEBO + 5] = pos / 6 - trajectory.size() - 2;
                 //Increment the counter in order to find the next set of indices
                 
+				//write << indicesEBO[counterEBO] << ", " << indicesEBO[counterEBO + 1] << ", " << indicesEBO[counterEBO + 2] << ", " << indicesEBO[counterEBO + 3] << ", " << indicesEBO[counterEBO + 4] << ", " << indicesEBO[counterEBO + 5] << endl;
+
                 counterEBO += 6;
             }
         }

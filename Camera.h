@@ -54,6 +54,11 @@ class Camera
     {
         return position;
     }
+
+	void setPosition(glm::vec3 position)
+	{
+		this->position = position;
+	}
     
     glm::mat4 getViewMatrix() 
     {
