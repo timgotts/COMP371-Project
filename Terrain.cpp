@@ -91,8 +91,8 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
         chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
     shader = chunkShader;
 
-	//material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(1.0f, 1.0f, 1.0f), 0.f);
-	material = Material();
+	material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4.0f);
+
 }
 
 void TerrainChunk::addEntity(Renderable* r)

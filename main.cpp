@@ -247,6 +247,10 @@ int main()
         glm::mat4 view = camera.getViewMatrix();
         glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
+		//Render skybox
+		skybox->render(view, projection);
+
+
 
 		lightingShader->use();
 
@@ -312,8 +316,7 @@ int main()
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-    	//Render skybox
-        //skybox->render(view, projection);
+
         terrain->render(camera.getPosition(), view, projection, lightingShader);
 
         // Render objects
