@@ -49,6 +49,9 @@ class TerrainChunk : public Renderable
     //heightmap grid
     float** heightMap;
     
+    
+    std::vector<glm::vec3> finalVertices;
+    
     static Shader* chunkShader;
     
     

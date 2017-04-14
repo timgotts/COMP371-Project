@@ -9,5 +9,6 @@ uniform samplerCube skyboxTexture;
 void main()
 {
 	color = texture(skyboxTexture, skyboxCoord);
+	color.b += 0.2f;
 } 
 
