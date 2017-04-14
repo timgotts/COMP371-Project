@@ -20,7 +20,6 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "Timer.h"
-=======
 
 
 
