@@ -1,13 +1,13 @@
 #version 330 core
 
 in vec3 vPos;
-in vec3 fragmentColor;
+in vec4 vNorm;
 
 out vec4 color;
 
 
 void main()
 {
-	color = vec4(fragmentColor, 1.0f);
+	color = vec4(vNorm.r, vNorm.g, vNorm.b, 1.0f);
 	color.b += 0.2f;
 }
