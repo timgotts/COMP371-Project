@@ -15,7 +15,7 @@ class TerrainChunk : public Renderable
 {
     public:
     
-    TerrainChunk(int size, int posX, int posY, float offset, PerlinNoiseGenerator* pn);
+    TerrainChunk(int size, int posX, int posY, float offset, SimplexNoise* pn, int finalSize);
     
     int getSize();
     

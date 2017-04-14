@@ -2,7 +2,7 @@
 
 Shader* TerrainChunk::chunkShader = nullptr;
 
-TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNoiseGenerator* pn) : size(size), posX(posX), posY(posY)
+TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexNoise* pn, int finalSize) : size(size), posX(posX), posY(posY)
 {
     
     heightMap = new float*[size];
@@ -21,9 +21,11 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             float coordY = (posY * (size-1) + y);
             
             
-            float height = pn->getHeightAt(coordX, coordY);
+            float height = 50 * pn->noise(coordX/(size*size), coordY/(size*size));
             
             heightMap[x][y] = height;
+            
+            //std::cout << height << std::endl;
             
             vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
@@ -186,12 +188,13 @@ Terrain::Terrain()
     double amplitude = generatorConfig->getDouble("amplitude");
     int octaves = generatorConfig->getInt("octaves");
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, rand());
+    SimplexNoise* perlin = new SimplexNoise(frequency, amplitude, 2.0f, persistence);
     
     ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
     
     pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
     
+    int finalSize = size * (pointsPerChunk-1);
     
     for(int x = 0; x < size; x++)
     {
@@ -199,7 +202,7 @@ Terrain::Terrain()
         
         for(int y = 0; y < size; y++)
         {
-            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin);
+            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin, finalSize);
         }
     }
     
