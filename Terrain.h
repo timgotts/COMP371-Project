@@ -33,8 +33,8 @@ class TerrainChunk : public Renderable
     float getHeightAt(int x, int y);
     void setHeightAt(int x, int y, float height);
     
-    void render(glm::mat4 view, glm::mat4 proj);
-    
+    void render(glm::mat4 view, glm::mat4 proj, Shader* shader);
+
     void addEntity(Renderable* r);
     
     private:
@@ -63,7 +63,7 @@ class Terrain
     Terrain();
     
     
-    void render(glm::vec3 position, glm::mat4 view, glm::mat4 proj);
+    void render(glm::vec3 position, glm::mat4 view, glm::mat4 proj, Shader* shader);
     
     
     int getSize();

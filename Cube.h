@@ -14,7 +14,7 @@ public:
 
 	Cube(float edgeLength, glm::vec3 eulerXYZ, glm::vec3 position);
 	
-	void Cube::render(glm::mat4 view, glm::mat4 projection, Camera& camera, std::vector<PointLight> & pointlights, DirectionalLight & dirlight, SpotLight & spotLight);
+	void Cube::render(glm::mat4 view, glm::mat4 projection, Shader* shader);
 
 
 private:
