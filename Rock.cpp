@@ -25,20 +25,17 @@ glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 
 Rock::Rock(glm::vec3 position)
 {
-    // randomize whether colour will be shade of brown or grey
-    int colorType = rand() % 10;
-    // initialize placeholder for colour float value
-    double color;
-    
     float const X = 0.525731112119133606f;
     float const Z = 0.850650808352039932f;
     
+	// randon generators
     std::random_device rd;
     std::mt19937 gen(rd());
+
     // uniform distribution for the rocks
-    std::uniform_real_distribution<> dis(0, 1);
 	std::uniform_real_distribution<> nudge(-0.3, 0.3);
     
+	// set the vertices with random displacement
 	rockVertices = {
 /*0*/	glm::vec3(-X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
 /*1*/	glm::vec3(X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
@@ -54,20 +51,7 @@ Rock::Rock(glm::vec3 position)
 /*11*/	glm::vec3(-Z + nudge(gen), -X + nudge(gen), 0 + nudge(gen)),
 	};
 
-    // brown rock
-//  if (colorType >= 7) 
-//  {
-//      // pick a shade
-//      std::uniform_real_distribution<> colorDis(0.15, 0.5);
-//      color = colorDis(gen);
-//  }
-	// grey rock
-//  else
-//      // pick a shade
-//      std::uniform_real_distribution<> colorDis(0.15, 0.4);
-//      color = colorDis(gen);
-//  }
-
+	// get surface normals for lighting
 	glm::vec3 surfaceNormals[20] = {
 		calculateNormal(rockVertices[1],rockVertices[4],rockVertices[0]),
 		calculateNormal(rockVertices[4],rockVertices[9],rockVertices[0]),
@@ -91,6 +75,7 @@ Rock::Rock(glm::vec3 position)
 		calculateNormal(rockVertices[11],rockVertices[2],rockVertices[7])
 	};
 
+	// store the vertices and normals in the final vector to be pushed to gpu
 	int surface = 0;
 	vertices = 
 	{
@@ -210,15 +195,34 @@ Rock::Rock(glm::vec3 position)
 	}
     
     // Apply rotations to model matrix
+	std::uniform_real_distribution<> dis(0, 1);
     glm::vec3 eulerXYZ(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI);
     
     model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
     
-    
-	// Assign material
-	material = Material();
+	// randomize whether colour will be shade of brown or grey
+	int colorType = rand() % 10;
+	// initialize placeholder for colour float value
+	double color;
+	// brown rock
+	  if (colorType > 6) 
+	  {
+	    // pick a shade
+	    std::uniform_real_distribution<> colorDis(0.4, 0.6);
+	    color = colorDis(gen);
+		// Assign material
+		material = Material(glm::vec3(0.3, 0.15, 0), glm::vec3(color, color / 2, color / 6), glm::vec3(0.25), 0.4);
+	  }
+	  else // grey rock
+	  {
+	    // pick a shade
+	    std::uniform_real_distribution<> colorDis(0.3, 0.4);
+	    color = colorDis(gen);
+		// Assign material
+		material = Material(glm::vec3(0.25), glm::vec3(color, color, color), glm::vec3(0.25), 0.4);
+	  }
 }
 
 void Rock::render(Shader* shader)
