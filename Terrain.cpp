@@ -43,7 +43,7 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
                 glm::vec3 t2e2 = t2v3-t2v1;
                 
                 glm::vec3 t1n = glm::normalize(glm::cross(t1e1,t1e2));
-                glm::vec3 t2n = glm::normalize(glm::cross(t2e1,t2e2));
+                glm::vec3 t2n = glm::normalize(glm::cross(t2e2,t2e1));
                 
                 finalVertices.push_back(t1v1);
                 finalVertices.push_back(t1n);
