@@ -42,6 +42,7 @@ Terrain* terrain;
 
 
 
+
 // Free function signatures
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void cursorPosCallback(GLFWwindow* window, double xPos, double yPos);
@@ -146,7 +147,6 @@ int main()
     float terrainSize = terrain->getSize() * (terrain->getPointsPerChunk()-1);
     
     
-    
     Timer::start("fish");
     for (int i = 0; i < 300; ++i)
     {
@@ -167,6 +167,8 @@ int main()
             chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
     }
     Timer::stop("seaweed");
+
+	
     
     Timer::start("rock");
     for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
@@ -184,10 +186,9 @@ int main()
     Timer::stop("rock");
     // ____________________________ END CREATING SCENE ____________________________
     
-    
+   
 	camera->setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
-    
-    
+
     // ___________________________ GAME LOOP ___________________________
 	glfwShowWindow(window);
     while (!glfwWindowShouldClose(window)) {
@@ -212,6 +213,8 @@ int main()
         //Render skybox
         skybox->render(view, projection);
         terrain->render(camera->getPosition(), view, projection);
+		
+		
         // Render objects
         for (auto obj : objects)
         {
