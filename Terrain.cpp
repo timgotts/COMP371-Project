@@ -9,10 +9,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     int currentIndice = 0;
     
-    
-    std::vector<glm::vec3> vertices;
-    
-    
     for(int x = 0; x < size; x++)
     {
         heightMap[x] = new float[size];
@@ -32,14 +28,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
             {
-                indices.push_back(currentIndice);
-                indices.push_back(currentIndice-1);
-                indices.push_back(currentIndice-size-1);
-                
-                indices.push_back(currentIndice);
-                indices.push_back(currentIndice-size);
-                indices.push_back(currentIndice-size-1);
-                
                 glm::vec3 t1v1 = vertices.at(currentIndice);
                 glm::vec3 t1v2 = vertices.at(currentIndice-1);
                 glm::vec3 t1v3 = vertices.at(currentIndice-size-1);
@@ -95,16 +83,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    // Apply translation to model matrix
-    
-    // Apply scale to model matrix
-    
-    // Apply rotations to model matrix
-    
-    
-    
-    
     
     // Compile and load shaders
     if(chunkShader == nullptr)
