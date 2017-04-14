@@ -7,8 +7,6 @@
 
 #define PI 3.14159265358979323846
 
-Shader* Rock::rockShader = nullptr;
-
 glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
 	//Edge1, Edge2
@@ -27,20 +25,17 @@ glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 
 Rock::Rock(glm::vec3 position)
 {
-    // randomize whether colour will be shade of brown or grey
-    int colorType = rand() % 10;
-    // initialize placeholder for colour float value
-    double color;
-    
     float const X = 0.525731112119133606f;
     float const Z = 0.850650808352039932f;
     
+	// randon generators
     std::random_device rd;
     std::mt19937 gen(rd());
+
     // uniform distribution for the rocks
-    std::uniform_real_distribution<> dis(0, 1);
 	std::uniform_real_distribution<> nudge(-0.3, 0.3);
     
+	// set the vertices with random displacement
 	rockVertices = {
 /*0*/	glm::vec3(-X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
 /*1*/	glm::vec3(X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
@@ -56,20 +51,7 @@ Rock::Rock(glm::vec3 position)
 /*11*/	glm::vec3(-Z + nudge(gen), -X + nudge(gen), 0 + nudge(gen)),
 	};
 
-    // brown rock
-//  if (colorType >= 7) 
-//  {
-//      // pick a shade
-//      std::uniform_real_distribution<> colorDis(0.15, 0.5);
-//      color = colorDis(gen);
-//  }
-	// grey rock
-//  else
-//      // pick a shade
-//      std::uniform_real_distribution<> colorDis(0.15, 0.4);
-//      color = colorDis(gen);
-//  }
-
+	// get surface normals for lighting
 	glm::vec3 surfaceNormals[20] = {
 		calculateNormal(rockVertices[1],rockVertices[4],rockVertices[0]),
 		calculateNormal(rockVertices[4],rockVertices[9],rockVertices[0]),
@@ -93,6 +75,7 @@ Rock::Rock(glm::vec3 position)
 		calculateNormal(rockVertices[11],rockVertices[2],rockVertices[7])
 	};
 
+	// store the vertices and normals in the final vector to be pushed to gpu
 	int surface = 0;
 	vertices = 
 	{
@@ -186,9 +169,6 @@ Rock::Rock(glm::vec3 position)
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
-    
 	// Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
@@ -215,32 +195,65 @@ Rock::Rock(glm::vec3 position)
 	}
     
     // Apply rotations to model matrix
+	std::uniform_real_distribution<> dis(0, 1);
     glm::vec3 eulerXYZ(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI);
     
     model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
     
-    
-    // Compile and load shaders
-    if(rockShader == nullptr)
-        rockShader = new Shader("res/shaders/rock.vs", "res/shaders/rock.fs"); 
-    
-    shader = rockShader;
+	// randomize whether colour will be shade of brown or grey
+	int colorType = rand() % 10;
+	// initialize placeholder for colour float value
+	double color;
+	// brown rock
+	  if (colorType > 6) 
+	  {
+	    // pick a shade
+	    std::uniform_real_distribution<> colorDis(0.4, 0.6);
+	    color = colorDis(gen);
+		material = Material(glm::vec3(0.3, 0.15, 0), glm::vec3(color, color / 2, color / 6), glm::vec3(0.25), 0.4);
+	  }
+	  else // grey rock
+	  {
+	    // pick a shade
+	    std::uniform_real_distribution<> colorDis(0.3, 0.4);
+	    color = colorDis(gen);
+		material = Material(glm::vec3(0.25), glm::vec3(color, color, color), glm::vec3(0.25), 0.4);
+	  }
+	// Assign material
 }
 
-void Rock::render(glm::mat4 view, glm::mat4 projection)
+void Rock::render(Shader* shader)
 {
-    shader->use();
+    //shader->use();
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+
     
     // Broadcast the uniform values to the shaders
-    GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
+
+
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+
+    //GLuint viewLoc = glGetUniformLocation(shader->program, "view");
+    //GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
     
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+    //glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+    //glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
     
     // Draw object
     glBindVertexArray(VAO);
