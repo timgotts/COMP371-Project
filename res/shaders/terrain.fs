@@ -12,7 +12,7 @@ out vec4 color;
 void main()
 
 {
-	color = vec4(vNorm.r, vNorm.g, vNorm.b, 1.0f);
+	color = vec4(-vNorm.r, -vNorm.g, -vNorm.b, 1.0f);
 
 	/**color = vec4(
 		0.961f - max(0, ((-vPos.y/1.0f) * 0.0195f)), 
