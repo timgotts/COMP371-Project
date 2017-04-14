@@ -33,7 +33,7 @@ class TerrainChunk : public Renderable
     float getHeightAt(int x, int y);
     void setHeightAt(int x, int y, float height);
     
-    void render(glm::mat4 view, glm::mat4 proj, Shader* shader);
+    void render(Shader* shader) override;
 
     void addEntity(Renderable* r);
     
@@ -52,8 +52,6 @@ class TerrainChunk : public Renderable
     
     std::vector<glm::vec3> finalVertices;
     
-    static Shader* chunkShader;
-    
     
 };
 
@@ -63,7 +61,7 @@ class Terrain
     Terrain();
     
     
-    void render(glm::vec3 position, glm::mat4 view, glm::mat4 proj, Shader* shader);
+    void render(glm::vec3 position, Shader* shader);
     
     
     int getSize();

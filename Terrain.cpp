@@ -1,7 +1,5 @@
 #include "Terrain.h"
 
-Shader* TerrainChunk::chunkShader = nullptr;
-
 TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexNoise* pn, int finalSize) : size(size), posX(posX), posY(posY)
 {
     
@@ -70,7 +68,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
     // Generate buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     
     // Buffer object data
     glBindVertexArray(VAO);
@@ -85,12 +82,8 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    // Compile and load shaders
-    if(chunkShader == nullptr)
-        chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
-    shader = chunkShader;
 
+	//Assign material
 	material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4.0f);
 
 }
@@ -132,14 +125,14 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
     
 }
 
-void TerrainChunk::render(glm::mat4 view, glm::mat4 projection, Shader* shader)
+void TerrainChunk::render(Shader* shader)
 {
     //shader->use();
 	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
-    // Broadcast the uniform values to the shaders
+   
+	// Broadcast the uniform values to the shaders
     GLuint modelLoc = glGetUniformLocation(shader->program, "model");
 	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
-
 	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
 	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
 	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
@@ -149,25 +142,20 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection, Shader* shader)
 	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
 	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
 	glUniform1f(matShineLoc, material.shininess);
-
-    //GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-   // GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-    
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-    //glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    //glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    
+
+        
     // Draw object
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, finalVertices.size()/2);
     glBindVertexArray(0);
     
     
-    //for(auto entity : entities)
-    //{
-    //    entity->render(view, projection);
-    //}
+    for(auto entity : entities)
+    {
+        entity->render(shader);
+    }
     
 }
 
@@ -280,7 +268,7 @@ void Terrain::setHeightAt(int x, int y, float  height)
 }
 
 
-void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj, Shader* shader)
+void Terrain::render(glm::vec3 position, Shader* shader)
 {
     TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
     if(chunk != nullptr)
@@ -316,7 +304,7 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj, Shader*
         {
             for(int y = minY; y <= maxY; y++)
             {
-                getChunkAt(x,y)->render(view,proj, shader);
+                getChunkAt(x,y)->render(shader);
             }
         }
         
@@ -327,7 +315,7 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj, Shader*
         {
             for(int y = 0; y < size; y++)
             {
-                getChunkAt(x,y)->render(view,proj, shader);
+                getChunkAt(x,y)->render(shader);
             }
         }
     }
