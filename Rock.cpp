@@ -212,6 +212,7 @@ Rock::Rock(glm::vec3 position)
 	    // pick a shade
 	    std::uniform_real_distribution<> colorDis(0.4, 0.6);
 	    color = colorDis(gen);
+		// Assign material
 		material = Material(glm::vec3(0.3, 0.15, 0), glm::vec3(color, color / 2, color / 6), glm::vec3(0.25), 0.4);
 	  }
 	  else // grey rock
@@ -219,9 +220,9 @@ Rock::Rock(glm::vec3 position)
 	    // pick a shade
 	    std::uniform_real_distribution<> colorDis(0.3, 0.4);
 	    color = colorDis(gen);
+		// Assign material
 		material = Material(glm::vec3(0.25), glm::vec3(color, color, color), glm::vec3(0.25), 0.4);
 	  }
-	// Assign material
 }
 
 void Rock::render(Shader* shader)
