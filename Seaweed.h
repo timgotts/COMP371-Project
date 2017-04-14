@@ -35,4 +35,6 @@ class Seaweed : public Renderable
     
     //Added for now to generate different seaweed
     static int amount;
+    
+    static Shader* seaweedShader;
 };

@@ -1,5 +1,7 @@
 #include "Terrain.h"
 
+Shader* TerrainChunk::chunkShader = nullptr;
+
 TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNoiseGenerator* pn) : size(size), posX(posX), posY(posY)
 {
     
@@ -7,7 +9,9 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     int currentIndice = 0;
     
+    
     std::vector<glm::vec3> vertices;
+    
     
     for(int x = 0; x < size; x++)
     {
@@ -23,23 +27,7 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             
             float height = pn->getHeightAt(coordX, coordY);
             
-            
-            if (rand() % 20 == 0)
-            {
-                
-                entities.push_back(new Seaweed(glm::vec3(coordX, height+1, coordY)));
-                
-            }
-            // randomly place a rock ***** Need condition so they dont sit on a peak (looks weird) *****
-            else if (rand() % 57 == 0)
-            {
-                entities.push_back(new Rock(glm::vec3(-coordX, -height, -coordY)));
-                
-            }
-            
             heightMap[x][y] = height;
-            
-            
             
             vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
@@ -119,9 +107,15 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     
     // Compile and load shaders
-    shader = new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
+    if(chunkShader == nullptr)
+        chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
+    shader = chunkShader;
     
-    
+}
+
+void TerrainChunk::addEntity(Renderable* r)
+{
+    entities.push_back(r);
 }
 
 int TerrainChunk::getPosX()
@@ -216,7 +210,7 @@ Terrain::Terrain()
         }
     }
     
-    std::cout << "terrain finished" << std::endl;
+    //std::cout << "terrain finished" << std::endl;
 }
 
 
