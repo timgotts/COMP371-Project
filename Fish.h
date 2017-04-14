@@ -13,6 +13,8 @@ public:
 	void render(glm::mat4 view, glm::mat4 projection);
 	void animate(float deltaTime);
 
+	glm::vec4 color;
+
 private:
 
 	// Position and orientation	

@@ -51,9 +51,6 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 
-void timerStart();
-void timerEnd();
-
 
 
 
@@ -67,6 +64,8 @@ int main()
     
     // ___________________________ SETTINGS ___________________________
     
+
+
     // Create GLFW window
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -76,6 +75,7 @@ int main()
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Aquinea", nullptr, nullptr);
+	glfwHideWindow(window);
     
     glfwGetFramebufferSize(window, &SCREEN_WIDTH, &SCREEN_HEIGHT);
     
@@ -98,25 +98,25 @@ int main()
     glfwSetWindowSizeCallback(window, windowResizeCallback);
     glfwSetScrollCallback(window, scrollCallback);
     
-    
-    // Initialize GLEW and OpenGL settings
-    glewExperimental = GL_TRUE;
-    
-    if (glewInit() != GLEW_OK)
-    {
-        std::cout << "Failed to initialize GLEW" << std::endl;
-        exit(1);
-    }
-    
-    glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    glPointSize(3);
-    
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	// Initialize GLEW and OpenGL settings
+	glewExperimental = GL_TRUE;
+
+	if (glewInit() != GLEW_OK)
+	{
+		std::cout << "Failed to initialize GLEW" << std::endl;
+		exit(1);
+	}
+
+	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glPointSize(3);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     // ___________________________ END SETTINGS ___________________________
     
@@ -150,17 +150,16 @@ int main()
     Timer::start("fish");
     for (int i = 0; i < 300; ++i)
     {
-        objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f, u1(gen) * terrainSize)));
+        objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
     }
     Timer::stop("Fish");
     
     Timer::start("seaweed");
     for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
     {
+
         float x = u1(gen) * terrainSize;
-        
         float z = u1(gen) * terrainSize;
-        
         float y = terrain->getHeightAt(x,z);
         
         TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
@@ -187,12 +186,11 @@ int main()
     Timer::stop("rock");
     // ____________________________ END CREATING SCENE ____________________________
     
-    
+   
+	camera->setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
 
-    
-	
     // ___________________________ GAME LOOP ___________________________
-    
+	glfwShowWindow(window);
     while (!glfwWindowShouldClose(window)) {
         
         // Update frame deltaTime

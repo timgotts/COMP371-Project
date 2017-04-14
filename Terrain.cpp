@@ -17,8 +17,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
         {
             
             
-            
-            
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
@@ -27,24 +25,45 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             
             heightMap[x][y] = height;
             
-            
-            
             vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
             {
-                indices.push_back(currentIndice);
-                indices.push_back(currentIndice-1);
-                indices.push_back(currentIndice-size-1);
+                glm::vec3 t1v1 = vertices.at(currentIndice);
+                glm::vec3 t1v2 = vertices.at(currentIndice-1);
+                glm::vec3 t1v3 = vertices.at(currentIndice-size-1);
                 
-                indices.push_back(currentIndice);
-                indices.push_back(currentIndice-size);
-                indices.push_back(currentIndice-size-1);
+                glm::vec3 t2v1 = vertices.at(currentIndice);
+                glm::vec3 t2v2 = vertices.at(currentIndice-size);
+                glm::vec3 t2v3 = vertices.at(currentIndice-size-1);
                 
+                glm::vec3 t1e1 = t1v2-t1v1;
+                glm::vec3 t1e2 = t1v3-t1v1;
+                
+                glm::vec3 t2e1 = t2v2-t2v1;
+                glm::vec3 t2e2 = t2v3-t2v1;
+                
+                glm::vec3 t1n = glm::normalize(glm::cross(t1e1,t1e2));
+                glm::vec3 t2n = glm::normalize(glm::cross(t2e2,t2e1));
+                
+                finalVertices.push_back(t1v1);
+                finalVertices.push_back(t1n);
+                finalVertices.push_back(t1v2);
+                finalVertices.push_back(t1n);
+                finalVertices.push_back(t1v3);
+                finalVertices.push_back(t1n);
+                
+                finalVertices.push_back(t2v1);
+                finalVertices.push_back(t2n);
+                finalVertices.push_back(t2v2);
+                finalVertices.push_back(t2n);
+                finalVertices.push_back(t2v3);
+                finalVertices.push_back(t2n);
             }
             
             currentIndice++;
         }
     }
+    vertices.clear();
     
     // Generate buffers
     glGenVertexArrays(1, &VAO);
@@ -54,26 +73,16 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     // Buffer object data
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * finalVertices.size(), finalVertices.data(), GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+    
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    // Apply translation to model matrix
-    
-    // Apply scale to model matrix
-    
-    // Apply rotations to model matrix
-    
-    
-    
-    
     
     // Compile and load shaders
     if(chunkShader == nullptr)
@@ -134,7 +143,7 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     
     // Draw object
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0, finalVertices.size()/2);
     glBindVertexArray(0);
     
     
@@ -179,7 +188,7 @@ Terrain::Terrain()
         }
     }
     
-    std::cout << "terrain finished" << std::endl;
+    //std::cout << "terrain finished" << std::endl;
 }
 
 
