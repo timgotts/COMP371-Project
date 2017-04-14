@@ -4,108 +4,132 @@
 #include <GLM\gtc\type_ptr.hpp>
 
 #include "Cube.h"
-
+#include <GLFW/glfw3.h>
+#include "Camera.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#include "DirectionalLight.h"
 
 
 Cube::Cube(float edgeLength, glm::vec3 eulerXYZ, glm::vec3 position)
 {
-    
+	
+	
+	//Compute surface normals for cube
+	glm::vec3 surfaceNormals[6] = {
+		glm::vec3(0.f, 0.f, -1.f),
+		glm::vec3(0.f, 0.f, 1.f),
+		glm::vec3(-1.f,0.f, 0.f),
+		glm::vec3(1.f, 0.f, 0.f),
+		glm::vec3(0.f, -1.f, 0.f),
+		glm::vec3(0.f, 1.f, 0.f) };
+
+	int surface = 0;
+
     // Base cube vertice data
-    vertices =
-    {
-        glm::vec3(-0.5f,-0.5f,-0.5f),	// 0 Left bottom back
-        glm::vec3(-0.5f,-0.5f,0.5f),	// 1 Left bottom front
-        glm::vec3(-0.5f,0.5f,-0.5f),	// 2 Left top back
-        glm::vec3(-0.5f,0.5f,0.5f),		// 3 Left top front
-        glm::vec3(0.5f,-0.5f,-0.5f),	// 4 Right bottom back
-        glm::vec3(0.5f,-0.5f,0.5f),		// 5 Right bottom front
-        glm::vec3(0.5f,0.5f,-0.5f),		// 6 Right top back
-        glm::vec3(0.5f,0.5f,0.5f)		// 7 Right top front
-    };
-    
-    indices =
-    {
-        // Left face
-        0, 1, 2,
-        2, 1, 3,
-        
-        // Right face
-        4, 5, 6,
-        6, 5, 7,
-        
-        // Front face
-        1, 5, 3,
-        3, 5, 7,
-        
-        // Back face
-        0, 4, 2,
-        2, 4, 6,
-        
-        // Bottom face
-        1, 5, 0,
-        0, 5, 4,
-        
-        // Top face
-        3, 7, 2,
-        2, 7, 6
-    };
+	vertices = {
+		glm::vec3(-0.5f, -0.5f, -0.5f), surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f, -0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f, -0.5f), surfaceNormals[surface++],
+
+		glm::vec3(-0.5f, -0.5f,  0.5f), surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f,  0.5f),  surfaceNormals[surface++],
+
+		glm::vec3(-0.5f,  0.5f,  0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f, -0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f, -0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f, -0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f,  0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f,  0.5f), surfaceNormals[surface++],
+
+		glm::vec3(0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f,  0.5f),  surfaceNormals[surface++],
+
+		glm::vec3(-0.5f, -0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f, -0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f, -0.5f, -0.5f),  surfaceNormals[surface++],
+
+		glm::vec3(-0.5f,  0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f, -0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(0.5f,  0.5f,  0.5f), surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f,  0.5f),  surfaceNormals[surface],
+		glm::vec3(-0.5f,  0.5f, -0.5f),  surfaceNormals[surface]
+	};
     
     // Generate buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     
     // Buffer object data
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
     
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
-    
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	//Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
     glEnableVertexAttribArray(0);
+
+	// Normal attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+	glBindVertexArray(0);
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    glBindVertexArray(0);    
     
-    // Apply translation to model matrix
-    model = glm::translate(model, -position);
-    
-    // Apply scale to model matrix
-    model = glm::scale(model, glm::vec3(edgeLength, edgeLength, edgeLength));
-    
-    // Apply rotations to model matrix
-    model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
-    
-    
-    
-    
-    
-    // Compile and load shaders
-    shader = new Shader("res/shaders/main.vs", "res/shaders/main.fs");
-    
+
+	// Apply translation to model matrix
+	model = glm::translate(model, -position);
+
+	// Apply scale to model matrix
+	model = glm::scale(model, glm::vec3(edgeLength, edgeLength, edgeLength));
+
+	// Apply rotations to model matrix
+	model = glm::rotate(model, eulerXYZ.x, glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, eulerXYZ.y, glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::rotate(model, eulerXYZ.z, glm::vec3(0.0f, 0.0f, 1.0f));
+
+	material = Material();
 }
 
 
-
-void Cube::render(glm::mat4 view, glm::mat4 projection)
+void Cube::render(Shader* shader)
 {
-    shader->use();
-    
-    // Broadcast the uniform values to the shaders
-    GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-    
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    
-    // Draw object
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+
+
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 }
+
