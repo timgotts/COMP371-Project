@@ -189,10 +189,10 @@ int main()
     }
     Timer::stop("Fish");
     
-    /*Timer::start("seaweed");
+    Timer::start("seaweed");
     for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
     {
-    
+        
         float x = u1(gen) * terrainSize  - terrain->getPointsPerChunk();;
         float z = u1(gen) * terrainSize  - terrain->getPointsPerChunk();;
         float y = terrain->getHeightAt(x,z);
@@ -201,7 +201,7 @@ int main()
         if(chunk != nullptr)
             chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
     }
-    Timer::stop("seaweed");*/
+    Timer::stop("seaweed");
     
     
     
