@@ -21534,8 +21534,8 @@ Seaweed::Seaweed(glm::vec3 position)
 		model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
 		//Scale the seaweed to make them bigger
 		model = model*glm::scale(glm::mat4(1.0f), glm::vec3(2.5f));
-		//Have to add a scale matrix
-
+		
+		//Applying lighitng for both seaweeds
 		if (amount % 2 == 0)
 		{
 			material = Material(glm::vec3(0.15f, 0.59f, 0.047f), glm::vec3(0.14f, 0.75f, 0.25f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
