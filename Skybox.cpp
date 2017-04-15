@@ -46,8 +46,6 @@ Skybox::Skybox()
         glm::vec3(-1.0f, -1.0f,  1.0f),
         glm::vec3(1.0f, -1.0f,  1.0f)
     };
-    // Compile and load shaders
-    shader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
     
     //std::vector<glm::vec3> skybox_normals;
     //std::vector<glm::vec2> skybox_UVs;
@@ -84,21 +82,10 @@ Skybox::Skybox()
     
 }
 
-void Skybox::render(glm::mat4 view, glm::mat4 projection)
+void Skybox::render(Shader* shader)
 {
     shader->use();
-    
-    // Remove translation component of the view matrix
-    glm::mat4 skybox_view = glm::mat4(glm::mat3(view));
-    
-    // Broadcast the uniform values to the shaders
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-    
-    
-    
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(skybox_view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
     glUniform1i(glGetUniformLocation(shader->program, "skyboxTexture"), 1);
     
     glDepthMask(GL_FALSE);
