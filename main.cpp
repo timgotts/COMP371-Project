@@ -176,7 +176,6 @@ int main()
     //}
     
     sun = DirectionalLight();
-    spotLight = SpotLight(camera.getPosition(), camera.getFront());
     
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
@@ -223,6 +222,7 @@ int main()
     
     
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+	spotLight = SpotLight(camera.getPosition(), camera.getFront());
     
     
     // ___________________________ GAME LOOP ___________________________
@@ -237,7 +237,7 @@ int main()
         // Process events
         glfwPollEvents();
         doMovement();
-        spotLight.UpdatePosition(camera.getPosition(),camera.getFront());
+        
         
         // Clear frame buffer
         glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
@@ -256,14 +256,14 @@ int main()
         
         // Set up lighting uniforms
         
-        // Directional light
+			// Directional light
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.direction"), sun.direction.x, sun.direction.y, sun.direction.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.ambient"), sun.ambient.x, sun.ambient.y, sun.ambient.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.diffuse"), sun.diffuse.x, sun.diffuse.y, sun.diffuse.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.specular"), sun.specular.x, sun.specular.y, sun.specular.z);
         
-        ////	// Point Lights
-        //	//	// Point light 1
+        	// Point Lights
+        		// Point light 1
         //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].position"), pointLights[0].position.x, pointLights[0].position.y, pointLights[0].position.z);
         //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].ambient"), pointLights[0].ambient.x, pointLights[0].ambient.y, pointLights[0].ambient.z);
         //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].diffuse"), pointLights[0].diffuse.x, pointLights[0].diffuse.y, pointLights[0].diffuse.z);
@@ -297,17 +297,17 @@ int main()
         //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[3].quadratic"), pointLights[3].quadratic);
         
         
-        ////// SpotLight
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), spotLight.position.x, spotLight.position.y, spotLight.position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), camera.getFront().x, camera.getFront().y, camera.getFront().z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.ambient"), spotLight.ambient.x, spotLight.ambient.y, spotLight.ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.diffuse"), spotLight.diffuse.x, spotLight.diffuse.y, spotLight.diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.specular"), spotLight.specular.x, spotLight.specular.y, spotLight.specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.constant"), spotLight.constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.linear"), spotLight.linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.quadratic"), spotLight.quadratic);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.cutOff"), spotLight.cutOff);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.outerCutOff"), spotLight.cutOff);
+        // SpotLight
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), spotLight.position.x, spotLight.position.y, spotLight.position.z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), camera.getFront().x, camera.getFront().y, camera.getFront().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.ambient"), spotLight.ambient.x, spotLight.ambient.y, spotLight.ambient.z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.diffuse"), spotLight.diffuse.x, spotLight.diffuse.y, spotLight.diffuse.z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.specular"), spotLight.specular.x, spotLight.specular.y, spotLight.specular.z);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.constant"), spotLight.constant);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.linear"), spotLight.linear);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.quadratic"), spotLight.quadratic);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.cutOff"), spotLight.cutOff);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.outerCutOff"), spotLight.outerCutOff);
         
         
         GLint viewPosLoc = glGetUniformLocation(lightingShader->program, "viewPos");
@@ -495,5 +495,6 @@ void doMovement()
     {
         camera.processKeyboard(WALK, deltaTime);
     }
+	spotLight.UpdatePosition(camera.getPosition(), camera.getFront());
     
 }
