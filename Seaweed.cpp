@@ -11111,8 +11111,8 @@ GLfloat Seaweed::greenVBO[] =
 };
 
 //Red seaweed
-	GLfloat Seaweed::redVBO[] =
-	{
+GLfloat Seaweed::redVBO[] =
+{
 	-0.3775, 0.6575, 0.7925, -0.541981, 0.104899, 0.833818,
  -0.3275, 0.6575, 0.825, -0.541981, 0.104899, 0.833818,
  -0.2975, 0.8125, 0.825, -0.541981, 0.104899, 0.833818,
@@ -21483,7 +21483,7 @@ GLfloat Seaweed::greenVBO[] =
  -0.2575, -0.8125, 0.7375, 0.88862, 0, -0.458643, 
 
 	};
-	Seaweed::Seaweed(glm::vec3 position)
+Seaweed::Seaweed(glm::vec3 position)
 	{
 
 		//calculateSweep();
@@ -21535,9 +21535,17 @@ GLfloat Seaweed::greenVBO[] =
 
 		//Have to add a scale matrix
 
-
+		if (amount % 2 == 0)
+		{
+			material = Material(glm::vec3(0.15f, 0.59f, 0.047f), glm::vec3(0.14f, 0.75f, 0.25f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+		}
+		else
+		{
+			material = Material(glm::vec3(0.635f, 0.08f, 0.08f), glm::vec3(0.75f, 0.14f, 0.15f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+		}
 		amount++;
-		material = Material(glm::vec3(0.007f, 0.51f, 0.5f), glm::vec3(0.14f, 0.25f, 0.9f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+		
+		
 	}
 
 
@@ -21576,12 +21584,8 @@ GLfloat Seaweed::greenVBO[] =
 
 		}; */
 
-
-
-
 		//model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
-
-		//model = model*shear;
+		model = model*glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
 
 		//Draw the seaweed
 		glBindVertexArray(VAO);
