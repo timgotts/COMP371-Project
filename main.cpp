@@ -193,8 +193,8 @@ int main()
     for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
     {
         
-        float x = u1(gen) * terrainSize  - terrain->getPointsPerChunk();;
-        float z = u1(gen) * terrainSize  - terrain->getPointsPerChunk();;
+        float x = u1(gen) * terrainSize;
+        float z = u1(gen) * terrainSize;
         float y = terrain->getHeightAt(x,z);
         
         TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
