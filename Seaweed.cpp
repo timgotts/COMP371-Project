@@ -21532,7 +21532,8 @@ Seaweed::Seaweed(glm::vec3 position)
 
 		//Apply the a rotation
 		model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
-
+		//Scale the seaweed to make them bigger
+		model = model*glm::scale(glm::mat4(1.0f), glm::vec3(2.5f));
 		//Have to add a scale matrix
 
 		if (amount % 2 == 0)
@@ -21585,7 +21586,7 @@ Seaweed::Seaweed(glm::vec3 position)
 		}; */
 
 		//model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
-		model = model*glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
+	
 
 		//Draw the seaweed
 		glBindVertexArray(VAO);
