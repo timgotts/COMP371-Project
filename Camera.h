@@ -66,6 +66,11 @@ public:
 
 	}
 
+	glm::vec3 getFront()
+	{
+		return front;
+	}
+
 
 	void processKeyboard(CameraMovement command, GLfloat deltaTime)
 	{

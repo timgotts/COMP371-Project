@@ -2,7 +2,6 @@
 #include <fstream>
 using namespace std;
 
-Shader* Seaweed::seaweedShader;
 int Seaweed::amount = 0;
 
 
@@ -21491,6 +21490,17 @@ GLfloat Seaweed::redVBO[]=
 		if(amount==0)
 			calculateSweep();
 
+<<<<<<< HEAD
+=======
+		rotAngle = 90.0;
+    
+    //VAO, VBO, and EBO initialization
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    //Binding the VAO
+    glBindVertexArray(VAO);
+    // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+>>>>>>> refs/remotes/origin/master
 
 		rotAngle = 90.0;
 
@@ -21592,6 +21602,7 @@ GLfloat Seaweed::redVBO[]=
 	}
 
 
+<<<<<<< HEAD
 
 
 	void Seaweed::calculateSweep()
@@ -21603,6 +21614,29 @@ GLfloat Seaweed::redVBO[]=
 		//The colour modifiers
 		float colMod1 = 0;
 		float colMod2 = 0;
+=======
+    //For the colors (vertex shader)
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    //unbind the VAO
+    glBindVertexArray(0);
+    
+    
+    //Translate the weed to a position
+    model = glm::translate(model, position);
+    
+    //Apply the a rotation
+    model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
+    
+    //Have to add a scale matrix
+   
+    
+    amount++;
+	material = Material(glm::vec3(0.007f,0.51f,0.5f), glm::vec3(0.14f, 0.25f, 0.9f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+}
+>>>>>>> refs/remotes/origin/master
 
 		//The Original GREEn seaweed
 		// if (amount % 2 == 0)
@@ -21651,6 +21685,7 @@ GLfloat Seaweed::redVBO[]=
 			glm::vec3(0.785352, -0.11834, 0)
 		};
 
+<<<<<<< HEAD
 		trajectory =
 		{
 
@@ -21712,6 +21747,57 @@ GLfloat Seaweed::redVBO[]=
 		// }
 		*/
 		//The other RED seaweed
+=======
+void Seaweed::render(Shader* shader)
+{
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+	GLuint modelLoc = glGetUniformLocation(shader->program, "model");
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+    //Sin functiont to move the vertices based on time.
+    GLfloat timeMove = (sin(glfwGetTime()))/2;
+    //enabling the shader
+    //shader->use();
+    
+    
+    /*glm::mat4 shear = 
+    {
+     1, timeMove, 0, 0,
+     0, 1, timeMove ,0,
+     0, 0, 1, 0,
+     0, 0, 0, 0
+     
+    }; */
+    
+
+
+    
+    //model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
+    
+    //model = model*shear;
+    
+    //Draw the seaweed
+    glBindVertexArray(VAO);
+	if(amount%2==0)
+		glDrawArrays(GL_TRIANGLES, 0, ((sizeof(greenVBO))/(6*sizeof(GLfloat))) );
+	else
+		glDrawArrays(GL_TRIANGLES, 0, ((sizeof(redVBO)) / (6 * sizeof(GLfloat))));
+    glBindVertexArray(0);
+}
+>>>>>>> refs/remotes/origin/master
 
 		// {
 		

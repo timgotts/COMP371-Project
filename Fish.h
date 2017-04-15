@@ -10,10 +10,8 @@ public:
 	
 	Fish(glm::vec3 position);
 
-	void render(glm::mat4 view, glm::mat4 projection);
+	void render(Shader* shader);
 	void animate(float deltaTime);
-
-	glm::vec4 color;
 
 private:
 

@@ -1,8 +1,6 @@
 #include "Terrain.h"
 
-Shader* TerrainChunk::chunkShader = nullptr;
-
-TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNoiseGenerator* pn) : size(size), posX(posX), posY(posY)
+TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexNoise* pn, int finalSize) : size(size), posX(posX), posY(posY)
 {
     
     heightMap = new float*[size];
@@ -21,9 +19,11 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
             float coordY = (posY * (size-1) + y);
             
             
-            float height = pn->getHeightAt(coordX, coordY);
+            float height = 50 * pn->noise(coordX/(size*size), coordY/(size*size));
             
             heightMap[x][y] = height;
+            
+            //std::cout << height << std::endl;
             
             vertices.push_back({coordX, height, coordY });
             if(x > 0 && y > 0)
@@ -68,7 +68,6 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     // Generate buffers
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     
     // Buffer object data
     glBindVertexArray(VAO);
@@ -83,12 +82,10 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  PerlinNo
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    // Compile and load shaders
-    if(chunkShader == nullptr)
-        chunkShader= new Shader("res/shaders/terrain.vs", "res/shaders/terrain.fs");
-    shader = chunkShader;
-    
+
+	//Assign material
+	material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4.0f);
+
 }
 
 void TerrainChunk::addEntity(Renderable* r)
@@ -128,19 +125,27 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
     
 }
 
-void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
+void TerrainChunk::render(Shader* shader)
 {
-    shader->use();
-    
-    // Broadcast the uniform values to the shaders
+    //shader->use();
+	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+   
+	// Broadcast the uniform values to the shaders
     GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-    GLuint viewLoc = glGetUniformLocation(shader->program, "view");
-    GLuint projectionLoc = glGetUniformLocation(shader->program, "projection");
-    
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-    glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-    
+	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+
+	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+	glUniform1f(matShineLoc, material.shininess);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+
+        
     // Draw object
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, finalVertices.size()/2);
@@ -149,7 +154,7 @@ void TerrainChunk::render(glm::mat4 view, glm::mat4 projection)
     
     for(auto entity : entities)
     {
-        entity->render(view, projection);
+        entity->render(shader);
     }
     
 }
@@ -171,12 +176,13 @@ Terrain::Terrain()
     double amplitude = generatorConfig->getDouble("amplitude");
     int octaves = generatorConfig->getInt("octaves");
     
-    PerlinNoiseGenerator* perlin = new PerlinNoiseGenerator(persistence, frequency, amplitude, octaves, rand());
+    SimplexNoise* perlin = new SimplexNoise(frequency, amplitude, 2.0f, persistence);
     
     ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
     
     pointsPerChunk = chunkConfig->getInt("pointsPerChunk");
     
+    int finalSize = size * (pointsPerChunk-1);
     
     for(int x = 0; x < size; x++)
     {
@@ -184,7 +190,7 @@ Terrain::Terrain()
         
         for(int y = 0; y < size; y++)
         {
-            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin);
+            chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin, finalSize);
         }
     }
     
@@ -262,7 +268,7 @@ void Terrain::setHeightAt(int x, int y, float  height)
 }
 
 
-void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
+void Terrain::render(glm::vec3 position, Shader* shader)
 {
     TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
     if(chunk != nullptr)
@@ -298,7 +304,7 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
         {
             for(int y = minY; y <= maxY; y++)
             {
-                getChunkAt(x,y)->render(view,proj);
+                getChunkAt(x,y)->render(shader);
             }
         }
         
@@ -309,7 +315,7 @@ void Terrain::render(glm::vec3 position, glm::mat4 view, glm::mat4 proj)
         {
             for(int y = 0; y < size; y++)
             {
-                getChunkAt(x,y)->render(view,proj);
+                getChunkAt(x,y)->render(shader);
             }
         }
     }
