@@ -24,8 +24,8 @@ PointLight::PointLight(glm::vec3 position) : Light()
 {
 	this->position = position;
 	this->constant = 1.0f;
-	this->linear = 0.09f;
-	this->quadratic = 0.032f;
+	this->linear = 0.007f;
+	this->quadratic = 0.0002f;
 }
 
 

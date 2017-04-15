@@ -9,8 +9,8 @@ SpotLight::SpotLight(): Light()
 	this->cutOff = glm::cos(glm::radians(12.5f));
 	this->outerCutOff = glm::cos(glm::radians(15.0f));
 	this->constant = 1.0f;
-	this->linear = 0.09f;
-	this->quadratic = 0.032f;
+	this->linear = 0.0014f;
+	this->quadratic = 0.000007f;
 }
 
 SpotLight::SpotLight(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 position, glm::vec3 direction, float cutOff, float outerCutOff, float constant, float linear, float quadratic):
@@ -30,16 +30,10 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction): Light()
 	this->position = position;
 	this->direction = direction;
 	this->cutOff = glm::cos(glm::radians(12.5f));
-	this->outerCutOff = glm::cos(glm::radians(15.0f));
+	this->outerCutOff = glm::cos(glm::radians(22.0f));
 	this->constant = 1.0f;
-	this->linear = 0.09f;
-	this->quadratic = 0.032f;
-}
-
-void SpotLight::UpdatePosition(glm::vec3 position, glm::vec3 direction)
-{
-	this->position = position;
-	this->direction = direction;
+	this->linear = 0.007f;
+	this->quadratic = 0.0002f;
 }
 
 
