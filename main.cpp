@@ -181,20 +181,20 @@ int main()
     
     
     Timer::start("fish");
-    for (int i = 0; i < 50; ++i)
+    for (int i = 0; i < 300; ++i)
     {
         objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
     }
     Timer::stop("Fish");
 
 	Timer::start("GlowFish");
-	for (int i = 0; i < 300; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
 	}
 	Timer::stop("GlowFish");
     
-    Timer::start("seaweed");
+    /*Timer::start("seaweed");
     for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
     {
         
@@ -206,7 +206,7 @@ int main()
         if(chunk != nullptr)
             chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
     }
-    Timer::stop("seaweed");
+    Timer::stop("seaweed");*/
     
     
     

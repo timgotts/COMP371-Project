@@ -30,7 +30,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
-#define NR_POINT_LIGHTS 25  
+#define NR_POINT_LIGHTS 10  
 
 
 // Spot lights
@@ -78,7 +78,7 @@ void main()
 
 	vec3 result=vec3(0.0, 0.0, 0.0);
     // Phase 1: Directional lighting
-    //result += CalcDirLight(dirLight, norm, viewDir);
+    result += CalcDirLight(dirLight, norm, viewDir);
     // Phase 2: Point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
       result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
