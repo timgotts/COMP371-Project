@@ -137,6 +137,15 @@ bool TerrainChunk::load()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
         
+        
+        //render all the entities contained in the chunk
+        for(auto entity : entities)
+        {
+            entity->load();
+        }
+        
+        
+        
         return true;
     }
     return false;
@@ -144,6 +153,14 @@ bool TerrainChunk::load()
 
 void TerrainChunk::unload()
 {
+    
+    //unload all the entities contained in the chunk
+    for(auto entity : entities)
+    {
+        entity->unload();
+    }
+    
+    
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
     

@@ -26,6 +26,9 @@ class Renderable
     virtual void render(Shader* shader) {};
     virtual void animate(float deltaTime) {};
     
+    virtual bool load() { return true; };
+    virtual void unload() {};
+    
     private:
     
 };
