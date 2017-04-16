@@ -48,7 +48,6 @@ Skybox* skybox;
 DirectionalLight sun;
 SpotLight spotLight;
 std::vector<PointLight> pointLights;
-std::vector<LightSource> lightSources; // Temp to test point lights
 Terrain* terrain;
 Shader* lightingShader;
 Shader* lightSourceShader;
