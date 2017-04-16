@@ -33,6 +33,9 @@ class Seaweed : public Renderable
     //Length of the indicesEBO
     int indexLength;
     
+    //seaweed type
+    int type;
+    
     //Added for now to generate different seaweed
     static int amount;
     
