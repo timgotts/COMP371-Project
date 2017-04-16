@@ -48,6 +48,7 @@ Skybox* skybox;
 DirectionalLight sun;
 SpotLight spotLight;
 std::vector<PointLight> pointLights;
+std::vector<LightSource> lightSources; // Temp to test point lights
 Terrain* terrain;
 Shader* lightingShader;
 Shader* lightSourceShader;
@@ -243,7 +244,7 @@ int main()
     // ____________________________ END CREATING SCENE ____________________________
     
     
-    camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+    camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
     spotLight = SpotLight(camera.getPosition(), camera.getFront());
     
     
@@ -449,39 +450,77 @@ void windowResizeCallback(GLFWwindow* window, int width, int height)
 
 void doMovement()
 {
+    GLfloat velocity = 2*camera.getMovementSpeed() * deltaTime;
+    
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
-        camera.processKeyboard(FORWARD, deltaTime);
+        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(FORWARD, deltaTime);
+        }
+        
     }
     
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
-        camera.processKeyboard(BACKWARD, deltaTime);
+        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getFront());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(BACKWARD, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
-        camera.processKeyboard(LEFT, deltaTime);
+        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getRight());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(LEFT, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
-        camera.processKeyboard(RIGHT, deltaTime);
+        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getRight());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(RIGHT, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_SPACE])
     {
-        camera.processKeyboard(UP, deltaTime);
+        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getUp());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(UP, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
-        camera.processKeyboard(DOWN, deltaTime);
+        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getUp());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(DOWN, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_Q])
     {
-        camera.processKeyboard(ROLL_LEFT, deltaTime);
+        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        if(height < -newPos.y)
+        {
+            camera.processKeyboard(ROLL_LEFT, deltaTime);
+        }
     }
     
     if (keys[GLFW_KEY_E])
