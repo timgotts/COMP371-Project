@@ -53,7 +53,9 @@ struct SpotLight {
 
 in vec3 FragPos;  
 in vec3 Normal;  
-  
+in float Opacity;  
+in float DistanceFromView;
+
 out vec4 color;
  
 
@@ -64,6 +66,7 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 
+uniform float viewDistance;
 
 //Function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);  
@@ -86,7 +89,7 @@ void main()
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
     
 	result= pow(result, vec3(1.0/0.8));
-    color = vec4(result, 1.0);
+    color = vec4(result, Opacity) * (1.0f-(DistanceFromView/viewDistance));
 }
 
 

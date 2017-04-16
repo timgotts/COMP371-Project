@@ -439,3 +439,8 @@ void Terrain::render(glm::vec3 position, Shader* shader)
     }
     
 }
+
+int Terrain::getRenderDistance()
+{
+    return renderDistance;
+}

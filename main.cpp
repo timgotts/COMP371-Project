@@ -74,6 +74,9 @@ int main()
     
     // ___________________________ SETTINGS ___________________________
     
+    // Generate terrain
+    std::thread terrainThread(createTerrainThread);
+    
     
     
     // Create GLFW window
@@ -139,9 +142,6 @@ int main()
     // ____________________________ CREATING SCENE ____________________________
     
     
-    // Generate terrain
-    std::thread terrainThread(createTerrainThread);
-    
     // Generate skybox
     Timer::start("skybox");
     skybox = new Skybox();
@@ -183,13 +183,13 @@ int main()
     
     
     Timer::start("seaweed");
-    for (int i = 0; i < (int)(0.0005f*(terrainSize*terrainSize)); i++)
+    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
     
     {
         float x = u1(gen) * terrainSize;
         float z = u1(gen) * terrainSize;
         
-        int patchSize = rand() % 40;
+        int patchSize = rand() % 20;
         
         for (float j = 0; j < patchSize; j++)
         {
@@ -219,6 +219,8 @@ int main()
     glfwShowWindow(window);
     while (!glfwWindowShouldClose(window)) {
         
+        float viewDistance = terrain->getRenderDistance() * terrain->getPointsPerChunk();
+        
         // Update frame deltaTime
         GLfloat currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
@@ -233,7 +235,7 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
-        glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         
@@ -242,13 +244,15 @@ int main()
         
         //Skybox
         skyboxShader->use();
+        
+        glUniform1f(glGetUniformLocation(skyboxShader->program, "viewDistance"), viewDistance);
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        skybox->render(skyboxShader);
+        //skybox->render(skyboxShader);
         
         //Terrain/fish/rocks
         lightingShader->use();
-        
+        glUniform1f(glGetUniformLocation(lightingShader->program, "viewDistance"), viewDistance);
         glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         
@@ -289,6 +293,7 @@ int main()
             
         }
         
+        
         // Render the terrain and scene objects
         terrain->render(camera.getPosition(), lightingShader);
         
@@ -299,11 +304,13 @@ int main()
             fish->render(lightingShader);
         }
         
-        
         //Glowfish
         lightSourceShader->use();
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        
+        glUniform1f(glGetUniformLocation(lightSourceShader->program, "viewDistance"),  viewDistance);
+        
         
         //Render glowfish
         for (auto gf : glowFish)
@@ -566,7 +573,7 @@ void createTerrainThread()
     
     
     Timer::start("rock");
-    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+    for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
     {
         float x = u1(gen) * terrainSize;
         

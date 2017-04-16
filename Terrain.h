@@ -88,6 +88,8 @@ class Terrain
     
     void updateChunks(glm::vec3 position);
     
+    int getRenderDistance();
+    
     private:
     
     //number of chunks on x,y
