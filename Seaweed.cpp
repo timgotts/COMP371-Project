@@ -1,5 +1,6 @@
 #include "Seaweed.h"
 #include <fstream>
+#include <random>
 using namespace std;
 
 int Seaweed::amount = 0;
@@ -416,7 +417,11 @@ Seaweed::Seaweed(glm::vec3 position)
         
         rotAngle = 180.0;
     }
-    
+
+	// Random devices and distributions
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> u(2.5, 5.5);
     
     //Translate the weed to a position
     model = glm::translate(model, position);
@@ -424,7 +429,7 @@ Seaweed::Seaweed(glm::vec3 position)
     //Apply the a rotation
     model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
     //Scale the seaweed to make them bigger
-    model = model*glm::scale(glm::mat4(1.0f), glm::vec3(2.5f));
+	model = glm::scale(model, glm::vec3(u(gen)));
     
     //Applying lightinng for both seaweeds
     if (amount % 2 == 0)

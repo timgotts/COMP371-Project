@@ -44,7 +44,6 @@ Camera camera = Camera();
 std::vector<Fish*> fishes;
 std::vector<GlowFish*> glowFish;
 std::vector<Cube*> cubes;
-std::vector<Coral*> corals;
 Skybox* skybox;
 DirectionalLight sun;
 SpotLight spotLight;
@@ -229,7 +228,7 @@ int main()
     Timer::stop("rock");
 
 	Timer::start("coral");
-	for (int i = 0; i < (int)(0.0005f*terrainSize*terrainSize); i++)
+	for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
 	{
 		float x = u1(gen) * terrainSize;
 
@@ -252,7 +251,7 @@ int main()
     terrain->updateChunks(camera.getPosition());
 	
 	spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(17.5f)), 1.0f, 0.0014f, 0.000007f);
+		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -272,7 +271,7 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
-        glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
+        glClearColor(1.01f, 1.01f, 1.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         
@@ -338,10 +337,6 @@ int main()
             fish->render(lightingShader);
         }
 
-		for (auto coral : corals)
-		{
-			coral->render(lightingShader);
-		}
 
 
 		//Glowfish
@@ -466,7 +461,7 @@ void doMovement()
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
         if(height < -newPos.y)
         {
             camera.processKeyboard(FORWARD, deltaTime);
@@ -478,7 +473,7 @@ void doMovement()
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
         if(height < -newPos.y)
         {
             camera.processKeyboard(BACKWARD, deltaTime);
@@ -489,7 +484,7 @@ void doMovement()
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(LEFT, deltaTime);
@@ -500,7 +495,7 @@ void doMovement()
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(RIGHT, deltaTime);
@@ -511,7 +506,7 @@ void doMovement()
     if (keys[GLFW_KEY_SPACE])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(UP, deltaTime);
@@ -522,7 +517,7 @@ void doMovement()
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(DOWN, deltaTime);
@@ -533,7 +528,7 @@ void doMovement()
     if (keys[GLFW_KEY_Q])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(ROLL_LEFT, deltaTime);

@@ -15,8 +15,10 @@ Coral::Coral(glm::vec3 position) : position(position)
 	std::uniform_real_distribution<> u(0.2, 0.3);
 	std::uniform_real_distribution<> u1(0.5, 1.5);
 	std::uniform_real_distribution<> randWidth(1.0, 3.0);
+	std::uniform_real_distribution<> randColor(0.0, 1.0);
+	std::uniform_real_distribution<> v(-0.2, 0.2);
 
-	float wc = randWidth(gen);
+	float wc = randWidth(gen) * 0.5;
 	float lc = wc*5.0f*u1(gen);
 	
 	// Base triangle
@@ -35,8 +37,11 @@ Coral::Coral(glm::vec3 position) : position(position)
 
 	model = glm::translate(glm::mat4(1.0f), -position);
 
+	float baseColor = v(gen);
+	glm::vec3 color = glm::vec3(randColor(gen) + baseColor, randColor(gen) + baseColor, randColor(gen) + baseColor);
+
 	// Assign material 
-	material = Material(glm::vec3(0.28f, 0.24f, 0.545f), glm::vec3(0.75f, 0.75f, 0.75f), glm::vec3(0.5f, 0.5f, 0.5f), 64.0f);
+	material = Material(glm::vec3(0.25f), color, glm::vec3(0.25f), 0.4f);
 
 }
 
@@ -79,7 +84,7 @@ void Coral::tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, floa
 	std::poisson_distribution<> p(10);
 	std::uniform_real_distribution<> u(0.5, 0.9);
 	std::uniform_real_distribution<> u3(0.1, 0.3);
-	std::uniform_real_distribution<> u1(0.5, 1.5);
+	std::uniform_real_distribution<> u1(0.0, 1.0);
 	std::uniform_real_distribution<> u2(5.0, 15.0);
 
 	float lv = u(gen);
@@ -92,7 +97,7 @@ void Coral::tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, floa
 	glm::vec3 v3 = v0 + lc * tnormal;
 	glm::vec3 v4 = v1 + lc * tnormal;
 	glm::vec3 v5 = v2 + lc * tnormal;
-	glm::vec3 c2 = centroid + lc * tnormal;
+	glm::vec3 c2 = glm::vec3((v3.x + v4.x + v5.x) / 3, (v3.y + v4.y + v5.y) / 3, (v3.z + v4.z + v5.z) / 3);
 
 	//Reduce width
 	v3 = v3 + wv * (c2 - v3);
@@ -114,10 +119,10 @@ void Coral::tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, floa
 	pushTriangle(v2, v0, v3, n3);
 	pushTriangle(v2, v3, v5, n3);
 
+	float edgeLength = glm::distance(v4, v5);
 
 	//Cap vertex
-	float edgeLength = wc - (2 * wv*cos(glm::radians(30.0f)));
-	glm::vec3 v6 = centroid + (lc + edgeLength * float(sqrt(6)) / 3) * tnormal;
+	glm::vec3 v6 = c2 + (edgeLength * float(sqrt(6)) / 3) * tnormal;
 
 	//Cap face 1
 	glm::vec3 n4 = glm::normalize(glm::cross(v6 - v3, v4 - v3));
@@ -125,20 +130,24 @@ void Coral::tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, floa
 
 	//Cap face 2
 	glm::vec3 n5 = glm::normalize(glm::cross(v6 - v4, v5 - v4));
-	pushTriangle(v4, v6, v6, n5);
+	pushTriangle(v4, v5, v6, n5);
 
 	//Cap face 3
 	glm::vec3 n6 = glm::normalize(glm::cross(v6 - v5, v3 - v5));
 	pushTriangle(v5, v3, v6, n6);
 
-	
+
 
 	if (r > 0)
 	{
-		tree(v3, v4, v6, r - 1, lc * lv, edgeLength);
-		tree(v4, v5, v6, r - 1, lc * lv, edgeLength);
-		tree(v5, v3, v6, r - 1, lc * lv, edgeLength);
-		tree(v3, v4, v5, r - 1, lc * lv, edgeLength);
+		if (u1(gen) < 0.9f)
+			tree(v3, v4, v6, r - 1, lc * u(gen), edgeLength);
+		if (u1(gen) < 0.9f)
+			tree(v4, v5, v6, r - 1, lc * u(gen), edgeLength);
+		if (u1(gen) < 0.9f)
+			tree(v5, v3, v6, r - 1, lc * u(gen), edgeLength);
+		if (u1(gen) < 0.9f)
+			tree(v3, v4, v5, r - 1, lc * u(gen), edgeLength);
 	}
 
 }

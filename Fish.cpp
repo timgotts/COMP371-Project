@@ -188,10 +188,14 @@ Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), 
 	// Update orientation vectors
 	updateVectors();
 
-
+	// Random devices and distributions
+	std::uniform_real_distribution<> randColor(0.0, 1.0);
+	std::uniform_real_distribution<> v(-0.1, 0.1);
+	float baseColor = v(gen);
+	glm::vec3 color = glm::vec3(randColor(gen) + baseColor, randColor(gen) + baseColor, randColor(gen) + baseColor);
 
 	// Assign material 
-	material = Material(glm::vec3(0.28f, 0.24f, 0.545f), glm::vec3(0.75f,0.75f, 0.75f), glm::vec3(0.5f, 0.5f, 0.5f), 64.0f);
+	material = Material(0.5f *color, 0.5f * color, glm::vec3(0.5f), 1.0f);
 
 
 }
