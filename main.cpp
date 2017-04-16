@@ -156,21 +156,6 @@ int main()
 	skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
     
     
-    
-    //// Create some test cubes (lit objects)
-    //for (int i = 0; i < 150; ++i)
-    //{
-    //	cubes.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
-    //}
-    //
-    //Create some point lights
-    //for (int i=0; i<1; i++)
-    //{
-    //	pointLights.push_back(PointLight(camera.getPosition()));
-    //	// Create white cubes to show the location of point lights
-    //	lightSources.push_back(LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(-10,-15,-11)));
-    //}
-	//DirectionalLight::DirectionalLight(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction)
     sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     
@@ -232,9 +217,8 @@ int main()
     
     
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
-	spotLight = SpotLight(camera.getPosition(), camera.getFront());
-    
-    
+	spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
+		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(17.5f)), 1.0f, 0.0014f, 0.000007f);
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
     while (!glfwWindowShouldClose(window)) {
