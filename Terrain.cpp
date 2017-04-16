@@ -144,7 +144,11 @@ bool TerrainChunk::load()
 
 void TerrainChunk::unload()
 {
+    glDeleteBuffers(1, &VBO);
+    glDeleteVertexArrays(1, &VAO);
     
+    VBO = 0;
+    VAO = 0;
 }
 void TerrainChunk::render(Shader* shader)
 {
