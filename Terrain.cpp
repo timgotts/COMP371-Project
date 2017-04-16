@@ -20,7 +20,7 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
             float coordY = (posY * (size-1) + y);
             
             //generate height at coordinates
-            float height = 50 * pn->noise(coordX/(size*size), coordY/(size*size));
+            float height = 50 * pn->noise(coordX/(20*20), coordY/(20*20));
             
             heightMap[x][y] = height;
             
