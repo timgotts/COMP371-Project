@@ -21,6 +21,7 @@
 #include "PointLight.h"
 #include "Timer.h"
 #include "GlowFish.h"
+#include "Coral.h"
 
 
 #define PI 3.14159265358979323846
@@ -209,11 +210,48 @@ int main()
     Timer::stop("seaweed");
     
     
+    
+    Timer::start("rock");
+    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+    }
+    Timer::stop("rock");
+
+	
+	Timer::start("coral");
+	for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
+	{
+		float x = u1(gen) * terrainSize;
+
+		float z = u1(gen) * terrainSize;
+
+		float y = terrain->getHeightAt(x, z);
+
+		TerrainChunk* chunk = terrain->getChunkAtReal((int)x, (int)z);
+		if (chunk != nullptr)
+			chunk->addEntity(new Coral(glm::vec3(-x, -y, -z)));
+	}
+	Timer::stop("Coral");
+
+    // ____________________________ END CREATING SCENE ____________________________
+    
+    
+    camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
     terrain->updateChunks(camera.getPosition());
-    
-    spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(17.5f)), 1.0f, 0.0014f, 0.000007f);
+	
+	spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
+		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -278,24 +316,22 @@ int main()
         glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
         
         // Point lights (glowfish)
-        for (int i = 0; i<glowFish.size(); i++)
-        {
-            glowFish.at(i)->animate(deltaTime);
-            std::string identifier = "pointLights[" + std::to_string(i) + "]";
-            
-            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
-            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
-            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
-            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
-            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
-            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
-            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
-            
-        }
-        
-        
+		for (int i = 0; i < glowFish.size(); i++)
+		{
+			glowFish.at(i)->animate(deltaTime);
+			std::string identifier = "pointLights[" + std::to_string(i) + "]";
+
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
+		}
+
         // Render the terrain and scene objects
-        terrain->render(camera.getPosition(), lightingShader);
+        terrain->render(camera.getPosition(), lightingShader, deltaTime);
         
         animateFish(deltaTime);
         // Render objects in the scene
@@ -429,7 +465,7 @@ void doMovement()
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
         if(height < -newPos.y)
         {
             camera.processKeyboard(FORWARD, deltaTime);
@@ -441,7 +477,7 @@ void doMovement()
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
         if(height < -newPos.y)
         {
             camera.processKeyboard(BACKWARD, deltaTime);
@@ -452,7 +488,7 @@ void doMovement()
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(LEFT, deltaTime);
@@ -463,7 +499,7 @@ void doMovement()
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(RIGHT, deltaTime);
@@ -474,7 +510,7 @@ void doMovement()
     if (keys[GLFW_KEY_SPACE])
     {
         glm::vec3 newPos = camera.getPosition() - velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(UP, deltaTime);
@@ -485,7 +521,7 @@ void doMovement()
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(DOWN, deltaTime);
@@ -496,7 +532,7 @@ void doMovement()
     if (keys[GLFW_KEY_Q])
     {
         glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z); 
+        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
         if(height < -newPos.y)
         {
             camera.processKeyboard(ROLL_LEFT, deltaTime);

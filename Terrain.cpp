@@ -167,7 +167,7 @@ void TerrainChunk::unload()
     VBO = 0;
     VAO = 0;
 }
-void TerrainChunk::render(Shader* shader)
+void TerrainChunk::render(Shader* shader, float deltaTime)
 {
     
     //shader->use();
@@ -197,7 +197,8 @@ void TerrainChunk::render(Shader* shader)
     //render all the entities contained in the chunk
     for(auto entity : entities)
     {
-        entity->render(shader);
+		entity->animate(deltaTime);
+		entity->render(shader);
     }
     
 }
@@ -385,7 +386,7 @@ void Terrain::updateChunks(glm::vec3 position)
     
 }
 
-void Terrain::render(glm::vec3 position, Shader* shader)
+void Terrain::render(glm::vec3 position, Shader* shader, float deltaTime)
 {
     //render from position outwards in all directions
     TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
@@ -422,7 +423,7 @@ void Terrain::render(glm::vec3 position, Shader* shader)
         {
             for(int y = minY; y <= maxY; y++)
             {
-                getChunkAt(x,y)->render(shader);
+                getChunkAt(x,y)->render(shader, deltaTime);
             }
         }
         
@@ -433,7 +434,7 @@ void Terrain::render(glm::vec3 position, Shader* shader)
         {
             for(int y = 0; y < size; y++)
             {
-                getChunkAt(x,y)->render(shader);
+                getChunkAt(x,y)->render(shader, deltaTime);
             }
         }
     }

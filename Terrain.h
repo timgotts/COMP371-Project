@@ -37,7 +37,7 @@ class TerrainChunk : public Renderable
     void setHeightAt(int x, int y, float height);
     
     //render chunk using specified shader
-    void render(Shader* shader) override;
+    void render(Shader* shader, float deltaTime);
     
     //add entity to chunk
     void addEntity(Renderable* r);
@@ -70,7 +70,7 @@ class Terrain
     Terrain();
     
     //render terrain using a position and shader
-    void render(glm::vec3 position, Shader* shader);
+    void render(glm::vec3 position, Shader* shader, float deltaTime);
     
     //get terrain size in chunks
     int getSize();
