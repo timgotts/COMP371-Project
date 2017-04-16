@@ -227,6 +227,7 @@ int main()
     }
     Timer::stop("rock");
 
+	
 	Timer::start("coral");
 	for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
 	{
@@ -326,9 +327,9 @@ int main()
             glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
             
         }
-        
+
         // Render the terrain and scene objects
-        terrain->render(camera.getPosition(), lightingShader);
+        terrain->render(camera.getPosition(), lightingShader, deltaTime);
         
         animateFish(deltaTime);
         // Render objects in the scene
@@ -349,6 +350,8 @@ int main()
 		{
 			gf->render(lightSourceShader);
 		}
+
+		
         
         glfwSwapBuffers(window);
     }

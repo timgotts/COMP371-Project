@@ -11,15 +11,13 @@ Coral::Coral(glm::vec3 position) : position(position)
 	// Random devices and distributions
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::poisson_distribution<> p(10);
-	std::uniform_real_distribution<> u(0.2, 0.3);
-	std::uniform_real_distribution<> u1(0.5, 1.5);
+	std::uniform_real_distribution<> randLength(0.5, 1.5);
 	std::uniform_real_distribution<> randWidth(1.0, 3.0);
-	std::uniform_real_distribution<> randColor(0.0, 1.0);
+	std::uniform_real_distribution<> u(0.0, 1.0);
 	std::uniform_real_distribution<> v(-0.2, 0.2);
 
 	float wc = randWidth(gen) * 0.5;
-	float lc = wc*5.0f*u1(gen);
+	float lc = wc*5.0f*randLength(gen);
 	
 	// Base triangle
 	glm::vec3 v0 = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -37,11 +35,14 @@ Coral::Coral(glm::vec3 position) : position(position)
 
 	model = glm::translate(glm::mat4(1.0f), -position);
 
+	oscOffset = u(gen)*3.14159265;
+
 	float baseColor = v(gen);
-	glm::vec3 color = glm::vec3(randColor(gen) + baseColor, randColor(gen) + baseColor, randColor(gen) + baseColor);
+	glm::vec3 color = glm::vec3(u(gen) + baseColor, u(gen) + baseColor, u(gen) + baseColor);
 
 	// Assign material 
 	material = Material(glm::vec3(0.25f), color, glm::vec3(0.25f), 0.4f);
+
 
 }
 
@@ -74,6 +75,26 @@ void Coral::render(Shader * shader)
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 	glBindVertexArray(0);
+}
+
+void Coral::animate(float deltaTime)
+{
+	totalTime += deltaTime;
+
+	// Model transformations
+	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), -position);
+
+	float sx = sin(totalTime + oscOffset) / 25.0f;
+	float sz = sin(totalTime+ oscOffset + 1.584) / 25.153f;
+	glm::mat4 shearMatrix = {
+		1.0f, sx, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, sz, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	tempModel = tempModel * shearMatrix;
+
+	model = tempModel;
 }
 
 void Coral::tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, float wc)

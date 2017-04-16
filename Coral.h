@@ -10,6 +10,7 @@ public:
 	Coral(glm::vec3 position);
 
 	void render(Shader* shader);
+	void animate(float deltaTime);
 
 	std::vector<glm::vec3> normals;
 
@@ -20,4 +21,8 @@ private:
 	void tree(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, int r, float lc, float wc);
 	void pushTriangle(glm::vec3 v0, glm::vec3 v1, glm::vec3 v2, glm::vec3 n);
 	void loadBuffers();
+
+	// Variables for periodic animations
+	GLfloat totalTime = 0.0f;
+	GLfloat oscOffset;
 };
