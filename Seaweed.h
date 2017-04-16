@@ -29,13 +29,19 @@ class Seaweed : public Renderable
     GLuint* indicesEBO;
     
     //Length of the verticesVBO
-     int totalLength;
+    int totalLength;
     //Length of the indicesEBO
-      int indexLength;
+    int indexLength;
     
     //Added for now to generate different seaweed
     static int amount;
-
-	static GLfloat greenVBO[];
-	static GLfloat redVBO[];
+    
+    static GLfloat greenVBO[];
+    static GLfloat redVBO[];
+    
+    static GLuint gVAO;
+    static GLuint gVBO;
+    
+    static GLuint rVAO;
+    static GLuint rVBO;
 };
