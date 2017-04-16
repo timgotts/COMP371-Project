@@ -203,7 +203,7 @@ Terrain::Terrain()
     int octaves = generatorConfig->getInt("octaves");
     
     //noise generator for heightmap
-    SimplexNoise* perlin = new SimplexNoise(frequency, amplitude, 1.0f, persistence);
+    SimplexNoise* perlin = new SimplexNoise(frequency, amplitude, 0.01f, persistence);
     
     ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
     
@@ -297,21 +297,22 @@ void Terrain::updateChunks(glm::vec3 position)
     TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
     if(chunk != nullptr)
     {
-        if(loadedChunks.size() > (renderDistance*renderDistance)*2)
-            for(int i=0; i < loadedChunks.size(); i++)
+        if(loadedChunks.size() > ((2*renderDistance)*(2*renderDistance)*2))
         {
-            TerrainChunk* loadedChunk = loadedChunks.at(i);
-            
-            int dx = abs(chunk->getPosX() - loadedChunk->getPosX());
-            int dy = abs(chunk->getPosX() - loadedChunk->getPosY());
-            
-            if(dx > renderDistance || dy > renderDistance)
+            for(int i=0; i < loadedChunks.size(); i++)
             {
-                loadedChunk->unload();
-                loadedChunks.erase (loadedChunks.begin()+i);
-                i--;
+                TerrainChunk* loadedChunk = loadedChunks.at(i);
+                
+                int dx = abs(chunk->getPosX() - loadedChunk->getPosX());
+                int dy = abs(chunk->getPosY() - loadedChunk->getPosY());
+                
+                if(dx > renderDistance || dy > renderDistance)
+                {
+                    loadedChunk->unload();
+                    loadedChunks.erase (loadedChunks.begin()+i);
+                    i--;
+                }
             }
-            
         }
         
         //make sure draw distance is contained within terrain size
