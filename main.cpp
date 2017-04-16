@@ -45,6 +45,7 @@ Camera camera = Camera();
 std::vector<Fish*> fishes;
 std::vector<GlowFish*> glowFish;
 std::vector<Cube*> cubes;
+std::vector<Coral*> corals;
 Skybox* skybox;
 DirectionalLight sun;
 SpotLight spotLight;
@@ -131,7 +132,7 @@ int main()
     
     glPointSize(3);
     
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     // ___________________________ END SETTINGS ___________________________
     
@@ -236,7 +237,17 @@ int main()
     //camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
 	spotLight = SpotLight(camera.getPosition(), camera.getFront());
 
-	Coral * coral = new Coral();
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::poisson_distribution<> p(10);
+	std::uniform_real_distribution<> u(0.0f, 1.0f);
+
+	Timer::start("coral");
+	for (int i = 0; i < 10; ++i)
+	{
+	    corals.push_back(new Coral(glm::vec3(u(gen) * 100.0f, 0.0f, u(gen) * 100.0f)));
+	}
+	 Timer::stop("Coral");
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -322,7 +333,10 @@ int main()
   //          fish->render(lightingShader);
   //      }
 
-		coral->render(lightingShader);
+		for (auto coral : corals)
+		{
+			coral->render(lightingShader);
+		}
 
 
 		//Glowfish
