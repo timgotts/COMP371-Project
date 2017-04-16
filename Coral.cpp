@@ -33,7 +33,7 @@ Coral::Coral(glm::vec3 position) : position(position)
 
 	loadBuffers();
 
-	model = glm::translate(glm::mat4(1.0f), position);
+	model = glm::translate(glm::mat4(1.0f), -position);
 
 	// Assign material 
 	material = Material(glm::vec3(0.28f, 0.24f, 0.545f), glm::vec3(0.75f, 0.75f, 0.75f), glm::vec3(0.5f, 0.5f, 0.5f), 64.0f);
