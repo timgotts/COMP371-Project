@@ -22,6 +22,7 @@
 #include "PointLight.h"
 #include "Timer.h"
 #include "GlowFish.h"
+#include "Coral.h"
 
 
 #define PI 3.14159265358979323846
@@ -130,7 +131,7 @@ int main()
     
     glPointSize(3);
     
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     // ___________________________ END SETTINGS ___________________________
     
@@ -141,15 +142,15 @@ int main()
     // ____________________________ CREATING SCENE ____________________________
     
     
-    // Generate skybox
-    Timer::start("skybox");
-    skybox = new Skybox();
-    Timer::stop("Skybox");
-    
-    // Generate terrain
-    Timer::start("terrain");
-    terrain = new Terrain();
-    Timer::stop("Terrain");
+    //// Generate skybox
+    //Timer::start("skybox");
+    //skybox = new Skybox();
+    //Timer::stop("Skybox");
+    //
+    //// Generate terrain
+    //Timer::start("terrain");
+    //terrain = new Terrain();
+    //Timer::stop("Terrain");
     
     // Create Shaders
     lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
@@ -175,66 +176,67 @@ int main()
     sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     
-    float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
+    //float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
     
 
 
-	//Randomize fish locations
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<> u1(0, 1);
+	////Randomize fish locations
+	//std::random_device rd;
+	//std::mt19937 gen(rd());
+	//std::uniform_real_distribution<> u1(0, 1);
 
-    Timer::start("fish");
-    for (int i = 0; i < 600; ++i)
-    {
-        fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
-    }
-    Timer::stop("Fish");
+ //   Timer::start("fish");
+ //   for (int i = 0; i < 600; ++i)
+ //   {
+ //       fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
+ //   }
+ //   Timer::stop("Fish");
 
-	Timer::start("GlowFish");
-	for (int i = 0; i < 10; ++i)
-	{
-		glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
-	}
-	Timer::stop("GlowFish");
+	//Timer::start("GlowFish");
+	//for (int i = 0; i < 10; ++i)
+	//{
+	//	glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
+	//}
+	//Timer::stop("GlowFish");
 
 
-    Timer::start("seaweed");
-    for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
-    {
-        
-        float x = u1(gen) * terrainSize;
-        float z = u1(gen) * terrainSize;
-        float y = terrain->getHeightAt(x,z);
-        
-        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
-        if(chunk != nullptr)
-            chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
-    }
-    Timer::stop("seaweed");
-    
-    
-    
-    Timer::start("rock");
-    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
-    {
-        float x = u1(gen) * terrainSize;
-        
-        float z = u1(gen) * terrainSize;
-        
-        float y = terrain->getHeightAt(x,z);
-        
-        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
-        if(chunk != nullptr)
-            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
-    }
-    Timer::stop("rock");
+ //   Timer::start("seaweed");
+ //   for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
+ //   {
+ //       
+ //       float x = u1(gen) * terrainSize;
+ //       float z = u1(gen) * terrainSize;
+ //       float y = terrain->getHeightAt(x,z);
+ //       
+ //       TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+ //       if(chunk != nullptr)
+ //           chunk->addEntity(new Seaweed(glm::vec3(x, y+1, z)));
+ //   }
+ //   Timer::stop("seaweed");
+ //   
+ //   
+ //   
+ //   Timer::start("rock");
+ //   for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+ //   {
+ //       float x = u1(gen) * terrainSize;
+ //       
+ //       float z = u1(gen) * terrainSize;
+ //       
+ //       float y = terrain->getHeightAt(x,z);
+ //       
+ //       TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+ //       if(chunk != nullptr)
+ //           chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+ //   }
+ //   Timer::stop("rock");
     // ____________________________ END CREATING SCENE ____________________________
     
     
-    camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+    //camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
 	spotLight = SpotLight(camera.getPosition(), camera.getFront());
-    
+
+	Coral * coral = new Coral();
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -254,7 +256,7 @@ int main()
 		glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
-        glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
@@ -265,7 +267,7 @@ int main()
 		skyboxShader->use();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		skybox->render(skyboxShader);
+		//skybox->render(skyboxShader);
 
 		//Terrain/fish/rocks
 		lightingShader->use();
@@ -294,31 +296,33 @@ int main()
         
 		glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
 		
-    	// Point lights (glowfish)
-		for (int i = 0; i<glowFish.size(); i++)
-		{
-			glowFish.at(i)->animate(deltaTime);
-			std::string identifier = "pointLights[" + std::to_string(i) + "]";
+  //  	// Point lights (glowfish)
+		//for (int i = 0; i<glowFish.size(); i++)
+		//{
+		//	glowFish.at(i)->animate(deltaTime);
+		//	std::string identifier = "pointLights[" + std::to_string(i) + "]";
 
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
+		//	glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
+		//	glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
+		//	glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
+		//	glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
+		//	glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
+		//	glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
+		//	glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
 
-		}
+		//}
     	
-    	// Render the terrain and scene objects
-        terrain->render(camera.getPosition(), lightingShader);
+  //  	// Render the terrain and scene objects
+  //      terrain->render(camera.getPosition(), lightingShader);
 
-		animateFish(deltaTime);
-        // Render objects in the scene
-        for (auto fish : fishes)
-        {
-            fish->render(lightingShader);
-        }
+		//animateFish(deltaTime);
+  //      // Render objects in the scene
+  //      for (auto fish : fishes)
+  //      {
+  //          fish->render(lightingShader);
+  //      }
+
+		coral->render(lightingShader);
 
 
 		//Glowfish
@@ -326,12 +330,12 @@ int main()
 		glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		//Render glowfish
-		for (auto gf : glowFish)
-		{
-			gf->render(lightSourceShader);
-		}
-        
+		////Render glowfish
+		//for (auto gf : glowFish)
+		//{
+		//	gf->render(lightSourceShader);
+		//}
+  //      
         glfwSwapBuffers(window);
     }
     
