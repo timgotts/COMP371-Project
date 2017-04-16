@@ -2,9 +2,10 @@
 
 TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexNoise* pn, int finalSize) : size(size), posX(posX), posY(posY)
 {
-    
+    //create new heightmap
     heightMap = new float*[size];
     
+    //keep track of indices
     int currentIndice = 0;
     
     for(int x = 0; x < size; x++)
@@ -14,11 +15,11 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
         for(int y = 0; y < size; y++)
         {
             
-            
+            //get coordinates of chunk point in real world
             float coordX = (posX * (size-1) + x);
             float coordY = (posY * (size-1) + y);
             
-            
+            //generate height at coordinates
             float height = 50 * pn->noise(coordX/(size*size), coordY/(size*size));
             
             heightMap[x][y] = height;
@@ -26,25 +27,32 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
             //std::cout << height << std::endl;
             
             vertices.push_back({coordX, height, coordY });
+            
+            //add triangles to vertice list in order to render terrain alter
             if(x > 0 && y > 0)
             {
+                //triangle one
                 glm::vec3 t1v1 = vertices.at(currentIndice);
                 glm::vec3 t1v2 = vertices.at(currentIndice-1);
                 glm::vec3 t1v3 = vertices.at(currentIndice-size-1);
                 
+                //triangle two
                 glm::vec3 t2v1 = vertices.at(currentIndice);
                 glm::vec3 t2v2 = vertices.at(currentIndice-size);
                 glm::vec3 t2v3 = vertices.at(currentIndice-size-1);
                 
+                //edges
                 glm::vec3 t1e1 = t1v2-t1v1;
                 glm::vec3 t1e2 = t1v3-t1v1;
                 
                 glm::vec3 t2e1 = t2v2-t2v1;
                 glm::vec3 t2e2 = t2v3-t2v1;
                 
+                //normals
                 glm::vec3 t1n = glm::normalize(glm::cross(t1e1,t1e2));
                 glm::vec3 t2n = glm::normalize(glm::cross(t2e2,t2e1));
                 
+                //store data
                 finalVertices.push_back(t1v1);
                 finalVertices.push_back(t1n);
                 finalVertices.push_back(t1v2);
@@ -82,10 +90,10 @@ TerrainChunk::TerrainChunk(int size, int posX, int posY, float offset,  SimplexN
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-	//Assign material
-	material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4.0f);
-
+    
+    //Assign material
+    material = Material(glm::vec3(0.65f, 0.4f, 0.31f), glm::vec3(0.76f, 0.7f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4.0f);
+    
 }
 
 void TerrainChunk::addEntity(Renderable* r)
@@ -128,30 +136,30 @@ void TerrainChunk::setHeightAt(int x, int y, float height)
 void TerrainChunk::render(Shader* shader)
 {
     //shader->use();
-	glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
-   
-	// Broadcast the uniform values to the shaders
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
+    
+    // Broadcast the uniform values to the shaders
     GLuint modelLoc = glGetUniformLocation(shader->program, "model");
-	GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
-	GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
-	GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
-	GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
-	GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
-
-	glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
-	glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
-	glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
-	glUniform1f(matShineLoc, material.shininess);
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
-
-        
+    GLint normalMatrixLoc = glGetUniformLocation(shader->program, "normalMatrix");
+    GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
+    GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
+    GLint matSpecularLoc = glGetUniformLocation(shader->program, "material.specular");
+    GLint matShineLoc = glGetUniformLocation(shader->program, "material.shininess");
+    
+    glUniform3f(matAmbientLoc, material.ambient.x, material.ambient.y, material.ambient.z);
+    glUniform3f(matDiffuseLoc, material.diffuse.x, material.diffuse.y, material.diffuse.z);
+    glUniform3f(matSpecularLoc, material.specular.x, material.specular.y, material.specular.z);
+    glUniform1f(matShineLoc, material.shininess);
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
+    
+    
     // Draw object
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, finalVertices.size()/2);
     glBindVertexArray(0);
     
-    
+    //render all the entities contained in the chunk
     for(auto entity : entities)
     {
         entity->render(shader);
@@ -161,7 +169,7 @@ void TerrainChunk::render(Shader* shader)
 
 Terrain::Terrain()
 {
-    
+    //load terrain config
     Config config("res/config/Terrain.config");
     
     size = config.getConfig()->getInt("size");
@@ -176,6 +184,7 @@ Terrain::Terrain()
     double amplitude = generatorConfig->getDouble("amplitude");
     int octaves = generatorConfig->getInt("octaves");
     
+    //noise generator for heightmap
     SimplexNoise* perlin = new SimplexNoise(frequency, amplitude, 2.0f, persistence);
     
     ConfigSection* chunkConfig = config.getConfig()->getSection("chunk");
@@ -184,6 +193,7 @@ Terrain::Terrain()
     
     int finalSize = size * (pointsPerChunk-1);
     
+    //generate chunks and store in chunk array
     for(int x = 0; x < size; x++)
     {
         chunks[x] = new TerrainChunk*[size];
@@ -193,8 +203,6 @@ Terrain::Terrain()
             chunks[x][y] = new TerrainChunk(pointsPerChunk, x, y, (float)size/2.0f ,perlin, finalSize);
         }
     }
-    
-    //std::cout << "terrain finished" << std::endl;
 }
 
 
@@ -224,7 +232,7 @@ TerrainChunk* Terrain::getChunkAtReal(int posX, int posY)
 
 float Terrain::getHeightAt(int x, int y)
 {
-    
+    //relative coordinate for chunk
     int relX = x % (pointsPerChunk - 1);
     int relY = y % (pointsPerChunk - 1);
     
@@ -236,8 +244,6 @@ float Terrain::getHeightAt(int x, int y)
     TerrainChunk* chunk;
     if((chunk = getChunkAt(chunkX,chunkY)) != nullptr)
     {
-        //position relative to the chunk
-        
         return chunk->getHeightAt(relX, relY);
     }
     else
@@ -270,10 +276,11 @@ void Terrain::setHeightAt(int x, int y, float  height)
 
 void Terrain::render(glm::vec3 position, Shader* shader)
 {
+    //render from position outwards in all directions
     TerrainChunk* chunk = getChunkAt(-position.x/(pointsPerChunk-1), -position.z/(pointsPerChunk-1));
     if(chunk != nullptr)
     {
-        
+        //make sure draw distance is contained within terrain size
         int minX = chunk->getPosX()-renderDistance;
         int minY = chunk->getPosY()-renderDistance;
         
@@ -309,7 +316,7 @@ void Terrain::render(glm::vec3 position, Shader* shader)
         }
         
     }
-    else
+    else //if out of bounds, render everything, mainly for debug purposes
     {
         for(int x = 0; x < size; x++)
         {
