@@ -63,15 +63,13 @@ void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 void animateFish(float deltaTime);
 void animateFishThread(int start, int count);
-
+void createTerrainThread();
 
 
 // ________________________________ MAIN ________________________________
 int main()
 {
     srand(time(NULL));
-    
-    
     
     
     // ___________________________ SETTINGS ___________________________
@@ -130,6 +128,8 @@ int main()
     
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
+    
+    
     // ___________________________ END SETTINGS ___________________________
     
     
@@ -139,15 +139,14 @@ int main()
     // ____________________________ CREATING SCENE ____________________________
     
     
+    // Generate terrain
+    std::thread terrainThread(createTerrainThread);
+    
     // Generate skybox
     Timer::start("skybox");
     skybox = new Skybox();
     Timer::stop("Skybox");
     
-    // Generate terrain
-    Timer::start("terrain");
-    terrain = new Terrain();
-    Timer::stop("Terrain");
     
     // Create Shaders
     lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
@@ -156,6 +155,7 @@ int main()
     
     sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
+    terrainThread.join();
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
     
@@ -209,30 +209,11 @@ int main()
     Timer::stop("seaweed");
     
     
-    
-    
-    Timer::start("rock");
-    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
-    {
-        float x = u1(gen) * terrainSize;
-        
-        float z = u1(gen) * terrainSize;
-        
-        float y = terrain->getHeightAt(x,z);
-        
-        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
-        if(chunk != nullptr)
-            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
-    }
-    Timer::stop("rock");
-    // ____________________________ END CREATING SCENE ____________________________
-    
-    
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
     terrain->updateChunks(camera.getPosition());
-	
-	spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(17.5f)), 1.0f, 0.0014f, 0.000007f);
+    
+    spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
+                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(17.5f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -566,4 +547,38 @@ void animateFishThread(int start, int count)
     {
         fishes[i]->animate(deltaTime);
     }
+}
+
+void createTerrainThread()
+{
+    Timer::start("terrain");
+    terrain = new Terrain();
+    Timer::stop("Terrain");
+    
+    float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);
+    
+    
+    //Randomize fish locations
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> u1(0, 1);
+    
+    
+    
+    Timer::start("rock");
+    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x,z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
+        if(chunk != nullptr)
+            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+    }
+    Timer::stop("rock");
+    // ____________________________ END CREATING SCENE ____________________________
+    
 }
