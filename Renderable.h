@@ -11,21 +11,21 @@
 
 class Renderable 
 {
-public:
-
-	GLuint VAO;
-	GLuint VBO;
-
-	std::vector<glm::vec3> vertices;
-	std::vector<GLuint> indices;
-
-	glm::mat4 model;
-
-	Material material;
-
-	virtual void render(Shader* shader) {};
-	virtual void animate(float deltaTime) {};
-
-private:
-
+    public:
+    
+    GLuint VAO = 0;
+    GLuint VBO = 0;
+    
+    std::vector<glm::vec3> vertices;
+    std::vector<GLuint> indices;
+    
+    glm::mat4 model;
+    
+    Material material;
+    
+    virtual void render(Shader* shader) {};
+    virtual void animate(float deltaTime) {};
+    
+    private:
+    
 };

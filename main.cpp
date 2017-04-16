@@ -199,8 +199,9 @@ int main()
     Timer::stop("GlowFish");
     
     
+    
     Timer::start("seaweed");
-    for (int i = 0; i < (int)(0.001f*(terrainSize*terrainSize)); i++)
+    for (int i = 0; i < (int)(0.0005f*(terrainSize*terrainSize)); i++)
     
     {
         float x = u1(gen) * terrainSize;
@@ -227,6 +228,7 @@ int main()
     
     
     
+    
     Timer::start("rock");
     for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
     {
@@ -245,6 +247,7 @@ int main()
     
     
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
+    terrain->updateChunks(camera.getPosition());
     spotLight = SpotLight(camera.getPosition(), camera.getFront());
     
     
@@ -459,6 +462,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(FORWARD, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
         
     }
@@ -470,6 +474,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(BACKWARD, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     
@@ -480,6 +485,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(LEFT, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     
@@ -490,6 +496,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(RIGHT, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     
@@ -500,6 +507,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(UP, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     
@@ -510,6 +518,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(DOWN, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     
@@ -520,6 +529,7 @@ void doMovement()
         if(height < -newPos.y)
         {
             camera.processKeyboard(ROLL_LEFT, deltaTime);
+            terrain->updateChunks(camera.getPosition());
         }
     }
     

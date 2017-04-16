@@ -42,6 +42,9 @@ class TerrainChunk : public Renderable
     //add entity to chunk
     void addEntity(Renderable* r);
     
+    bool load();
+    void unload();
+    
     private:
     //width and height of chunk
     const int size;
@@ -83,6 +86,7 @@ class Terrain
     float getHeightAt(int x, int y);
     void setHeightAt(int x,int y,  float  height);
     
+    void updateChunks(glm::vec3 position);
     
     private:
     
@@ -92,6 +96,8 @@ class Terrain
     int renderDistance;
     
     int pointsPerChunk;
+    
+    std::vector<TerrainChunk*> loadedChunks;
     
     //chunk grid
     TerrainChunk*** chunks;
