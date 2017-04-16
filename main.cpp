@@ -260,7 +260,7 @@ int main()
 		skyboxShader->use();
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
 		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-		//skybox->render(skyboxShader);
+		skybox->render(skyboxShader);
 
 		//Terrain/fish/rocks
 		lightingShader->use();
