@@ -21,7 +21,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "Timer.h"
-
+#include "GlowFish.h"
 
 
 #define PI 3.14159265358979323846
@@ -42,6 +42,7 @@ bool keys[1024];
 Camera camera = Camera();
 
 std::vector<Fish*> fishes;
+std::vector<GlowFish*> glowFish;
 std::vector<Cube*> cubes;
 Skybox* skybox;
 DirectionalLight sun;
@@ -50,6 +51,8 @@ std::vector<PointLight> pointLights;
 std::vector<LightSource> lightSources; // Temp to test point lights
 Terrain* terrain;
 Shader* lightingShader;
+Shader* lightSourceShader;
+Shader* skyboxShader;
 
 
 
@@ -150,8 +153,8 @@ int main()
     
     // Create Shaders
     lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
-    
-    
+	lightSourceShader = new Shader("res/shaders/lightsource.vs", "res/shaders/lightsource.fs");
+	skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
     
     
     
@@ -161,16 +164,15 @@ int main()
     //	cubes.push_back(new Cube(dis(gen) * 2.0f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
     //}
     //
-    ////Create some point lights
-    //for (int i=0; i<4; i++)
+    //Create some point lights
+    //for (int i=0; i<1; i++)
     //{
-    //	pointLights.push_back(PointLight(glm::vec3(dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f, dis(gen) * 20.0f - 10.0f)));
+    //	pointLights.push_back(PointLight(camera.getPosition()));
     //	// Create white cubes to show the location of point lights
-    //	lightSources.push_back(LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), pointLights.at(i).position));
+    //	lightSources.push_back(LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(-10,-15,-11)));
     //}
-    
-    sun = DirectionalLight();
-    spotLight = SpotLight(camera.getPosition(), camera.getFront());
+	//DirectionalLight::DirectionalLight(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction)
+    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
@@ -188,7 +190,13 @@ int main()
         fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
     }
     Timer::stop("Fish");
-    
+
+	Timer::start("GlowFish");
+	for (int i = 0; i < 10; ++i)
+	{
+		glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
+	}
+	Timer::stop("GlowFish");
 
 
     Timer::start("seaweed");
@@ -225,6 +233,7 @@ int main()
     
     
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+	spotLight = SpotLight(camera.getPosition(), camera.getFront());
     
     
     // ___________________________ GAME LOOP ___________________________
@@ -239,105 +248,89 @@ int main()
         // Process events
         glfwPollEvents();
         doMovement();
-        spotLight.UpdatePosition(camera.getPosition(),camera.getFront());
+        
+		// Apply camera tranformations
+		glm::mat4 view = camera.getViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
         glClearColor(0.01f, 0.01f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        
-        // Apply camera tranformations
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
-        
-        //Render skybox
-        skybox->render(view, projection);
-        
-        // Enable lighting shader
-        lightingShader->use();
-        
-        
-        // Set up lighting uniforms
-        
-        // Directional light
+
+		
+		// Remove translation component of the view matrix for skybox 
+		glm::mat4 skybox_view = glm::mat4(glm::mat3(view));
+		
+		//Skybox
+		skyboxShader->use();
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
+		glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		skybox->render(skyboxShader);
+
+		//Terrain/fish/rocks
+		lightingShader->use();
+
+		glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+		
+    	// Set lighting uniforms
+		// Directional light
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.direction"), sun.direction.x, sun.direction.y, sun.direction.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.ambient"), sun.ambient.x, sun.ambient.y, sun.ambient.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.diffuse"), sun.diffuse.x, sun.diffuse.y, sun.diffuse.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.specular"), sun.specular.x, sun.specular.y, sun.specular.z);
         
-        ////	// Point Lights
-        //	//	// Point light 1
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].position"), pointLights[0].position.x, pointLights[0].position.y, pointLights[0].position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].ambient"), pointLights[0].ambient.x, pointLights[0].ambient.y, pointLights[0].ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].diffuse"), pointLights[0].diffuse.x, pointLights[0].diffuse.y, pointLights[0].diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[0].specular"), pointLights[0].specular.x, pointLights[0].specular.y, pointLights[0].specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[0].constant"), pointLights[0].constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[0].linear"), pointLights[0].linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[0].quadratic"), pointLights[0].quadratic);
-        //		//// Point light 2
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[1].position"), pointLights[1].position.x, pointLights[1].position.y, pointLights[1].position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[1].ambient"), pointLights[1].ambient.x, pointLights[1].ambient.y, pointLights[1].ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[1].diffuse"), pointLights[1].diffuse.x, pointLights[1].diffuse.y, pointLights[1].diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[1].specular"), pointLights[1].specular.x, pointLights[1].specular.y, pointLights[1].specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[1].constant"), pointLights[1].constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[1].linear"), pointLights[1].linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[1].quadratic"), pointLights[1].quadratic);
-        //		//// Point light 3
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[2].position"), pointLights[2].position.x, pointLights[2].position.y, pointLights[2].position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[2].ambient"), pointLights[2].ambient.x, pointLights[2].ambient.y, pointLights[2].ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[2].diffuse"), pointLights[2].diffuse.x, pointLights[2].diffuse.y, pointLights[2].diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[2].specular"), pointLights[2].specular.x, pointLights[2].specular.y, pointLights[2].specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[2].constant"), pointLights[2].constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[2].linear"), pointLights[2].linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[2].quadratic"), pointLights[2].quadratic);
-        //		//// Point light 4
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[3].position"), pointLights[3].position.x, pointLights[3].position.y, pointLights[3].position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[3].ambient"), pointLights[3].ambient.x, pointLights[3].ambient.y, pointLights[3].ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[3].diffuse"), pointLights[3].diffuse.x, pointLights[3].diffuse.y, pointLights[3].diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "pointLights[3].specular"), pointLights[3].specular.x, pointLights[3].specular.y, pointLights[3].specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[3].constant"), pointLights[3].constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[3].linear"), pointLights[3].linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "pointLights[3].quadratic"), pointLights[3].quadratic);
+        // SpotLight
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), -camera.getFront().x, -camera.getFront().y, -camera.getFront().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.ambient"), spotLight.ambient.x, spotLight.ambient.y, spotLight.ambient.z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.diffuse"), spotLight.diffuse.x, spotLight.diffuse.y, spotLight.diffuse.z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.specular"), spotLight.specular.x, spotLight.specular.y, spotLight.specular.z);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.constant"), spotLight.constant);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.linear"), spotLight.linear);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.quadratic"), spotLight.quadratic);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.cutOff"), spotLight.cutOff);
+        glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.outerCutOff"), spotLight.outerCutOff);
         
-        
-        ////// SpotLight
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), spotLight.position.x, spotLight.position.y, spotLight.position.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), camera.getFront().x, camera.getFront().y, camera.getFront().z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.ambient"), spotLight.ambient.x, spotLight.ambient.y, spotLight.ambient.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.diffuse"), spotLight.diffuse.x, spotLight.diffuse.y, spotLight.diffuse.z);
-        //glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.specular"), spotLight.specular.x, spotLight.specular.y, spotLight.specular.z);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.constant"), spotLight.constant);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.linear"), spotLight.linear);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.quadratic"), spotLight.quadratic);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.cutOff"), spotLight.cutOff);
-        //glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.outerCutOff"), spotLight.cutOff);
-        
-        
-        GLint viewPosLoc = glGetUniformLocation(lightingShader->program, "viewPos");
-        GLuint viewLoc = glGetUniformLocation(lightingShader->program, "view");
-        GLuint projectionLoc = glGetUniformLocation(lightingShader->program, "projection");
-        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-        glUniform3f(viewPosLoc, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
-        
-        // Render the terrain
+		glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+		
+    	// Point lights (glowfish)
+		for (int i = 0; i<glowFish.size(); i++)
+		{
+			glowFish.at(i)->animate(deltaTime);
+			std::string identifier = "pointLights[" + std::to_string(i) + "]";
+
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
+			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
+			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
+
+		}
+    	
+    	// Render the terrain and scene objects
         terrain->render(camera.getPosition(), lightingShader);
-        
 
 		animateFish(deltaTime);
-
         // Render objects in the scene
         for (auto fish : fishes)
         {
             fish->render(lightingShader);
         }
-        
-        ////Render cubes used for lighting tests
-        //for (auto cube : cubes)
-        //{
-        //	cube->render(view, projection, lightingShader);
-        //}
-        
-        
+
+
+		//Glowfish
+		lightSourceShader->use();
+		glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
+		glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+
+		//Render glowfish
+		for (auto gf : glowFish)
+		{
+			gf->render(lightSourceShader);
+		}
         
         glfwSwapBuffers(window);
     }
