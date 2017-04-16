@@ -4,7 +4,7 @@
 
 Light::Light()
 {
-	ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+	ambient = glm::vec3(0.9f, 0.9f, 0.9f);
 	diffuse = glm::vec3(0.3f, 0.3f, 0.3f);
 	specular = glm::vec3(1.0f, 1.0f, 1.0f);
 }

@@ -7,13 +7,12 @@ class Fish : public Renderable
 {
 
 public:
-	
 	Fish(glm::vec3 position);
 
 	void render(Shader* shader);
 	void animate(float deltaTime);
 
-private:
+protected:
 
 	// Position and orientation	
 	glm::vec3 position;
