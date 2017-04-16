@@ -173,8 +173,9 @@ int main()
     //	// Create white cubes to show the location of point lights
     //	lightSources.push_back(LightSource(1.f, glm::vec3(dis(gen) * PI, dis(gen) * PI, dis(gen) * PI), glm::vec3(-10,-15,-11)));
     //}
+    
     //DirectionalLight::DirectionalLight(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular, glm::vec3 direction)
-    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.1f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
@@ -273,7 +274,7 @@ int main()
         skyboxShader->use();
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
         glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        //skybox->render(skyboxShader);
+        skybox->render(skyboxShader);
         
         //Terrain/fish/rocks
         lightingShader->use();
@@ -283,6 +284,7 @@ int main()
         
         // Set lighting uniforms
         // Directional light
+        
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.direction"), sun.direction.x, sun.direction.y, sun.direction.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.ambient"), sun.ambient.x, sun.ambient.y, sun.ambient.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.diffuse"), sun.diffuse.x, sun.diffuse.y, sun.diffuse.z);

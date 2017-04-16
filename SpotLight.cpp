@@ -29,11 +29,11 @@ SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction): Light()
 {
 	this->position = position;
 	this->direction = direction;
-	this->cutOff = glm::cos(glm::radians(12.5f));
-	this->outerCutOff = glm::cos(glm::radians(22.0f));
+	this->cutOff = glm::cos(glm::radians(5.5f));
+	this->outerCutOff = glm::cos(glm::radians(17.5f));
 	this->constant = 1.0f;
-	this->linear = 0.007f;
-	this->quadratic = 0.0002f;
+	this->linear = 0.0014f;
+	this->quadratic = 0.000007f;
 }
 
 
