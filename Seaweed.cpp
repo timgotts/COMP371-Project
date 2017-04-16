@@ -4,6 +4,11 @@ using namespace std;
 
 int Seaweed::amount = 0;
 
+GLuint Seaweed::gVAO = 0;
+GLuint Seaweed::gVBO = 0;
+
+GLuint Seaweed::rVAO = 0;
+GLuint Seaweed::rVBO = 0;
 
 //Green seaweed
 GLfloat Seaweed::greenVBO[] =
@@ -21488,40 +21493,83 @@ GLfloat Seaweed::greenVBO[] =
 	Seaweed::Seaweed(glm::vec3 position)
 	{
 
-		//VAO, VBO, and EBO initialization
-		glGenVertexArrays(1, &VAO);
-		glGenBuffers(1, &VBO);
-		//Binding the VAO
-		glBindVertexArray(VAO);
-		// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-
-		//TEMPORARY
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-
+		
 		if (amount % 2 == 0)
 		{
-			glBufferData(GL_ARRAY_BUFFER, sizeof(greenVBO), greenVBO, GL_STATIC_DRAW);
+            if(gVAO == 0)
+            {
+                //VAO, VBO, and EBO initialization
+                glGenVertexArrays(1, &gVAO);
+                glGenBuffers(1, &gVBO);
+                
+              
+                //Binding the VAO
+                glBindVertexArray(gVAO);
+                // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+                
+                //TEMPORARY
+                glBindBuffer(GL_ARRAY_BUFFER, gVBO);
+                
+                glBufferData(GL_ARRAY_BUFFER, sizeof(greenVBO), greenVBO, GL_STATIC_DRAW);    
+                
+                //EBO Binding
+                
+                //For the vertices (vertex shader)
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+                glEnableVertexAttribArray(0);
+                
+                //For the colors (vertex shader)
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+                glEnableVertexAttribArray(1);
+                
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                //unbind the VAO
+                glBindVertexArray(0);
+                
+            }
+            VAO = gVAO;
+            VBO = gVBO;
+            
 			rotAngle = 90.0;
 		}
 		else
 		{
-			glBufferData(GL_ARRAY_BUFFER, sizeof(redVBO), redVBO, GL_STATIC_DRAW);
+			if(rVAO == 0)
+            {
+                //VAO, VBO, and EBO initialization
+                glGenVertexArrays(1, &rVAO);
+                glGenBuffers(1, &rVBO);
+                
+                //Binding the VAO
+                glBindVertexArray(rVAO);
+                // Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+                
+                //TEMPORARY
+                glBindBuffer(GL_ARRAY_BUFFER, rVBO);
+                
+                glBufferData(GL_ARRAY_BUFFER, sizeof(redVBO), redVBO, GL_STATIC_DRAW);    
+                
+                //EBO Binding
+                
+                //For the vertices (vertex shader)
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
+                glEnableVertexAttribArray(0);
+                
+                //For the colors (vertex shader)
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+                glEnableVertexAttribArray(1);
+                
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                //unbind the VAO
+                glBindVertexArray(0);
+                
+            }
+            
+            VAO = rVAO;
+            VBO = rVBO;
+            
 			rotAngle = 180.0;
 		}
-
-		//EBO Binding
-
-		//For the vertices (vertex shader)
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(0);
-
-		//For the colors (vertex shader)
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		glEnableVertexAttribArray(1);
-
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		//unbind the VAO
-		glBindVertexArray(0);
 
 
 		//Translate the weed to a position
