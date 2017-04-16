@@ -167,15 +167,17 @@ Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), 
 	// Random devices and distributions
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::poisson_distribution<> p(1000);
+	std::poisson_distribution<> p(10);
 	std::uniform_real_distribution<> u(0, 1);
 	std::uniform_real_distribution<> u1(0.5, 1.5);
 	std::uniform_real_distribution<> u2(1.0, 3.0);
 
 	// Pseudorandomize animation and scale variables
-	float pRand = float(p(gen)) / 1000.0f;
+	float pRand = float(p(gen)) / 10.0f;
+	float pRand2 = float(p(gen)) / 8.0f;
 
-	scale = glm::vec3(pRand * u2(gen) * 1.5, pRand * u2(gen), pRand * u2(gen) *1.5);
+
+	scale = pRand2 * glm::vec3(pRand * u2(gen) * 1.5, pRand * u2(gen), pRand * u2(gen) *1.5);
 	velocity = pRand * u2(gen) * 3.0f;
 	initYaw = u(gen) * 360.0f;
 	oscRate = u1(gen);

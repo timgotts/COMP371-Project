@@ -7,6 +7,7 @@
 #include <random>
 #include <time.h>
 #include <string>
+#include <thread>
 
 #include "Camera.h"
 #include "Shader.h"
@@ -40,7 +41,7 @@ bool keys[1024];
 
 Camera camera = Camera();
 
-std::vector<Renderable*> objects;
+std::vector<Fish*> fishes;
 std::vector<Cube*> cubes;
 Skybox* skybox;
 DirectionalLight sun;
@@ -59,7 +60,8 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset);
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
-
+void animateFish(float deltaTime);
+void animateFishThread(int start, int count);
 
 
 
@@ -149,16 +151,8 @@ int main()
     // Create Shaders
     lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
     
-    //generate some fish objects
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> u1(0, 1);
-    std::uniform_real_distribution<> dis(0, 1);
     
-    for (int i = 0; i < 3; ++i)
-    {
-        objects.push_back(new Fish(glm::vec3(u1(gen) * 300.0f, u1(gen) * 100.0f, u1(gen) * 300.0f)));
-    }
+    
     
     
     //// Create some test cubes (lit objects)
@@ -181,14 +175,22 @@ int main()
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
     
-    
+
+
+	//Randomize fish locations
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<> u1(0, 1);
+
     Timer::start("fish");
-    for (int i = 0; i < 300; ++i)
+    for (int i = 0; i < 600; ++i)
     {
-        objects.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
+        fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
     }
     Timer::stop("Fish");
     
+
+
     Timer::start("seaweed");
     for(int i = 0; i < (int)(0.01f*(terrainSize*terrainSize)); i++)
     {
@@ -320,11 +322,13 @@ int main()
         // Render the terrain
         terrain->render(camera.getPosition(), lightingShader);
         
+
+		animateFish(deltaTime);
+
         // Render objects in the scene
-        for (auto obj : objects)
+        for (auto fish : fishes)
         {
-            obj->animate(deltaTime);
-            obj->render(lightingShader);
+            fish->render(lightingShader);
         }
         
         ////Render cubes used for lighting tests
@@ -496,4 +500,34 @@ void doMovement()
         camera.processKeyboard(WALK, deltaTime);
     }
     
+}
+
+void animateFish(float deltaTime)
+{
+	int size = fishes.size();
+
+	std::thread t0(animateFishThread, 0, size / 8);
+	std::thread t1(animateFishThread, size / 8, size / 8);
+	std::thread t2(animateFishThread, size / 4, size / 8);
+	std::thread t3(animateFishThread, 3 * size / 8, size / 8);
+	std::thread t4(animateFishThread, size / 2, size / 8);
+	std::thread t5(animateFishThread, 5 * size / 8, size / 8);
+	std::thread t6(animateFishThread, 3 * size / 4, size / 8);
+	std::thread t7(animateFishThread, 7 * size / 8, size / 8);
+	t0.join();
+	t1.join();
+	t2.join();
+	t3.join();
+	t4.join();
+	t5.join();
+	t6.join();
+	t7.join();
+}
+
+void animateFishThread(int start, int count)
+{
+	for (int i = start; i < start + count; ++i)
+	{
+		fishes[i]->animate(deltaTime);
+	}
 }
