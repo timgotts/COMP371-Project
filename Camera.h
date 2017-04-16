@@ -54,21 +54,21 @@ class Camera
     {
         return position;
     }
-
-	void setPosition(glm::vec3 position)
-	{
-		this->position = position;
-	}
+    
+    void setPosition(glm::vec3 position)
+    {
+        this->position = position;
+    }
     
     glm::mat4 getViewMatrix() 
     {
         return viewMatrix;
         
     }
-
-	glm::vec3 getFront()
+    
+    glm::vec3 getFront()
     {
-		return front;
+        return front;
     }
     
     
@@ -225,6 +225,20 @@ class Camera
         return this->zoom;
     }
     
+    GLfloat getMovementSpeed()
+    {
+        return movementSpeed;
+    }
+    
+    glm::vec3 getRight()
+    {
+        return right;
+    }
+    
+    glm::vec3 getUp()
+    {
+        return up;
+    }
     
     private:
     
