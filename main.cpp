@@ -186,7 +186,7 @@ int main()
     
     
     
-    /* Timer::start("seaweed");
+     Timer::start("seaweed");
      for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
      
      {
@@ -210,7 +210,7 @@ int main()
          }
          
      }
-     Timer::stop("seaweed");*/
+     Timer::stop("seaweed");
     
     
     
