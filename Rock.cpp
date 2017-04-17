@@ -28,6 +28,8 @@ Rock::Rock(glm::vec3 position)
     float const X = 0.525731112119133606f;
     float const Z = 0.850650808352039932f;
     
+    radius = 1.6;
+    
     // randon generators
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -166,11 +168,13 @@ Rock::Rock(glm::vec3 position)
     // Apply scale to model matrix
     if (rand() % 100 == 99)
     {
+        radius *= 6;
         model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
     }
     else
     {
         float scaler = rand() % 4;
+        radius *= scaler;
         model = glm::scale(model, glm::vec3(scaler, scaler, scaler));
     }
     

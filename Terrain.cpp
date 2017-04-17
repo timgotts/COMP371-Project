@@ -197,8 +197,8 @@ void TerrainChunk::render(Shader* shader, float deltaTime)
     //render all the entities contained in the chunk
     for(auto entity : entities)
     {
-		entity->animate(deltaTime);
-		entity->render(shader);
+        entity->animate(deltaTime);
+        entity->render(shader);
     }
     
 }
@@ -444,4 +444,29 @@ void Terrain::render(glm::vec3 position, Shader* shader, float deltaTime)
 int Terrain::getRenderDistance()
 {
     return renderDistance;
+}
+
+bool Terrain::isPositionValid(glm::vec3 position)
+{
+    float height = getHeightAt(position.x, position.z) + 1.5f;
+    if(height < position.y)
+    {
+        TerrainChunk* chunk = getChunkAtReal(position.x, position.z);
+        
+        for(auto *entity : chunk->getEntities())
+        {
+            if(entity->radius > 0)
+            {
+                glm::vec3 entityPosition = entity->model * glm::vec4(0, 0, 0, 1);
+                float distance = glm::distance(entityPosition, position);
+                if(distance < entity->radius)
+                {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    return false;
 }
