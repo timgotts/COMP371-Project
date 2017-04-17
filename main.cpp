@@ -186,33 +186,33 @@ int main()
     
     
     
-   /* Timer::start("seaweed");
-    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
+    /* Timer::start("seaweed");
+     for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
+     
+     {
+         float x = u1(gen) * terrainSize;
+         float z = u1(gen) * terrainSize;
+         
+         int patchSize = rand() % 20;
+         
+         for (float j = 0; j < patchSize; j++)
+         {
+         
+             int sx = x + u1(gen) * 20;
+             int sz = z + u1(gen) * 20;
+             
+             float y = terrain->getHeightAt(sx, sz);
+             
+             TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
+             if (chunk != nullptr)
+                 chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
+                 
+         }
+         
+     }
+     Timer::stop("seaweed");*/
     
-    {
-        float x = u1(gen) * terrainSize;
-        float z = u1(gen) * terrainSize;
-        
-        int patchSize = rand() % 20;
-        
-        for (float j = 0; j < patchSize; j++)
-        {
-            
-            int sx = x + u1(gen) * 20;
-            int sz = z + u1(gen) * 20;
-            
-            float y = terrain->getHeightAt(sx, sz);
-            
-            TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
-            if (chunk != nullptr)
-                chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
-            
-        }
-        
-    }
-    Timer::stop("seaweed");*/
     
-	
     
     Timer::start("rock");
     for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
@@ -343,12 +343,12 @@ int main()
         {
             fish->render(lightingShader);
         }
-
-		animateHarpoon(deltaTime);
-		for (auto harpoon : harpoons)
-		{
-			harpoon->render(lightingShader);
-		}
+        
+        animateHarpoon(deltaTime);
+        for (auto harpoon : harpoons)
+        {
+            harpoon->render(lightingShader);
+        }
         
         //Glowfish
         lightSourceShader->use();
@@ -451,7 +451,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-		harpoons.push_back(new Harpoon(camera.getPosition(), camera.getFront()));
+        harpoons.push_back(new Harpoon(camera.getPosition(), camera.getFront()));
     }
 }
 
@@ -605,10 +605,10 @@ void animateFishThread(int start, int count)
 
 void animateHarpoon(float deltaTime)
 {
-	for (auto harpoon : harpoons)
-	{
-		harpoon->animate(deltaTime, terrain);
-	}
+    for (auto harpoon : harpoons)
+    {
+        harpoon->animate(deltaTime, terrain);
+    }
 }
 
 void createTerrainThread()
