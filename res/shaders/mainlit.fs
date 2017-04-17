@@ -89,7 +89,9 @@ void main()
     result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
     
 	result= pow(result, vec3(1.0/0.8));
-    color = vec4(result, Opacity) * (1.0f-(DistanceFromView/viewDistance));
+
+	float ratio = (1.0f-(DistanceFromView/viewDistance));
+    color = vec4(result.x * ratio, result.y * ratio, result.z*ratio, Opacity);
 }
 
 

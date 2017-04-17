@@ -154,7 +154,7 @@ int main()
     lightSourceShader = new Shader("res/shaders/lightsource.vs", "res/shaders/lightsource.fs");
     skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
     
-    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.2f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.3f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     terrainThread.join();
     
@@ -212,7 +212,7 @@ int main()
     
     
     Timer::start("rock");
-    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
+    for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
     {
         float x = u1(gen) * terrainSize;
         
@@ -225,33 +225,34 @@ int main()
             chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
     }
     Timer::stop("rock");
-
-	
-	Timer::start("coral");
-	for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
-	{
-		float x = u1(gen) * terrainSize;
-
-		float z = u1(gen) * terrainSize;
-
-		float y = terrain->getHeightAt(x, z);
-
-		TerrainChunk* chunk = terrain->getChunkAtReal((int)x, (int)z);
-		if (chunk != nullptr)
-			chunk->addEntity(new Coral(glm::vec3(-x, -y, -z)));
-	}
-	Timer::stop("Coral");
-
+    
+    
+    
+    Timer::start("coral");
+    for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
+    {
+        float x = u1(gen) * terrainSize;
+        
+        float z = u1(gen) * terrainSize;
+        
+        float y = terrain->getHeightAt(x, z);
+        
+        TerrainChunk* chunk = terrain->getChunkAtReal((int)x, (int)z);
+        if (chunk != nullptr)
+            chunk->addEntity(new Coral(glm::vec3(-x, -y, -z)));
+    }
+    Timer::stop("Coral");
+    
     // ____________________________ END CREATING SCENE ____________________________
     
     
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
-
+    
     camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
     terrain->updateChunks(camera.getPosition());
-	
-	spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-		camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
+    
+    spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
+                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -273,7 +274,7 @@ int main()
         glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
-        glClearColor(0.0f, 0.0f, 0.1f, 1.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         
@@ -316,20 +317,20 @@ int main()
         glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
         
         // Point lights (glowfish)
-		for (int i = 0; i < glowFish.size(); i++)
-		{
-			glowFish.at(i)->animate(deltaTime);
-			std::string identifier = "pointLights[" + std::to_string(i) + "]";
-
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
-			glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
-			glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
-		}
-
+        for (int i = 0; i < glowFish.size(); i++)
+        {
+            glowFish.at(i)->animate(deltaTime);
+            std::string identifier = "pointLights[" + std::to_string(i) + "]";
+            
+            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
+            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".ambient").c_str()), glowFish.at(i)->ambient.x, glowFish.at(i)->ambient.y, glowFish.at(i)->ambient.z);
+            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".diffuse").c_str()), glowFish.at(0)->diffuse.x, glowFish.at(0)->diffuse.y, glowFish.at(0)->diffuse.z);
+            glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".specular").c_str()), glowFish.at(0)->specular.x, glowFish.at(0)->specular.y, glowFish.at(0)->specular.z);
+            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".constant").c_str()), glowFish.at(0)->constant);
+            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".linear").c_str()), glowFish.at(0)->linear);
+            glUniform1f(glGetUniformLocation(lightingShader->program, (identifier + ".quadratic").c_str()), glowFish.at(0)->quadratic);
+        }
+        
         // Render the terrain and scene objects
         terrain->render(camera.getPosition(), lightingShader, deltaTime);
         
