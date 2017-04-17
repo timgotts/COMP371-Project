@@ -24,11 +24,11 @@ class Harpoon : public Renderable
     glm::vec3 direction;
     
     protected:
-    bool belowTerrain = false;
-    bool outsideTerrain = false;
+    
+    bool isStuck = false;
     
     // Harpoon movement speed
-    GLfloat velocity = 0.5f;
+    GLfloat velocity = 15.0f;
     
     // periodic animation variables
     GLfloat totalTime;

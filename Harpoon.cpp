@@ -251,6 +251,8 @@ void Harpoon::render(Shader * shader)
 
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
+    if(isStuck)
+        return;
     
     //totalTime += deltaTime;
     position += direction * velocity * deltaTime;
@@ -258,6 +260,10 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     // Model transformations
     glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
     
+    if(!terrain->isPositionValid(position))
+    {
+        isStuck = true;
+    }
     
     model = tempModel;
     
