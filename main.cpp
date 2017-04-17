@@ -22,6 +22,7 @@
 #include "Timer.h"
 #include "GlowFish.h"
 #include "Coral.h"
+#include "Harpoon.h"
 
 
 #define PI 3.14159265358979323846
@@ -43,6 +44,7 @@ Camera camera = Camera();
 
 std::vector<Fish*> fishes;
 std::vector<GlowFish*> glowFish;
+std::vector<Harpoon*> harpoons;
 std::vector<Cube*> cubes;
 Skybox* skybox;
 DirectionalLight sun;
@@ -64,6 +66,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 void animateFish(float deltaTime);
 void animateFishThread(int start, int count);
+void animateHarpoon(float deltaTime);
 void createTerrainThread();
 
 
@@ -167,7 +170,7 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(0, 1);
     
-   /* Timer::start("fish");
+    Timer::start("fish");
     for (int i = 0; i < 600; ++i)
     {
         fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
@@ -179,12 +182,12 @@ int main()
     {
         glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
     }
-    Timer::stop("GlowFish");*/
+    Timer::stop("GlowFish");
     
     
     
-    Timer::start("seaweed");
-    /*for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
+   /* Timer::start("seaweed");
+    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
     
     {
         float x = u1(gen) * terrainSize;
@@ -206,10 +209,10 @@ int main()
             
         }
         
-    }*/
-    Timer::stop("seaweed");
+    }
+    Timer::stop("seaweed");*/
     
-    
+	
     
     Timer::start("rock");
     for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
@@ -340,6 +343,12 @@ int main()
         {
             fish->render(lightingShader);
         }
+
+		animateHarpoon(deltaTime);
+		for (auto harpoon : harpoons)
+		{
+			harpoon->render(lightingShader);
+		}
         
         //Glowfish
         lightSourceShader->use();
@@ -442,8 +451,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        // SHOOT HARPOON
-        // TAKE PHOTO
+		harpoons.push_back(new Harpoon(camera.getPosition(), camera.getFront()));
     }
 }
 
@@ -593,6 +601,14 @@ void animateFishThread(int start, int count)
     {
         fishes[i]->animate(deltaTime, terrain);
     }
+}
+
+void animateHarpoon(float deltaTime)
+{
+	for (auto harpoon : harpoons)
+	{
+		harpoon->animate(deltaTime, terrain);
+	}
 }
 
 void createTerrainThread()

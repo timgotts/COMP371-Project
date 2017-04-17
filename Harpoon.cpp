@@ -2,37 +2,47 @@
 
 #include "Harpoon.h"
 #include <GLM\glm.hpp>
-#include <GLM\gtc\matrix_transform.inl>
 
-glm::vec3 Harpoon::calculateNormal(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3)
+glm::vec3 Harpoon::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
-	return glm::vec3();
+	// Edge1, Edge2
+	glm::vec3 e1, e2;
+	glm::vec3 normal;
+
+	// Find vectors for two edges sharing p1
+	e1 = p2 - p1;
+	e2 = p3 - p1;
+
+	// Calculate normal
+	normal = glm::normalize(glm::cross(e2, e1));
+
+	return normal;
 }
 
-Harpoon::Harpoon(glm::vec3 position)
+Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(position), direction(direction)
 {
 
 	glm::vec3 harpoonVertices[] = {
 		// face 1
 		glm::vec3(0.0,0.0,0.0),
-		glm::vec3(-0.2,0.4,0.0),
-		glm::vec3(0.2,0.4,0.0),
-		glm::vec3(0.4,0.2,0.0),
-		glm::vec3(0.4,-0.2,0.0),
-		glm::vec3(0.2,-0.4,0.0),
-		glm::vec3(-0.2,-0.4,0.0),
-		glm::vec3(-0.4,-0.2,0.0),
-		glm::vec3(-0.4,0.2,0.0),
+		glm::vec3(-0.1,0.2,0.0),
+		glm::vec3(0.1,0.2,0.0),
+		glm::vec3(0.2,0.1,0.0),
+		glm::vec3(0.2,-0.1,0.0),
+		glm::vec3(0.1,-0.2,0.0),
+		glm::vec3(-0.1,-0.2,0.0),
+		glm::vec3(-0.2,-0.1,0.0),
+		glm::vec3(-0.2,0.1,0.0),
 		// face 2
-		glm::vec3(0.0,0.0,1.0),
-		glm::vec3(-0.2,0.4,1.0),
-		glm::vec3(0.2,0.4,1.0),
-		glm::vec3(0.4,0.2,1.0),
-		glm::vec3(0.4,-0.2,1.0),
-		glm::vec3(0.2,-0.4,1.0),
-		glm::vec3(-0.2,-0.4,1.0),
-		glm::vec3(-0.4,-0.2,1.0),
-		glm::vec3(-0.4,0.2,1.0)
+		glm::vec3(0.0,0.0,6.0),
+		glm::vec3(-0.1,0.2,6.0),
+		glm::vec3(0.1,0.2,6.0),
+		glm::vec3(0.2,0.1,6.0),
+		glm::vec3(0.2,-0.1,6.0),
+		glm::vec3(0.1,-0.2,6.0),
+		glm::vec3(-0.1,-0.2,6.0),
+		glm::vec3(-0.2,-0.1,6.0),
+		glm::vec3(-0.2,0.1,6.0)
 	};
 	glm::vec3 surfaceNormals[] = {
 		calculateNormal(harpoonVertices[0],harpoonVertices[2],harpoonVertices[1]),
@@ -159,7 +169,7 @@ Harpoon::Harpoon(glm::vec3 position)
 	};
 
 	model = glm::translate(model, -position);
-	material = Material();
+	material = Material(glm::vec3(0.2), glm::vec3(0.5),glm::vec3(0.5), 0.7);
 }
 
 bool Harpoon::load()
@@ -235,4 +245,39 @@ void Harpoon::render(Shader * shader)
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 96);
 	glBindVertexArray(0);
+}
+
+void Harpoon::animate(float deltaTime, Terrain * terrain)
+{
+
+	//totalTime += deltaTime;
+	position += direction * velocity * deltaTime;
+
+	// Model transformations
+	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
+	
+
+	float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk() - 1);
+
+	if (belowTerrain)
+	{
+		// stop moving
+	}
+
+	// Below terrain
+	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 6.0f)) && (belowTerrain == false))
+	{
+		belowTerrain = true;
+	}
+
+	// Outside terrain
+	if ((position.x < 0.0f || position.z < 0.0f || position.x > terrainSize || position.z > terrainSize) && (outsideTerrain == false))
+	{
+		//delete harpoon
+	}
+
+
+
+	model = tempModel;
+
 }
