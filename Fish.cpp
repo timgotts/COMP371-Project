@@ -303,7 +303,7 @@ void Fish::animate(float deltaTime, Terrain * terrain)
 	}
 
 	// Below terrain
-	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 4.0f)) && (belowTerrain == false))
+	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 6.0f)) && (belowTerrain == false))
 	{
 		belowTerrain = true;
 		descending = false;
@@ -313,7 +313,7 @@ void Fish::animate(float deltaTime, Terrain * terrain)
 	}
 
 	// Above terrain
-	if ((position.y >(terrain->getHeightAt((int)position.x, (int)position.z) + 6.0f)) && (belowTerrain == true))
+	if ((position.y >(terrain->getHeightAt((int)position.x, (int)position.z) + 8.0f)) && (belowTerrain == true))
 	{
 		belowTerrain = false;
 		levelingOut = true;
