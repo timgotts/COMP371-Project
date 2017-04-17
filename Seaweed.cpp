@@ -21501,11 +21501,10 @@ GLfloat Seaweed::redVBO[] =
 
 };
 
-
 Seaweed::Seaweed(glm::vec3 position)
 {
 
-
+	positionSeaweed = position;
 	if (amount % 2 == 0)
 	{
 		if (gVAO == 0)
@@ -21733,8 +21732,26 @@ void Seaweed::render(Shader* shader)
 	glBindVertexArray(0);
 }
 
+void Seaweed::animate(float deltaTime)
+{
+	totalTime += deltaTime;
 
+	// Model transformations
+	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), positionSeaweed);
 
+	float sx = sin(totalTime + oscOffset);
+	float sz = sin(totalTime + oscOffset + 1.584);
+	glm::mat4 shearMatrix =
+	{
+		1.0f, sx, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, sz, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+	tempModel = tempModel * shearMatrix;
+
+	model = tempModel;
+}
 
 void Seaweed::calculateSweep()
 {
@@ -22043,4 +22060,5 @@ void Seaweed::calculateSweep()
 	}
 
 }
+
 

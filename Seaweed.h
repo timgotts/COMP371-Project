@@ -12,39 +12,46 @@
 
 class Seaweed : public Renderable
 {
-    public:
-    
-    //Non-default constructor
-    Seaweed( glm::vec3 position);
-    float rotAngle;
-    //Seaweed's render function
-    void render(Shader* shader);
-    
-    //Calulates the seaweeds translational sweep, which only happens once per seaweed type.
-    void calculateSweep();
-    
-    //Final vertices for the seaweed
-    GLfloat* verticesVBO;
-    //Indices for the ebo
-    GLuint* indicesEBO;
-    
-    //Length of the verticesVBO
-    int totalLength;
-    //Length of the indicesEBO
-    int indexLength;
-    
-    //seaweed type
-    int type;
-    
-    //Added for now to generate different seaweed
-    static int amount;
-    
-    static GLfloat greenVBO[];
-    static GLfloat redVBO[];
-    
-    static GLuint gVAO;
-    static GLuint gVBO;
-    
-    static GLuint rVAO;
-    static GLuint rVBO;
+public:
+
+	//Non-default constructor
+	Seaweed(glm::vec3 position);
+	float rotAngle;
+	//Seaweed's render function
+	void render(Shader* shader);
+
+	void animate(float deltaTime);
+
+	//Calulates the seaweeds translational sweep, which only happens once per seaweed type.
+	void calculateSweep();
+
+	//Final vertices for the seaweed
+	GLfloat* verticesVBO;
+	//Indices for the ebo
+	GLuint* indicesEBO;
+
+	//Length of the verticesVBO
+	int totalLength;
+	//Length of the indicesEBO
+	int indexLength;
+
+	//seaweed type
+	int type;
+
+	//Added for now to generate different seaweed
+	static int amount;
+
+	static GLfloat greenVBO[];
+	static GLfloat redVBO[];
+
+	static GLuint gVAO;
+	static GLuint gVBO;
+
+	static GLuint rVAO;
+	static GLuint rVBO;
+
+	GLfloat totalTime = 0.0f;
+	GLfloat oscOffset;
+
+	glm::vec3 positionSeaweed;
 };
