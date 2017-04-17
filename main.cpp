@@ -175,7 +175,7 @@ int main()
     Timer::stop("Fish");
     
     Timer::start("GlowFish");
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 25; ++i)
     {
         glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
     }
@@ -252,7 +252,7 @@ int main()
     terrain->updateChunks(camera.getPosition());
     
     spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(5.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
+                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(15.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);

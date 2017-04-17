@@ -7,5 +7,5 @@ uniform float viewDistance;
 
 void main()
 {
-    color = vec4((1.0f-(DistanceFromView/viewDistance))); // Set all 4 vector values to 1.0f
+    color = vec4((1.0f-(DistanceFromView/viewDistance)*0.2f)); // Set all 4 vector values to 1.0f
 }
