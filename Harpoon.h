@@ -20,11 +20,12 @@ class Harpoon : public Renderable
     bool load();
     void unload();
     
+	// harpoon position & direction vector
     glm::vec3 position;
     glm::vec3 direction;
     
     protected:
-    
+    // determine whether harpoon is stuck or not
     bool isStuck = false;
     
     // Harpoon movement speed

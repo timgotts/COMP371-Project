@@ -46,6 +46,8 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         glm::vec3(-0.2,-0.1,6.0),
         glm::vec3(-0.2,0.1,6.0)
     };
+
+	// calculate surface normals
     glm::vec3 surfaceNormals[] = {
         calculateNormal(harpoonVertices[0],harpoonVertices[2],harpoonVertices[1]),
         
@@ -61,8 +63,10 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         calculateNormal(harpoonVertices[9],harpoonVertices[11],harpoonVertices[10])
     };
     
+	// set vertices and normals for each side
     int surface = 0;
     vertices = {
+		// face 1
         harpoonVertices[0], surfaceNormals[surface],
         harpoonVertices[2], surfaceNormals[surface],
         harpoonVertices[1], surfaceNormals[surface],
@@ -88,6 +92,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
+		// long sides
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -144,6 +149,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         harpoonVertices[10], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
+		// face 2
         harpoonVertices[9], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -266,8 +272,10 @@ void Harpoon::render(Shader * shader)
     glBindVertexArray(0);
 }
 
+// animate the harpoon over time to move it through the scene
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
+	// if the harpoon is stuck
     if(isStuck)
         return;
     
@@ -277,11 +285,12 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     // Model transformations
     glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
     
+	// if the harpoon hits the ground make it stay there
     if(!terrain->isPositionValid(position))
     {
         isStuck = true;
     }
     
+	// update model matrix
     model = tempModel;
-    
 }
