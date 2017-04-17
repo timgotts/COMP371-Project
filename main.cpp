@@ -475,9 +475,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
-        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getFront()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(FORWARD, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -487,9 +486,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
-        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f; 
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getFront()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(BACKWARD, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -498,9 +496,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
-        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getRight()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(LEFT, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -509,9 +506,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
-        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getRight());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getRight()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(RIGHT, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -520,9 +516,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_SPACE])
     {
-        glm::vec3 newPos = camera.getPosition() - velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getUp()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(UP, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -531,9 +526,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
-        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getUp());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getUp()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(DOWN, deltaTime);
             terrain->updateChunks(camera.getPosition());
@@ -542,9 +536,8 @@ void doMovement()
     
     if (keys[GLFW_KEY_Q])
     {
-        glm::vec3 newPos = camera.getPosition() + velocity*(camera.getFront());
-        float height = terrain->getHeightAt(-newPos.x, -newPos.z) + 1.5f;
-        if(height < -newPos.y)
+        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getFront()));
+        if(terrain->isPositionValid(newPos))
         {
             camera.processKeyboard(ROLL_LEFT, deltaTime);
             terrain->updateChunks(camera.getPosition());
