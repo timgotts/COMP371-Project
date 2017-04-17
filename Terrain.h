@@ -90,6 +90,8 @@ class Terrain
     
     int getRenderDistance();
     
+    bool isPositionValid(glm::vec3 position);
+    
     private:
     
     //number of chunks on x,y
@@ -103,6 +105,8 @@ class Terrain
     
     //chunk grid
     TerrainChunk*** chunks;
+    
+    
     
 };
 

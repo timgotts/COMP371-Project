@@ -23,6 +23,8 @@ class Renderable
     
     Material material;
     
+    float radius = -1;
+    
     virtual void render(Shader* shader) {};
     virtual void animate(float deltaTime) {};
     
