@@ -610,7 +610,7 @@ void createTerrainThread()
     
     
     Timer::start("rock");
-    for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
+    for(int i = 0; i < (int)(0.01f*terrainSize*terrainSize); i++)
     {
         float x = u1(gen) * terrainSize;
         
