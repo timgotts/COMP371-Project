@@ -1,7 +1,6 @@
 #include "Skybox.h"
 #include <GLM\gtc\matrix_transform.hpp>
 #include <soil\soil.h>
-//hygg
 Skybox::Skybox()
 {
     vertices = { glm::vec3(-1.0f,  1.0f, -1.0f),
