@@ -167,7 +167,7 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(0, 1);
     
-    Timer::start("fish");
+   /* Timer::start("fish");
     for (int i = 0; i < 600; ++i)
     {
         fishes.push_back(new Fish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 80.0f + 15.0f, u1(gen) * terrainSize)));
@@ -179,12 +179,12 @@ int main()
     {
         glowFish.push_back(new GlowFish(glm::vec3(u1(gen) * terrainSize, u1(gen) * 100.0f + 10.0f, u1(gen) * terrainSize)));
     }
-    Timer::stop("GlowFish");
+    Timer::stop("GlowFish");*/
     
     
     
     Timer::start("seaweed");
-    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
+    /*for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
     
     {
         float x = u1(gen) * terrainSize;
@@ -206,7 +206,7 @@ int main()
             
         }
         
-    }
+    }*/
     Timer::stop("seaweed");
     
     

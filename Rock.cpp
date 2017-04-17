@@ -52,7 +52,7 @@ Rock::Rock(glm::vec3 position)
     };
     
     // get surface normals for lighting
-    glm::vec3 surfaceNormals[20] = {
+    glm::vec3 surfaceNormals[] = {
         calculateNormal(rockVertices[1],rockVertices[4],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[9],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[5],rockVertices[9]),
