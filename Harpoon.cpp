@@ -2,6 +2,8 @@
 
 #include "Harpoon.h"
 #include <GLM\glm.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
+
 
 glm::vec3 Harpoon::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
@@ -187,9 +189,24 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
-    
+
+	// Apply translation to model matrix
     model = glm::translate(model, -position);
+	
+
+	// Apply rotation to face fron vector
+	float r = sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
+	float t = atan(direction.y / direction.x);
+	float p = acos(direction.z / r);
+	
+	//float t = asin(direction.z);
+	//float p = pow(atan(-direction.y * direction.x), 2);
+
+	model = glm::rotate(model, glm::radians(t), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::rotate(model, glm::radians(p), glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+	// Apply material properties
     material = Material(glm::vec3(0.2), glm::vec3(0.5),glm::vec3(0.5), 0.7);
 }
 

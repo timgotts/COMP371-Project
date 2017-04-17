@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLM\gtc\type_ptr.hpp>
+//#include <GLM\gtc\type_ptr.hpp>
 #include "Renderable.h"
 #include "Terrain.h"
 
@@ -28,10 +28,6 @@ class Harpoon : public Renderable
     bool isStuck = false;
     
     // Harpoon movement speed
-    GLfloat velocity = 15.0f;
-    
-    // periodic animation variables
-    GLfloat totalTime;
-    
+    GLfloat velocity = 30.0f;    
     
 };
