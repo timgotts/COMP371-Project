@@ -90,8 +90,9 @@ void main()
     
 	result= pow(result, vec3(1.0/0.8));
 
-	float ratio = (1.0f-(DistanceFromView/viewDistance));
-    color = vec4(result.x * ratio, result.y * ratio, result.z*ratio, Opacity);
+	float ratio = min(1.0f,(1.0f-(max(0.0f, DistanceFromView-(viewDistance/2))/(viewDistance/2))));
+	vec4 fog = vec4((2.0f/255.0f), (34.0f/255.0f), (134.0f/255.0f), 1.0f);
+	color = mix(vec4(result, 1.0f), fog, min(1.0f,(1-ratio)));
 }
 
 
