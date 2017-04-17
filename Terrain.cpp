@@ -452,20 +452,21 @@ bool Terrain::isPositionValid(glm::vec3 position)
     if(height < position.y)
     {
         TerrainChunk* chunk = getChunkAtReal(position.x, position.z);
-        
-        for(auto *entity : chunk->getEntities())
+        if(chunk!=nullptr)
         {
-            if(entity->radius > 0)
+            for(auto *entity : chunk->getEntities())
             {
-                glm::vec3 entityPosition = entity->model * glm::vec4(0, 0, 0, 1);
-                float distance = glm::distance(entityPosition, position);
-                if(distance < entity->radius)
+                if(entity->radius > 0)
                 {
-                    return false;
+                    glm::vec3 entityPosition = entity->model * glm::vec4(0, 0, 0, 1);
+                    float distance = glm::distance(entityPosition, position);
+                    if(distance < entity->radius)
+                    {
+                        return false;
+                    }
                 }
             }
         }
-        
         return true;
     }
     return false;
