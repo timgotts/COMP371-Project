@@ -349,6 +349,8 @@ int main()
         glUniform1f(glGetUniformLocation(lightSourceShader->program, "viewDistance"),  viewDistance);
         
         
+        glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+        
         //Render glowfish
         for (auto gf : glowFish)
         {
