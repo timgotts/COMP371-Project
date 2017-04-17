@@ -319,7 +319,7 @@ int main()
         // Point lights (glowfish)
         for (int i = 0; i < glowFish.size(); i++)
         {
-            glowFish.at(i)->animate(deltaTime);
+            glowFish.at(i)->animate(deltaTime, terrain);
             std::string identifier = "pointLights[" + std::to_string(i) + "]";
             
             glUniform3f(glGetUniformLocation(lightingShader->program, (identifier + ".position").c_str()), glowFish.at(i)->getPosition().x, glowFish.at(i)->getPosition().y, glowFish.at(i)->getPosition().z);
@@ -589,7 +589,7 @@ void animateFishThread(int start, int count)
 {
     for (int i = start; i < start + count; ++i)
     {
-        fishes[i]->animate(deltaTime);
+        fishes[i]->animate(deltaTime, terrain);
     }
 }
 
