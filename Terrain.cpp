@@ -254,6 +254,7 @@ int Terrain::getPointsPerChunk()
 
 TerrainChunk* Terrain::getChunkAt(int posX, int posY)
 {
+    //return nullptr if outside of range
     if(posX < 0 || posY < 0 || posX >= size || posY >= size)
     {
         return nullptr;
