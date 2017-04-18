@@ -70,6 +70,12 @@ class Camera
     {
         return front;
     }
+
+	glm::quat getCameraQuat()
+	{
+		
+		return cameraQuat;
+	}
     
     
     void processKeyboard(CameraMovement command, GLfloat deltaTime) 

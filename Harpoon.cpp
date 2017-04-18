@@ -21,31 +21,58 @@ glm::vec3 Harpoon::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
     return normal;
 }
 
-Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position), direction(-direction)
+Harpoon::Harpoon(glm::vec3 position, glm::quat cameraQuat) : position(-position)
 {
     
-    glm::vec3 harpoonVertices[] = {
-        // face 1
-        glm::vec3(0.0,0.0,0.0),
-        glm::vec3(-0.1,0.2,0.0),
-        glm::vec3(0.1,0.2,0.0),
-        glm::vec3(0.2,0.1,0.0),
-        glm::vec3(0.2,-0.1,0.0),
-        glm::vec3(0.1,-0.2,0.0),
-        glm::vec3(-0.1,-0.2,0.0),
-        glm::vec3(-0.2,-0.1,0.0),
-        glm::vec3(-0.2,0.1,0.0),
-        // face 2
-        glm::vec3(0.0,0.0,6.0),
-        glm::vec3(-0.1,0.2,6.0),
-        glm::vec3(0.1,0.2,6.0),
-        glm::vec3(0.2,0.1,6.0),
-        glm::vec3(0.2,-0.1,6.0),
-        glm::vec3(0.1,-0.2,6.0),
-        glm::vec3(-0.1,-0.2,6.0),
-        glm::vec3(-0.2,-0.1,6.0),
-        glm::vec3(-0.2,0.1,6.0)
-    };
+    //glm::vec3 harpoonVertices[] = {
+    //    // face 1
+    //    glm::vec3(0.0,0.0,0.0),
+    //    glm::vec3(-0.1,0.2,0.0),
+    //    glm::vec3(0.1,0.2,0.0),
+    //    glm::vec3(0.2,0.1,0.0),
+    //    glm::vec3(0.2,-0.1,0.0),
+    //    glm::vec3(0.1,-0.2,0.0),
+    //    glm::vec3(-0.1,-0.2,0.0),
+    //    glm::vec3(-0.2,-0.1,0.0),
+    //    glm::vec3(-0.2,0.1,0.0),
+    //    // face 2
+    //    glm::vec3(0.0,0.0,6.0),
+    //    glm::vec3(-0.1,0.2,6.0),
+    //    glm::vec3(0.1,0.2,6.0),
+    //    glm::vec3(0.2,0.1,6.0),
+    //    glm::vec3(0.2,-0.1,6.0),
+    //    glm::vec3(0.1,-0.2,6.0),
+    //    glm::vec3(-0.1,-0.2,6.0),
+    //    glm::vec3(-0.2,-0.1,6.0),
+    //    glm::vec3(-0.2,0.1,6.0)
+    //};
+
+	quat = cameraQuat * quat;
+	quat = glm::normalize(quat);
+
+
+	glm::vec3 harpoonVertices[] = {
+	    // face 1
+	    glm::vec3(0.0,0.0,0.0),
+	    glm::vec3(0.0,0.2,-0.1),
+	    glm::vec3(0.0,0.2,0.1),
+	    glm::vec3(0.0,0.1,0.2),
+	    glm::vec3(0.0,-0.1,0.2),
+	    glm::vec3(0.0,-0.2,0.1),
+	    glm::vec3(0.0,-0.2,-0.1),
+	    glm::vec3(0.0,-0.1,-0.2),
+	    glm::vec3(0.0,0.1,-0.2),
+	    // face 2
+	    glm::vec3(6.0,0.0,0.0),
+	    glm::vec3(6.0,0.2,-0.1),
+	    glm::vec3(6.0,0.2,0.1),
+	    glm::vec3(6.0,0.1,0.2),
+	    glm::vec3(6.0,-0.1,0.2),
+	    glm::vec3(6.0,-0.2,0.1),
+	    glm::vec3(6.0,-0.2,-0.1),
+	    glm::vec3(6.0,-0.1,-0.2),
+	    glm::vec3(6.0,0.1,-0.2)
+	};
 
 	// calculate surface normals
     glm::vec3 surfaceNormals[] = {
@@ -197,19 +224,18 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
     glBindVertexArray(0);
 
 	// Apply translation to model matrix
-    model = glm::translate(model, -position);
-	
+    //model = glm::translate(model, -position);
 
-	// Apply rotation to face fron vector
-	float r = sqrt(direction.x*direction.x + direction.y*direction.y + direction.z*direction.z);
-	float t = atan(direction.y / direction.x);
-	float p = acos(direction.z / r);
+	
 	
 	//float t = asin(direction.z);
 	//float p = pow(atan(-direction.y * direction.x), 2);
 
-	model = glm::rotate(model, glm::radians(t), glm::vec3(1.0f, 0.0f, 0.0f));
-	model = glm::rotate(model, glm::radians(p), glm::vec3(0.0f, 1.0f, 0.0f));
+	//model = glm::rotate(model, glm::radians(t), glm::vec3(1.0f, 0.0f, 0.0f));
+	// = glm::rotate(model, glm::radians(p), glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+	updateVectors();
 
 
 	// Apply material properties
@@ -233,6 +259,23 @@ void Harpoon::unload()
     
     VBO = 0;
     VAO = 0;
+}
+
+void Harpoon::updateVectors()
+{
+
+	glm::mat4 rotation = glm::mat4_cast(quat);
+
+	glm::mat4 translation = glm::mat4(1.0f);
+	translation = glm::translate(translation, position);
+
+	glm::mat4 viewMatrix = rotation * translation;
+
+	glm::mat4 mat = viewMatrix;
+
+	front = glm::vec3(mat[0][2], mat[1][2], mat[2][2]);
+	right = glm::vec3(mat[0][0], mat[1][0], mat[2][0]);
+	up = glm::normalize(glm::cross(front, right));
 }
 
 void Harpoon::render(Shader * shader)
@@ -275,22 +318,27 @@ void Harpoon::render(Shader * shader)
 // animate the harpoon over time to move it through the scene
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
+	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 5.0f)) && (isStuck == false))
+	{
+		isStuck = true;
+	}
+	
 	// if the harpoon is stuck
     if(isStuck)
-        return;
+      return;
     
-    //totalTime += deltaTime;
-    position += direction * velocity * deltaTime;
-    
-    // Model transformations
-    glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
-    
-	// if the harpoon hits the ground make it stay there
-    if(!terrain->isPositionValid(position))
-    {
-        isStuck = true;
-    }
-    
-	// update model matrix
-    model = tempModel;
+	totalTime += deltaTime;
+
+	pitch -= 0.25f;
+	updateVectors();
+	position += front * velocity * deltaTime;
+
+	// Model transformations
+	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
+
+	glm::mat4 rotationMatrix = glm::mat4_cast(quat);
+	tempModel = tempModel * rotationMatrix;
+
+
+	model = tempModel;
 }
