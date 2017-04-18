@@ -22,6 +22,7 @@
 #include "Timer.h"
 #include "GlowFish.h"
 #include "Coral.h"
+#include "Harpoon.h"
 
 
 #define PI 3.14159265358979323846
@@ -39,10 +40,11 @@ bool firstMouse = true;
 
 bool keys[1024];
 
-Camera camera = Camera();
+Camera * camera = new Camera();
 
 std::vector<Fish*> fishes;
 std::vector<GlowFish*> glowFish;
+std::vector<Harpoon*> harpoons;
 std::vector<Cube*> cubes;
 Skybox* skybox;
 DirectionalLight sun;
@@ -64,6 +66,7 @@ void windowResizeCallback(GLFWwindow* window, int width, int height);
 void doMovement();
 void animateFish(float deltaTime);
 void animateFishThread(int start, int count);
+void animateHarpoon(float deltaTime);
 void createTerrainThread();
 
 
@@ -184,31 +187,31 @@ int main()
     
     
     
-    Timer::start("seaweed");
-    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
-    
-    {
-        float x = u1(gen) * terrainSize;
-        float z = u1(gen) * terrainSize;
-        
-        int patchSize = rand() % 20;
-        
-        for (float j = 0; j < patchSize; j++)
-        {
-            
-            int sx = x + u1(gen) * 20;
-            int sz = z + u1(gen) * 20;
-            
-            float y = terrain->getHeightAt(sx, sz);
-            
-            TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
-            if (chunk != nullptr)
-                chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
-            
-        }
-        
-    }
-    Timer::stop("seaweed");
+     Timer::start("seaweed");
+     for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
+     
+     {
+         float x = u1(gen) * terrainSize;
+         float z = u1(gen) * terrainSize;
+         
+         int patchSize = rand() % 20;
+         
+         for (float j = 0; j < patchSize; j++)
+         {
+         
+             int sx = x + u1(gen) * 20;
+             int sz = z + u1(gen) * 20;
+             
+             float y = terrain->getHeightAt(sx, sz);
+             
+             TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
+             if (chunk != nullptr)
+                 chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
+                 
+         }
+         
+     }
+     Timer::stop("seaweed");
     
     
     
@@ -247,13 +250,13 @@ int main()
     // ____________________________ END CREATING SCENE ____________________________
     
     
-    camera.setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
+    camera->setPosition(glm::vec3(-float(terrainSize / 2), -40.0f, -float(terrainSize / 2)));
     
-    camera.setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
-    terrain->updateChunks(camera.getPosition());
+    camera->setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
+    terrain->updateChunks(camera->getPosition());
     
     spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
-                          camera.getPosition(), camera.getFront(), glm::cos(glm::radians(15.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
+                          camera->getPosition(), camera->getFront(), glm::cos(glm::radians(15.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
     // ___________________________ GAME LOOP ___________________________
     glfwShowWindow(window);
@@ -271,8 +274,8 @@ int main()
         doMovement();
         
         // Apply camera tranformations
-        glm::mat4 view = camera.getViewMatrix();
-        glm::mat4 projection = glm::perspective(glm::radians(camera.getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
+        glm::mat4 view = camera->getViewMatrix();
+        glm::mat4 projection = glm::perspective(glm::radians(camera->getSmoothedZoom(deltaTime)), (GLfloat)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 1000.0f);
         
         // Clear frame buffer
         glClearColor((2.0f/255.0f), (34.0f / 255.0f), (134.0f/255.0f), 1.0f);
@@ -304,8 +307,8 @@ int main()
         glUniform3f(glGetUniformLocation(lightingShader->program, "dirLight.specular"), sun.specular.x, sun.specular.y, sun.specular.z);
         
         // SpotLight
-        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
-        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), -camera.getFront().x, -camera.getFront().y, -camera.getFront().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.position"), -camera->getPosition().x, -camera->getPosition().y, -camera->getPosition().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.direction"), -camera->getFront().x, -camera->getFront().y, -camera->getFront().z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.ambient"), spotLight.ambient.x, spotLight.ambient.y, spotLight.ambient.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.diffuse"), spotLight.diffuse.x, spotLight.diffuse.y, spotLight.diffuse.z);
         glUniform3f(glGetUniformLocation(lightingShader->program, "spotLight.specular"), spotLight.specular.x, spotLight.specular.y, spotLight.specular.z);
@@ -315,7 +318,7 @@ int main()
         glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.cutOff"), spotLight.cutOff);
         glUniform1f(glGetUniformLocation(lightingShader->program, "spotLight.outerCutOff"), spotLight.outerCutOff);
         
-        glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera->getPosition().x, -camera->getPosition().y, -camera->getPosition().z);
         
         // Point lights (glowfish)
         for (int i = 0; i < glowFish.size(); i++)
@@ -333,13 +336,19 @@ int main()
         }
         
         // Render the terrain and scene objects
-        terrain->render(camera.getPosition(), lightingShader, deltaTime);
+        terrain->render(camera->getPosition(), lightingShader, deltaTime);
         
         animateFish(deltaTime);
         // Render objects in the scene
         for (auto fish : fishes)
         {
             fish->render(lightingShader);
+        }
+        
+        animateHarpoon(deltaTime);
+        for (auto harpoon : harpoons)
+        {
+            harpoon->render(lightingShader);
         }
         
         //Glowfish
@@ -350,7 +359,7 @@ int main()
         glUniform1f(glGetUniformLocation(lightSourceShader->program, "viewDistance"),  viewDistance);
         
         
-        glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera.getPosition().x, -camera.getPosition().y, -camera.getPosition().z);
+        glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera->getPosition().x, -camera->getPosition().y, -camera->getPosition().z);
         
         //Render glowfish
         for (auto gf : glowFish)
@@ -426,7 +435,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
     lastX = xPos;
     lastY = yPos;
     
-    camera.processMouseMovement(xOffset, yOffset);
+    camera->processMouseMovement(xOffset, yOffset);
 }
 
 
@@ -434,7 +443,7 @@ void cursorPosCallback(GLFWwindow* window, double xPos, double yPos)
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
-    camera.processMouseScroll(yOffset);
+    camera->processMouseScroll(yOffset);
 }
 
 
@@ -443,8 +452,9 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        // SHOOT HARPOON
-        // TAKE PHOTO
+		glm::vec3 harpoonPos;
+		harpoonPos = camera->getPosition() + camera->getUp() - 0.7f *camera->getRight();
+		harpoons.push_back(new Harpoon(harpoonPos, camera->getFront()));
     }
 }
 
@@ -464,97 +474,97 @@ void windowResizeCallback(GLFWwindow* window, int width, int height)
 
 void doMovement()
 {
-    GLfloat velocity = 2*camera.getMovementSpeed() * deltaTime;
+    GLfloat velocity = 2*camera->getMovementSpeed() * deltaTime;
     
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
-        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getFront()));
+        glm::vec3 newPos = -(camera->getPosition() + velocity*(camera->getFront()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(FORWARD, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(FORWARD, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
         
     }
     
     if (keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN])
     {
-        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getFront()));
+        glm::vec3 newPos = -(camera->getPosition() - velocity*(camera->getFront()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(BACKWARD, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(BACKWARD, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT])
     {
-        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getRight()));
+        glm::vec3 newPos = -(camera->getPosition() + velocity*(camera->getRight()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(LEFT, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(LEFT, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT])
     {
-        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getRight()));
+        glm::vec3 newPos = -(camera->getPosition() - velocity*(camera->getRight()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(RIGHT, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(RIGHT, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_SPACE])
     {
-        glm::vec3 newPos = -(camera.getPosition() - velocity*(camera.getUp()));
+        glm::vec3 newPos = -(camera->getPosition() - velocity*(camera->getUp()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(UP, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(UP, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_LEFT_CONTROL])
     {
-        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getUp()));
+        glm::vec3 newPos = -(camera->getPosition() + velocity*(camera->getUp()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(DOWN, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(DOWN, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_Q])
     {
-        glm::vec3 newPos = -(camera.getPosition() + velocity*(camera.getFront()));
+        glm::vec3 newPos = -(camera->getPosition() + velocity*(camera->getFront()));
         if(terrain->isPositionValid(newPos))
         {
-            camera.processKeyboard(ROLL_LEFT, deltaTime);
-            terrain->updateChunks(camera.getPosition());
+            camera->processKeyboard(ROLL_LEFT, deltaTime);
+            terrain->updateChunks(camera->getPosition());
         }
     }
     
     if (keys[GLFW_KEY_E])
     {
-        camera.processKeyboard(ROLL_RIGHT, deltaTime);
+        camera->processKeyboard(ROLL_RIGHT, deltaTime);
     }
     
     if (keys[GLFW_KEY_LEFT_SHIFT])
     {
-        camera.processKeyboard(SPRINT, deltaTime);
+        camera->processKeyboard(SPRINT, deltaTime);
     }
     
     if (keys[GLFW_KEY_LEFT_ALT])
     {
-        camera.processKeyboard(CRAWL, deltaTime);
+        camera->processKeyboard(CRAWL, deltaTime);
     }
     
     if (!keys[GLFW_KEY_LEFT_ALT] && !keys[GLFW_KEY_LEFT_SHIFT])
     {
-        camera.processKeyboard(WALK, deltaTime);
+        camera->processKeyboard(WALK, deltaTime);
     }
     
 }
@@ -586,6 +596,14 @@ void animateFishThread(int start, int count)
     for (int i = start; i < start + count; ++i)
     {
         fishes[i]->animate(deltaTime, terrain);
+    }
+}
+
+void animateHarpoon(float deltaTime)
+{
+    for (auto harpoon : harpoons)
+    {
+        harpoon->animate(deltaTime, terrain);
     }
 }
 

@@ -17,8 +17,8 @@ glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
     e1 = p2 - p1;
     e2 = p3 - p1;
     
-    //Begin calculating determinant - also used to calculate u parameter
-    normal = glm::normalize(glm::cross(e2, e1));
+	// Calculate normal
+	normal = glm::normalize(glm::cross(e2, e1));
     
     return normal;
 }
@@ -54,7 +54,7 @@ Rock::Rock(glm::vec3 position)
     };
     
     // get surface normals for lighting
-    glm::vec3 surfaceNormals[20] = {
+    glm::vec3 surfaceNormals[] = {
         calculateNormal(rockVertices[1],rockVertices[4],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[9],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[5],rockVertices[9]),
