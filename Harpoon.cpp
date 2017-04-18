@@ -23,36 +23,36 @@ glm::vec3 Harpoon::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 
 Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position), front(-cameraFront)
 {
-
-	glm::vec3 harpoonVertices[] = {
-	    // face 1
-	    glm::vec3(0.0,0.0,0.0),
-	    glm::vec3(0.0,0.2,-0.1),
-	    glm::vec3(0.0,0.2,0.1),
-	    glm::vec3(0.0,0.1,0.2),
-	    glm::vec3(0.0,-0.1,0.2),
-	    glm::vec3(0.0,-0.2,0.1),
-	    glm::vec3(0.0,-0.2,-0.1),
-	    glm::vec3(0.0,-0.1,-0.2),
-	    glm::vec3(0.0,0.1,-0.2),
-	    // face 2
-	    glm::vec3(12.0,0.0,0.0),
-	    glm::vec3(12.0,0.2,-0.1),
-	    glm::vec3(12.0,0.2,0.1),
-	    glm::vec3(12.0,0.1,0.2),
-	    glm::vec3(12.0,-0.1,0.2),
-	    glm::vec3(12.0,-0.2,0.1),
-	    glm::vec3(12.0,-0.2,-0.1),
-	    glm::vec3(12.0,-0.1,-0.2),
-	    glm::vec3(12.0,0.1,-0.2)
-	};
-
-	// calculate surface normals
+    
+    glm::vec3 harpoonVertices[] = {
+        // face 1
+        glm::vec3(0.0,0.0,0.0),
+        glm::vec3(0.0,0.2,-0.1),
+        glm::vec3(0.0,0.2,0.1),
+        glm::vec3(0.0,0.1,0.2),
+        glm::vec3(0.0,-0.1,0.2),
+        glm::vec3(0.0,-0.2,0.1),
+        glm::vec3(0.0,-0.2,-0.1),
+        glm::vec3(0.0,-0.1,-0.2),
+        glm::vec3(0.0,0.1,-0.2),
+        // face 2
+        glm::vec3(12.0,0.0,0.0),
+        glm::vec3(12.0,0.2,-0.1),
+        glm::vec3(12.0,0.2,0.1),
+        glm::vec3(12.0,0.1,0.2),
+        glm::vec3(12.0,-0.1,0.2),
+        glm::vec3(12.0,-0.2,0.1),
+        glm::vec3(12.0,-0.2,-0.1),
+        glm::vec3(12.0,-0.1,-0.2),
+        glm::vec3(12.0,0.1,-0.2)
+    };
+    
+    // calculate surface normals
     glm::vec3 surfaceNormals[] = {
-		// normal for face 1
+        // normal for face 1
         calculateNormal(harpoonVertices[0],harpoonVertices[2],harpoonVertices[1]),
         
-		// normals for shaft faces
+        // normals for shaft faces
         calculateNormal(harpoonVertices[1],harpoonVertices[11],harpoonVertices[10]),
         calculateNormal(harpoonVertices[2],harpoonVertices[12],harpoonVertices[11]),
         calculateNormal(harpoonVertices[3],harpoonVertices[13],harpoonVertices[12]),
@@ -62,14 +62,14 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
         calculateNormal(harpoonVertices[7],harpoonVertices[17],harpoonVertices[16]),
         calculateNormal(harpoonVertices[8],harpoonVertices[10],harpoonVertices[17]),
         
-		// normal for face 2
+        // normal for face 2
         calculateNormal(harpoonVertices[9],harpoonVertices[11],harpoonVertices[10])
     };
     
-	// set vertices and normals for each side
+    // set vertices and normals for each side
     int surface = 0;
     vertices = {
-		// face 1
+        // face 1
         harpoonVertices[0], surfaceNormals[surface],
         harpoonVertices[2], surfaceNormals[surface],
         harpoonVertices[1], surfaceNormals[surface],
@@ -95,7 +95,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
-		// shaft sides
+        // shaft sides
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -152,7 +152,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
         harpoonVertices[10], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
-		// face 2
+        // face 2
         harpoonVertices[9], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -198,9 +198,9 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-
-	// Apply material properties
+    
+    
+    // Apply material properties
     material = Material(glm::vec3(0.2), glm::vec3(0.5),glm::vec3(0.5), 0.7);
 }
 
@@ -226,7 +226,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
 
 void Harpoon::render(Shader * shader)
 {
-	// set normal matrix
+    // set normal matrix
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
     
     
@@ -263,39 +263,40 @@ void Harpoon::render(Shader * shader)
 // animate the harpoon over time to move it through the scene
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
-	if (((position + front*12.0f).y < (terrain->getHeightAt((int)position.x, (int)position.z) + 0.0f)) && (isStuck == false))
-	{
-		isStuck = true;
-	}
-	
-	// if the harpoon is stuck
-    if(isStuck)
-      return;
+    glm::vec3 checkPosition = position + front * velocity * deltaTime;
+    if (!(terrain->isPositionValid(checkPosition)) && (isStuck == false))
+    {
+        isStuck = true;
+    }
     
-	// Calculate model rotation to match front vector
-	glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 axis = glm::normalize(glm::cross(front, initial));
-	float angle = acos(glm::dot(initial, front) / (glm::length(initial) * glm::length(front)));
-
-	glm::mat4 a = {
-		0.0f, -axis.z, axis.y, 0.0f,
-		axis.z, 0.0f, axis.x, 0.0f,
-		-axis.y, axis.x, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
-	};
-	rotationMatrix = glm::mat4(1.0f) + sin(angle) * a + (1 - cos(angle)) * (a * a);
-
-	front.y = front.y - 0.002f;
-	
-	// update position
-	position += front * velocity * deltaTime;
-
-	// Model transformations
-	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
-
-	// update tempModel with rotation matrix
-	tempModel = tempModel * rotationMatrix;
-
-	// set new model
-	model = tempModel;
+    // if the harpoon is stuck
+    if(isStuck)
+        return;
+    
+    // Calculate model rotation to match front vector
+    glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
+    glm::vec3 axis = glm::normalize(glm::cross(front, initial));
+    float angle = acos(glm::dot(initial, front) / (glm::length(initial) * glm::length(front)));
+    
+    glm::mat4 a = {
+        0.0f, -axis.z, axis.y, 0.0f,
+        axis.z, 0.0f, axis.x, 0.0f,
+        -axis.y, axis.x, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f
+    };
+    rotationMatrix = glm::mat4(1.0f) + sin(angle) * a + (1 - cos(angle)) * (a * a);
+    
+    front.y = front.y - 0.002f;
+    
+    // update position
+    position += front * velocity * deltaTime;
+    
+    // Model transformations
+    glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
+    
+    // update tempModel with rotation matrix
+    tempModel = tempModel * rotationMatrix;
+    
+    // set new model
+    model = tempModel;
 }
