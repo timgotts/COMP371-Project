@@ -155,6 +155,7 @@ int main()
     Timer::stop("Skybox");*/
     
     sun = DirectionalLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.2f, 0.2f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+
     
     terrainThread.join();
     
@@ -165,7 +166,7 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(0, 1);
     
-	// Generate fish
+    // Generate fish
     Timer::start("fish");
     for (int i = 0; i < 600; ++i)
     {
@@ -173,7 +174,7 @@ int main()
     }
     Timer::stop("Fish");
     
-	// Generate glowing fish
+    // Generate glowing fish
     Timer::start("GlowFish");
     for (int i = 0; i < 25; ++i)
     {
@@ -186,44 +187,26 @@ int main()
     Timer::start("seaweed");
     for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++) 
     {
-         float x = u1(gen) * terrainSize;
-         float z = u1(gen) * terrainSize;
-         
-         int patchSize = rand() % 20;
-         
-         for (float j = 0; j < patchSize; j++)
-         {
-         
-             int sx = x + u1(gen) * 20;
-             int sz = z + u1(gen) * 20;
-             
-             float y = terrain->getHeightAt(sx, sz);
-             
-             TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
-             if (chunk != nullptr)
-                 chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
-                 
-         }
-    }
-    Timer::stop("seaweed");
-    
-    
-    // Generate rocks
-    Timer::start("rock");
-    for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
-    {
         float x = u1(gen) * terrainSize;
-        
         float z = u1(gen) * terrainSize;
         
-        float y = terrain->getHeightAt(x,z);
+        int patchSize = rand() % 20;
         
-        TerrainChunk* chunk = terrain->getChunkAtReal((int)x,(int)z);
-        if(chunk != nullptr)
-            chunk->addEntity(new Rock(glm::vec3(-x, -y, -z)));
+        for (float j = 0; j < patchSize; j++)
+        {
+            
+            int sx = x + u1(gen) * 20;
+            int sz = z + u1(gen) * 20;
+            
+            float y = terrain->getHeightAt(sx, sz);
+            
+            TerrainChunk* chunk = terrain->getChunkAtReal((int)sx, (int)sz);
+            if (chunk != nullptr)
+                chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
+            
+        }
     }
-    Timer::stop("rock");
-    
+    Timer::stop("seaweed");
     
     // Generate coral
     Timer::start("coral");
@@ -442,9 +425,9 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-		glm::vec3 harpoonPos;
-		harpoonPos = camera->getPosition() + camera->getUp() - 0.7f *camera->getRight();
-		harpoons.push_back(new Harpoon(harpoonPos, camera->getFront()));
+        glm::vec3 harpoonPos;
+        harpoonPos = camera->getPosition() + camera->getUp() - 0.7f *camera->getRight();
+        harpoons.push_back(new Harpoon(harpoonPos, camera->getFront()));
     }
 }
 
