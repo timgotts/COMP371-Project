@@ -17,7 +17,6 @@ public:
 	//Non-default constructor
 	Seaweed(glm::vec3 position);
 	//rotation angle
-	float rotAngle;
 	//Seaweed's render function
 	void render(Shader* shader);
 
@@ -55,4 +54,10 @@ public:
 	GLfloat totalTime = 0.0f;
 	GLfloat oscOffset;
 
+protected:
+	GLfloat rotRand;
+	GLfloat rotAngle;
+	GLfloat scaleRand;
+	GLfloat xScaleRand;
+	GLfloat yScaleRand;
 };

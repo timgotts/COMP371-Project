@@ -21504,6 +21504,23 @@ GLfloat Seaweed::redVBO[] =
 
 Seaweed::Seaweed(glm::vec3 position)
 {
+	// Random devices and distributions
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::poisson_distribution<> p(10);
+	std::uniform_real_distribution<> u(0.0, 1.0);
+	std::uniform_real_distribution<> u1(-180.0, 180.0);
+	std::uniform_real_distribution<> u2(1.5, 4.5);
+	std::uniform_real_distribution<> u3(1.0, 2.0);
+	std::uniform_real_distribution<> u4(1.0, 6.0);
+
+	oscOffset = u(gen) * 3.14159265f;
+
+	rotRand = u1(gen);
+	scaleRand = u2(gen);
+	xScaleRand = u3(gen);
+	yScaleRand = u4(gen);
+
 
 	positionSeaweed = position;
 	if (amount % 2 == 0)
@@ -21595,10 +21612,10 @@ Seaweed::Seaweed(glm::vec3 position)
 
 	
 	//Translate the weed to a position
-	model = glm::translate(model, position);
+	//model = glm::translate(model, position);
 	
 	//Apply the a rotation
-	model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
+	//model = glm::rotate(model, glm::radians(rotAngle), glm::vec3(0, 0, 1));
 
 	//Colour modifier
 	float col;
@@ -21609,17 +21626,17 @@ Seaweed::Seaweed(glm::vec3 position)
 	{
 		
 		//Rotate the model randomly
-		model = glm::rotate(model, glm::radians(rotRand), glm::vec3(1, 0, 0));
+		//model = glm::rotate(model, glm::radians(rotRand), glm::vec3(1, 0, 0));
 
 		//Scale seaweed randomly
 		if (rand() % 100 == 99)
 		{
-			model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+			//model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
 		}
 		else
 		{
-			model = glm::translate(model, glm::vec3(yScale*2, 0.0, 0.0));
-			model = glm::scale(model, glm::vec3(yScale+2, xScale + 1, 2 + xScale));
+			//model = glm::translate(model, glm::vec3(yScale*2, 0.0, 0.0));
+			//model = glm::scale(model, glm::vec3(yScale+2, xScale + 1, 2 + xScale));
 		}
 
 		//Use a uniform distribution to select colours
@@ -21645,18 +21662,18 @@ Seaweed::Seaweed(glm::vec3 position)
 	else
 	{
 		//Rotate the model randomly
-		model = glm::rotate(model, glm::radians(rotRand), glm::vec3(0, 1, 0));
+		//model = glm::rotate(model, glm::radians(rotRand), glm::vec3(0, 1, 0));
 
 		//Scale seaweed randomly
 		if (rand() % 100 == 99)
 		{
-			model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
+			//model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
 
 		}
 		else
 		{
-			model = glm::translate(model, glm::vec3( 0.0, yScale2/4, 0.0));
-			model = glm::scale(model, glm::vec3(2.0f + xScale, yScale2 + 2.0f, 2.0f + xScale));
+			//model = glm::translate(model, glm::vec3( 0.0, yScale2/4, 0.0));
+			//model = glm::scale(model, glm::vec3(2.0f + xScale, yScale2 + 2.0f, 2.0f + xScale));
 		}
 		//Use a uniform distribution to select colours
 		std::uniform_real_distribution<> dis(0.01, 0.05);
@@ -21710,12 +21727,10 @@ void Seaweed::animate(float deltaTime)
 {
 	//Time needed wihtin the sin function
 	totalTime += deltaTime;
-	glm::mat4 shearMatrix;
-	// Model transformations
-	glm::mat4 tempModel = model;
 
-	float sx = sin(totalTime + oscOffset) / 75;
-	float sz = sin(totalTime + oscOffset + 1.584) / 75;
+	glm::mat4 shearMatrix;
+	float sx = sin(totalTime + oscOffset) / 15.0f;
+	float sz = sin(totalTime + oscOffset + 1.584) / 15.153f;
 	//Changes shearing direction
 	if (type == 0)
 	{
@@ -21731,13 +21746,44 @@ void Seaweed::animate(float deltaTime)
 	{
 		shearMatrix =
 		{
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, sz, 0.0f,
+			1.0f, 0.0f, sz, 0.0f,
+			0.0f, 1.0f, sx, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, sx, 1.0f
+			0.0f, 0.0f, 0.0f, 1.0f
 		};
 	}
+
+	glm::mat4 tempModel;
+
+	//Apply model translation
+	tempModel = glm::translate(tempModel, positionSeaweed);
+
+	//Apply model rotations
+	if (type == 0)
+	{
+		tempModel = glm::rotate(tempModel, glm::radians(rotRand), glm::vec3(0, 1.0, 0));
+	}
+	else
+	{
+		tempModel = glm::rotate(tempModel, glm::radians(rotRand), glm::vec3(0.0f, 1.0f, 0.0f));
+	}
+	tempModel = glm::rotate(tempModel, glm::radians(rotAngle), glm::vec3(0, 0, 1));
+	
+	
+	//Shear
 	tempModel = tempModel * shearMatrix;
+	
+	//Scale
+	if (type == 0)
+	{
+		tempModel = glm::scale(tempModel, glm::vec3(yScaleRand, xScaleRand, xScaleRand));
+	}
+	else
+	{
+		tempModel = glm::scale(tempModel, glm::vec3(xScaleRand, yScaleRand, xScaleRand));
+	}
+	tempModel = glm::scale(tempModel, glm::vec3(scaleRand));
+
 	//updates the model wiht the shear model (animated model)
 	model = tempModel;
 }
