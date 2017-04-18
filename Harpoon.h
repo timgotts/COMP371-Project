@@ -29,7 +29,7 @@ protected:
 	bool isStuck = false;
 
 	// Harpoon movement speed
-	GLfloat velocity = 40.0f;
+	GLfloat velocity = 60.0f;
 
 
 	// Position and orientation	
@@ -46,5 +46,4 @@ protected:
 	GLfloat totalTime;
 
 
-    
 };

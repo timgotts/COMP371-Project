@@ -36,15 +36,15 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
 	    glm::vec3(0.0,-0.1,-0.2),
 	    glm::vec3(0.0,0.1,-0.2),
 	    // face 2
-	    glm::vec3(6.0,0.0,0.0),
-	    glm::vec3(6.0,0.2,-0.1),
-	    glm::vec3(6.0,0.2,0.1),
-	    glm::vec3(6.0,0.1,0.2),
-	    glm::vec3(6.0,-0.1,0.2),
-	    glm::vec3(6.0,-0.2,0.1),
-	    glm::vec3(6.0,-0.2,-0.1),
-	    glm::vec3(6.0,-0.1,-0.2),
-	    glm::vec3(6.0,0.1,-0.2)
+	    glm::vec3(12.0,0.0,0.0),
+	    glm::vec3(12.0,0.2,-0.1),
+	    glm::vec3(12.0,0.2,0.1),
+	    glm::vec3(12.0,0.1,0.2),
+	    glm::vec3(12.0,-0.1,0.2),
+	    glm::vec3(12.0,-0.2,0.1),
+	    glm::vec3(12.0,-0.2,-0.1),
+	    glm::vec3(12.0,-0.1,-0.2),
+	    glm::vec3(12.0,0.1,-0.2)
 	};
 
 	// calculate surface normals
@@ -198,18 +198,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
 
 
 
-	// Calculate model rotation to match front vector
-	glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
-	glm::vec3 axis = glm::normalize(glm::cross(front, initial));
-	float angle = acos(glm::dot(initial, front) / (glm::length(initial) * glm::length(front)));
-
-	glm::mat4 a = {
-		0.0f, -axis.z, axis.y, 0.0f,
-		axis.z, 0.0f, axis.x, 0.0f,
-		-axis.y, axis.x, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f
-	};
-	rotationMatrix = glm::mat4(1.0f) + sin(angle) * a + (1 - cos(angle)) * (a * a);
+	
 
 
 
@@ -279,7 +268,7 @@ void Harpoon::render(Shader * shader)
 // animate the harpoon over time to move it through the scene
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
-	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 5.0f)) && (isStuck == false))
+	if (((position + front*12.0f).y < (terrain->getHeightAt((int)position.x, (int)position.z) + 0.0f)) && (isStuck == false))
 	{
 		isStuck = true;
 	}
@@ -290,8 +279,21 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     
 	totalTime += deltaTime;
 
-	//pitch -= 0.25f;
-	//updateVectors();
+	// Calculate model rotation to match front vector
+	glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 axis = glm::normalize(glm::cross(front, initial));
+	float angle = acos(glm::dot(initial, front) / (glm::length(initial) * glm::length(front)));
+
+	glm::mat4 a = {
+		0.0f, -axis.z, axis.y, 0.0f,
+		axis.z, 0.0f, axis.x, 0.0f,
+		-axis.y, axis.x, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	};
+	rotationMatrix = glm::mat4(1.0f) + sin(angle) * a + (1 - cos(angle)) * (a * a);
+
+	front.y = front.y - 0.002f;
+	
 	position += front * velocity * deltaTime;
 
 	// Model transformations
