@@ -157,7 +157,8 @@ int main()
     lightSourceShader = new Shader("res/shaders/lightsource.vs", "res/shaders/lightsource.fs");
     skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
     
-    sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.3f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+	sun = DirectionalLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.3f, 0.3f, 0.7f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+    //sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.3f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     terrainThread.join();
     
