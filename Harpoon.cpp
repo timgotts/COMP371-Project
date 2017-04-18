@@ -49,8 +49,10 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
 
 	// calculate surface normals
     glm::vec3 surfaceNormals[] = {
+		// normal for face 1
         calculateNormal(harpoonVertices[0],harpoonVertices[2],harpoonVertices[1]),
         
+		// normals for shaft faces
         calculateNormal(harpoonVertices[1],harpoonVertices[11],harpoonVertices[10]),
         calculateNormal(harpoonVertices[2],harpoonVertices[12],harpoonVertices[11]),
         calculateNormal(harpoonVertices[3],harpoonVertices[13],harpoonVertices[12]),
@@ -60,6 +62,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
         calculateNormal(harpoonVertices[7],harpoonVertices[17],harpoonVertices[16]),
         calculateNormal(harpoonVertices[8],harpoonVertices[10],harpoonVertices[17]),
         
+		// normal for face 2
         calculateNormal(harpoonVertices[9],harpoonVertices[11],harpoonVertices[10])
     };
     
@@ -92,7 +95,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
-		// long sides
+		// shaft sides
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -197,45 +200,37 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position
     glBindVertexArray(0);
 
 
-
-	
-
-
-
-
-
 	// Apply material properties
     material = Material(glm::vec3(0.2), glm::vec3(0.5),glm::vec3(0.5), 0.7);
 }
 
-bool Harpoon::load()
-{
-    if (VAO == 0)
-    {
-        
-        return true;
-    }
-    return false;
-}
-
-void Harpoon::unload()
-{
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
-    
-    VBO = 0;
-    VAO = 0;
-}
+//bool Harpoon::load()
+//{
+//    if (VAO == 0)
+//    {
+//        
+//        return true;
+//    }
+//    return false;
+//}
+//
+//void Harpoon::unload()
+//{
+//    glDeleteBuffers(1, &VBO);
+//    glDeleteVertexArrays(1, &VAO);
+//    
+//    VBO = 0;
+//    VAO = 0;
+//}
 
 
 void Harpoon::render(Shader * shader)
 {
-    //shader->use();
+	// set normal matrix
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
     
     
     // Broadcast the uniform values to the shaders
-    
     
     GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
     GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
@@ -277,8 +272,6 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     if(isStuck)
       return;
     
-	totalTime += deltaTime;
-
 	// Calculate model rotation to match front vector
 	glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 axis = glm::normalize(glm::cross(front, initial));
@@ -294,12 +287,15 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
 
 	front.y = front.y - 0.002f;
 	
+	// update position
 	position += front * velocity * deltaTime;
 
 	// Model transformations
 	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
 
-	tempModel = tempModel* rotationMatrix;
+	// update tempModel with rotation matrix
+	tempModel = tempModel * rotationMatrix;
 
+	// set new model
 	model = tempModel;
 }

@@ -171,6 +171,7 @@ int main()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> u1(0, 1);
     
+	// Generate fish
     Timer::start("fish");
     for (int i = 0; i < 600; ++i)
     {
@@ -178,6 +179,7 @@ int main()
     }
     Timer::stop("Fish");
     
+	// Generate glowing fish
     Timer::start("GlowFish");
     for (int i = 0; i < 25; ++i)
     {
@@ -186,11 +188,10 @@ int main()
     Timer::stop("GlowFish");
     
     
-    
-     Timer::start("seaweed");
-     for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++)
-     
-     {
+    // Generate seaweed
+    Timer::start("seaweed");
+    for (int i = 0; i < (int)(0.0002f*(terrainSize*terrainSize)); i++) 
+    {
          float x = u1(gen) * terrainSize;
          float z = u1(gen) * terrainSize;
          
@@ -209,12 +210,11 @@ int main()
                  chunk->addEntity(new Seaweed(glm::vec3(sx, y + 1, sz)));
                  
          }
-         
-     }
-     Timer::stop("seaweed");
+    }
+    Timer::stop("seaweed");
     
     
-    
+    // Generate rocks
     Timer::start("rock");
     for(int i = 0; i < (int)(0.001f*terrainSize*terrainSize); i++)
     {
@@ -231,7 +231,7 @@ int main()
     Timer::stop("rock");
     
     
-    
+    // Generate coral
     Timer::start("coral");
     for (int i = 0; i < (int)(0.0009f*terrainSize*terrainSize); i++)
     {
