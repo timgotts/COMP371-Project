@@ -27,9 +27,9 @@ enum CameraMovement
 };
 
 
-const GLfloat SPEED = 5* 7.0f;
+const GLfloat SPEED = 14.0f;
 const GLfloat SENSITIVITY = 0.0025f;
-const GLfloat ROLL_SPEED = 1.0f;
+const GLfloat ROLL_SPEED = 1.6f;
 const GLfloat ZOOM = 45.0f;
 
 
