@@ -451,7 +451,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
     {
-        harpoons.push_back(new Harpoon(camera->getPosition(), camera->getCameraQuat()));
+        harpoons.push_back(new Harpoon(camera->getPosition(), camera->getFront()));
     }
 }
 

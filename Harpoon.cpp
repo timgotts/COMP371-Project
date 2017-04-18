@@ -21,35 +21,8 @@ glm::vec3 Harpoon::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
     return normal;
 }
 
-Harpoon::Harpoon(glm::vec3 position, glm::quat cameraQuat) : position(-position)
+Harpoon::Harpoon(glm::vec3 position, glm::vec3 cameraFront) : position(-position), front(-cameraFront)
 {
-    
-    //glm::vec3 harpoonVertices[] = {
-    //    // face 1
-    //    glm::vec3(0.0,0.0,0.0),
-    //    glm::vec3(-0.1,0.2,0.0),
-    //    glm::vec3(0.1,0.2,0.0),
-    //    glm::vec3(0.2,0.1,0.0),
-    //    glm::vec3(0.2,-0.1,0.0),
-    //    glm::vec3(0.1,-0.2,0.0),
-    //    glm::vec3(-0.1,-0.2,0.0),
-    //    glm::vec3(-0.2,-0.1,0.0),
-    //    glm::vec3(-0.2,0.1,0.0),
-    //    // face 2
-    //    glm::vec3(0.0,0.0,6.0),
-    //    glm::vec3(-0.1,0.2,6.0),
-    //    glm::vec3(0.1,0.2,6.0),
-    //    glm::vec3(0.2,0.1,6.0),
-    //    glm::vec3(0.2,-0.1,6.0),
-    //    glm::vec3(0.1,-0.2,6.0),
-    //    glm::vec3(-0.1,-0.2,6.0),
-    //    glm::vec3(-0.2,-0.1,6.0),
-    //    glm::vec3(-0.2,0.1,6.0)
-    //};
-
-	quat = cameraQuat * quat;
-	quat = glm::normalize(quat);
-
 
 	glm::vec3 harpoonVertices[] = {
 	    // face 1
@@ -223,19 +196,23 @@ Harpoon::Harpoon(glm::vec3 position, glm::quat cameraQuat) : position(-position)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-	// Apply translation to model matrix
-    //model = glm::translate(model, -position);
-
-	
-	
-	//float t = asin(direction.z);
-	//float p = pow(atan(-direction.y * direction.x), 2);
-
-	//model = glm::rotate(model, glm::radians(t), glm::vec3(1.0f, 0.0f, 0.0f));
-	// = glm::rotate(model, glm::radians(p), glm::vec3(0.0f, 1.0f, 0.0f));
 
 
-	updateVectors();
+	// Calculate model rotation to match front vector
+	glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 axis = glm::normalize(glm::cross(front, initial));
+	float angle = acos(glm::dot(initial, front) / (glm::length(initial) * glm::length(front)));
+
+	glm::mat4 a = {
+		0.0f, -axis.z, axis.y, 0.0f,
+		axis.z, 0.0f, axis.x, 0.0f,
+		-axis.y, axis.x, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f
+	};
+	rotationMatrix = glm::mat4(1.0f) + sin(angle) * a + (1 - cos(angle)) * (a * a);
+
+
+
 
 
 	// Apply material properties
@@ -261,22 +238,6 @@ void Harpoon::unload()
     VAO = 0;
 }
 
-void Harpoon::updateVectors()
-{
-
-	glm::mat4 rotation = glm::mat4_cast(quat);
-
-	glm::mat4 translation = glm::mat4(1.0f);
-	translation = glm::translate(translation, position);
-
-	glm::mat4 viewMatrix = rotation * translation;
-
-	glm::mat4 mat = viewMatrix;
-
-	front = glm::vec3(mat[0][2], mat[1][2], mat[2][2]);
-	right = glm::vec3(mat[0][0], mat[1][0], mat[2][0]);
-	up = glm::normalize(glm::cross(front, right));
-}
 
 void Harpoon::render(Shader * shader)
 {
@@ -329,16 +290,14 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     
 	totalTime += deltaTime;
 
-	pitch -= 0.25f;
-	updateVectors();
+	//pitch -= 0.25f;
+	//updateVectors();
 	position += front * velocity * deltaTime;
 
 	// Model transformations
 	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
 
-	glm::mat4 rotationMatrix = glm::mat4_cast(quat);
-	tempModel = tempModel * rotationMatrix;
-
+	tempModel = tempModel* rotationMatrix;
 
 	model = tempModel;
 }
