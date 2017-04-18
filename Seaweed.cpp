@@ -21557,19 +21557,15 @@ Seaweed::Seaweed(glm::vec3 position)
 			//Binding the VAO
 			glBindVertexArray(rVAO);
 			// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-
-			//TEMPORARY
 			glBindBuffer(GL_ARRAY_BUFFER, rVBO);
 
 			glBufferData(GL_ARRAY_BUFFER, sizeof(redVBO), redVBO, GL_STATIC_DRAW);
-
-			//EBO Binding
 
 			//For the vertices (vertex shader)
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)0);
 			glEnableVertexAttribArray(0);
 
-			//For the colors (vertex shader)
+			//For the colors (fragment shader)
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 			glEnableVertexAttribArray(1);
 
