@@ -9,12 +9,12 @@
 
 glm::vec3 Rock::calculateNormal(glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
-    //Edge1, Edge2
+    // Edge1, Edge2
     glm::vec3 e1, e2;  
     glm::vec3 normal;
     
-    //Find vectors for two edges sharing V1
-    e1 = p2 - p1;
+	// Find vectors for two edges sharing p1
+	e1 = p2 - p1;
     e2 = p3 - p1;
     
 	// Calculate normal
@@ -28,6 +28,7 @@ Rock::Rock(glm::vec3 position)
     float const X = 0.525731112119133606f;
     float const Z = 0.850650808352039932f;
     
+	// radius for bounding box
     radius = 1.6;
     
     // randon generators
@@ -38,7 +39,7 @@ Rock::Rock(glm::vec3 position)
     std::uniform_real_distribution<> nudge(-0.3, 0.3);
     
     // set the vertices with random displacement
-    rockVertices = {
+    glm::vec3 rockVertices[] = {
         /*0*/	glm::vec3(-X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
         /*1*/	glm::vec3(X + nudge(gen), 0 + nudge(gen), Z + nudge(gen)),
         /*2*/	glm::vec3(-X + nudge(gen), 0 + nudge(gen), -Z + nudge(gen)),
@@ -54,7 +55,7 @@ Rock::Rock(glm::vec3 position)
     };
     
     // get surface normals for lighting
-    glm::vec3 surfaceNormals[] = {
+    glm::vec3 surfaceNormals[20] = {
         calculateNormal(rockVertices[1],rockVertices[4],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[9],rockVertices[0]),
         calculateNormal(rockVertices[4],rockVertices[5],rockVertices[9]),
@@ -251,12 +252,10 @@ void Rock::unload()
 
 void Rock::render(Shader* shader)
 {
-    //shader->use();
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
     
     
     // Broadcast the uniform values to the shaders
-    
     
     GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
     GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");

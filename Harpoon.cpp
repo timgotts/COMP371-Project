@@ -49,8 +49,10 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
 
 	// calculate surface normals
     glm::vec3 surfaceNormals[] = {
+		// face 1 normal
         calculateNormal(harpoonVertices[0],harpoonVertices[2],harpoonVertices[1]),
         
+		// normals for each side of shaft
         calculateNormal(harpoonVertices[1],harpoonVertices[11],harpoonVertices[10]),
         calculateNormal(harpoonVertices[2],harpoonVertices[12],harpoonVertices[11]),
         calculateNormal(harpoonVertices[3],harpoonVertices[13],harpoonVertices[12]),
@@ -60,6 +62,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         calculateNormal(harpoonVertices[7],harpoonVertices[17],harpoonVertices[16]),
         calculateNormal(harpoonVertices[8],harpoonVertices[10],harpoonVertices[17]),
         
+		// face 2 normal
         calculateNormal(harpoonVertices[9],harpoonVertices[11],harpoonVertices[10])
     };
     
@@ -92,7 +95,7 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[8], surfaceNormals[surface++],
         
-		// long sides
+		// long sides of shaft
         harpoonVertices[1], surfaceNormals[surface],
         harpoonVertices[11], surfaceNormals[surface],
         harpoonVertices[10], surfaceNormals[surface],
@@ -216,33 +219,31 @@ Harpoon::Harpoon(glm::vec3 position, glm::vec3 direction) : position(-position),
     material = Material(glm::vec3(0.2), glm::vec3(0.5),glm::vec3(0.5), 0.7);
 }
 
-bool Harpoon::load()
-{
-    if (VAO == 0)
-    {
-        
-        return true;
-    }
-    return false;
-}
+//bool Harpoon::load()
+//{
+//    if (VAO == 0)
+//    {
+//        
+//        return true;
+//    }
+//    return false;
+//}
 
-void Harpoon::unload()
-{
-    glDeleteBuffers(1, &VBO);
-    glDeleteVertexArrays(1, &VAO);
-    
-    VBO = 0;
-    VAO = 0;
-}
+//void Harpoon::unload()
+//{
+//    glDeleteBuffers(1, &VBO);
+//    glDeleteVertexArrays(1, &VAO);
+//    
+//    VBO = 0;
+//    VAO = 0;
+//}
 
 void Harpoon::render(Shader * shader)
 {
-    //shader->use();
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(model));
     
     
     // Broadcast the uniform values to the shaders
-    
     
     GLint matAmbientLoc = glGetUniformLocation(shader->program, "material.ambient");
     GLint matDiffuseLoc = glGetUniformLocation(shader->program, "material.diffuse");
@@ -279,7 +280,6 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     if(isStuck)
         return;
     
-    //totalTime += deltaTime;
     position += direction * velocity * deltaTime;
     
     // Model transformations
