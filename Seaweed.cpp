@@ -21582,9 +21582,9 @@ Seaweed::Seaweed(glm::vec3 position)
 		rotAngle = 0.0;
 	}
 
+	//Random numbers for generation of colour and scaling
 	float xScale = rand() % 2;
 	float yScale = rand() % 6;
-	float zScale = rand() % 2;
 
 	float xScale2 = rand() % 4;
 	float yScale2 = rand() % 6;
@@ -21644,7 +21644,7 @@ Seaweed::Seaweed(glm::vec3 position)
 		{
 
 			col = dis(gen);
-			material = Material(glm::vec3(0.294 , 0.086 , 0.219), glm::vec3(col, col, col), glm::vec3(0.1f, 0.1f, 0.1f), 0.04f);
+			material = Material(glm::vec3(0.294, 0.086 + col, 0.219), glm::vec3(col, col, col), glm::vec3(0.1f, 0.1f, 0.1f), 0.04f);
 		}
 	}
 	//Render type 1 seaweed
@@ -21661,7 +21661,7 @@ Seaweed::Seaweed(glm::vec3 position)
 		}
 		else
 		{
-			model = glm::translate(model, glm::vec3( 0.0, yScale2, 0.0));
+			model = glm::translate(model, glm::vec3( 0.0, yScale2/6, 0.0));
 			model = glm::scale(model, glm::vec3(2.0f, yScale2, 2.0f));
 		}
 		std::uniform_real_distribution<> dis(0.01, 0.05);
@@ -21669,7 +21669,7 @@ Seaweed::Seaweed(glm::vec3 position)
 		//Orange
 	
 			col = dis(gen);
-			material = Material(glm::vec3(0.49, 0.45 + col, 0.078), glm::vec3(col, col, col), glm::vec3(0.2f, 0.2f, 0.2f), 0.04f);
+			material = Material(glm::vec3(0.47, 0.39 +col, 0.018), glm::vec3(col, col, col), glm::vec3(0.2f, 0.2f, 0.2f), 0.04f);
 
 
 	}
@@ -21698,24 +21698,6 @@ void Seaweed::render(Shader* shader)
 	glUniform1f(matShineLoc, material.shininess);
 	glUniformMatrix3fv(normalMatrixLoc, 1, GL_FALSE, glm::value_ptr(normalMatrix));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	//Sin functiont to move the vertices based on time.
-	GLfloat timeMove = (sin(glfwGetTime())) / 2;
-	//enabling the shader
-	//shader->use();
-
-
-	/*glm::mat4 shear =
-	{
-	1, timeMove, 0, 0,
-	0, 1, timeMove ,0,
-	0, 0, 1, 0,
-	0, 0, 0, 0
-
-	}; */
-
-	//model = glm::translate(model, timeMove*(glm::vec3(0, 1, 0)));
-
 
 	//Draw the seaweed
 	glBindVertexArray(VAO);
