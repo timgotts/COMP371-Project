@@ -280,6 +280,7 @@ void Harpoon::animate(float deltaTime, Terrain * terrain)
     if(isStuck)
         return;
     
+	// update position
     position += direction * velocity * deltaTime;
     
     // Model transformations
