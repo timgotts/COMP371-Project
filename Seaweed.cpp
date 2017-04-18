@@ -21579,11 +21579,11 @@ Seaweed::Seaweed(glm::vec3 position)
 		VAO = rVAO;
 		VBO = rVBO;
 
-		rotAngle = 180.0;
+		rotAngle = 0.0;
 	}
 
 	float xScale = rand() % 4;
-	float yScale = rand() % 5;
+	float yScale = rand() % 6;
 	float zScale = rand() % 4;
 
 	float xScale2 = rand() % 4;
@@ -21607,6 +21607,7 @@ Seaweed::Seaweed(glm::vec3 position)
 
 
 	//Applying lighting for both seaweeds
+	//Render type 2 seaweed
 	if (type == 0)
 	{
 		//Rotate the model randomly
@@ -21620,8 +21621,9 @@ Seaweed::Seaweed(glm::vec3 position)
 		}
 		else
 		{
-
-			model = glm::scale(model, glm::vec3(3 + yScale, xScale, 3 + zScale));
+			model = glm::translate(model, glm::vec3(xScale + 1, 0.0, 0.0));
+			model = glm::scale(model, glm::vec3(yScale, xScale + 1, 1 + xScale));
+			
 		}
 
 		std::uniform_real_distribution<> dis(0.01, 0.05);
@@ -21630,7 +21632,7 @@ Seaweed::Seaweed(glm::vec3 position)
 		if (num > 5)
 		{
 			col = dis(gen);
-			material = Material(glm::vec3(0.07f + col, 0.33f + col, 0.086f + col), glm::vec3(0.13f, 0.65f, 0.25f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+			material = Material(glm::vec3(0.25, 0.25 , 0.25 ), glm::vec3(0.184+col, 0.4392f+col, 0.105f+col), glm::vec3(0.2f, 0.2f, 0.2f), 12.0f);
 		}
 		//red
 		else
@@ -21640,6 +21642,7 @@ Seaweed::Seaweed(glm::vec3 position)
 			material = Material(glm::vec3(0.407f + col, 0.05f + col, 0.098f), glm::vec3(0.78f, 0.10f, 0.172f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
 		}
 	}
+	//Render type 1 seaweed
 	else
 	{
 		//Rotate the model randomly
@@ -21653,8 +21656,8 @@ Seaweed::Seaweed(glm::vec3 position)
 		}
 		else
 		{
-
-			model = glm::scale(model, glm::vec3(xScale2, yScale2, 3.0f));
+			model = glm::translate(model, glm::vec3( 0.0, yScale2, 0.0));
+			model = glm::scale(model, glm::vec3(2.0f, yScale2, 2.0f));
 		}
 		std::uniform_real_distribution<> dis(0.01, 0.05);
 		//Change colour randomly
@@ -21734,23 +21737,23 @@ void Seaweed::render(Shader* shader)
 
 void Seaweed::animate(float deltaTime)
 {
-	totalTime += deltaTime;
+	//totalTime += deltaTime;
 
-	// Model transformations
-	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), positionSeaweed);
+	//// Model transformations
+	//glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), positionSeaweed);
 
-	float sx = sin(totalTime + oscOffset);
-	float sz = sin(totalTime + oscOffset + 1.584);
-	glm::mat4 shearMatrix =
-	{
-		1.0f, sx, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f, 0.0f,
-		0.0f, sz, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f
-	};
-	tempModel = tempModel * shearMatrix;
+	//float sx = sin(totalTime + oscOffset);
+	//float sz = sin(totalTime + oscOffset + 1.584);
+	//glm::mat4 shearMatrix =
+	//{
+	//	1.0f, sx, 0.0f, 0.0f,
+	//	0.0f, 1.0f, 0.0f, 0.0f,
+	//	0.0f, sz, 1.0f, 0.0f,
+	//	0.0f, 0.0f, 0.0f, 1.0f
+	//};
+	//tempModel = tempModel * shearMatrix;
 
-	model = tempModel;
+	//model = tempModel;
 }
 
 void Seaweed::calculateSweep()
