@@ -41,14 +41,16 @@ class TerrainChunk : public Renderable
     
     //add entity to chunk
     void addEntity(Renderable* r);
-    
+    //load chunk
     bool load();
+    //unload chunk
     void unload();
     
     private:
     //width and height of chunk
     const int size;
     
+    //list of entites contained in chunk
     std::vector<Renderable*> entities;;
     
     //chunk position
@@ -57,7 +59,7 @@ class TerrainChunk : public Renderable
     //heightmap grid
     float** heightMap;
     
-    
+    //final chunk vertices
     std::vector<glm::vec3> finalVertices;
     
     
@@ -82,14 +84,20 @@ class Terrain
     TerrainChunk* getChunkAt(int posX, int posY);
     
     TerrainChunk* getChunkAtReal(int posX, int posY);
-    
+    //get height at 
     float getHeightAt(int x, int y);
+    //set height at
     void setHeightAt(int x,int y,  float  height);
     
+    //update chunks that should be rendered
+    //loads and unloads chuns depending on distance from position and view distance
     void updateChunks(glm::vec3 position);
     
+    //get view distance / render distance
     int getRenderDistance();
     
+    //returns if position is valid
+    //ie if it collides with terrain or not
     bool isPositionValid(glm::vec3 position);
     
     private:
