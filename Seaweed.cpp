@@ -21582,20 +21582,19 @@ Seaweed::Seaweed(glm::vec3 position)
 		rotAngle = 0.0;
 	}
 
-	float xScale = rand() % 4;
+	float xScale = rand() % 2;
 	float yScale = rand() % 6;
-	float zScale = rand() % 4;
+	float zScale = rand() % 2;
 
 	float xScale2 = rand() % 4;
-	float yScale2 = rand() % 15;
+	float yScale2 = rand() % 6;
 	float zScale2 = rand() % 4;
 
 	float rotRand = rand() % 360;
 
 	float num = rand() % 10;
 
-	float col = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-	std::uniform_real_distribution<> nudge(-0.3, 0.3);
+
 
 	//Translate the weed to a position
 	model = glm::translate(model, position);
@@ -21605,11 +21604,15 @@ Seaweed::Seaweed(glm::vec3 position)
 
 	//Scale the seaweed to make them bigger
 
+	
+	float col;
+
 
 	//Applying lighting for both seaweeds
 	//Render type 2 seaweed
 	if (type == 0)
 	{
+		
 		//Rotate the model randomly
 		model = glm::rotate(model, glm::radians(rotRand), glm::vec3(1, 0, 0));
 
@@ -21621,25 +21624,27 @@ Seaweed::Seaweed(glm::vec3 position)
 		}
 		else
 		{
-			model = glm::translate(model, glm::vec3(xScale + 1, 0.0, 0.0));
+			model = glm::translate(model, glm::vec3(yScale, 0.0, 0.0));
 			model = glm::scale(model, glm::vec3(yScale, xScale + 1, 1 + xScale));
 			
 		}
 
-		std::uniform_real_distribution<> dis(0.01, 0.05);
+		std::uniform_real_distribution<> dis(0.0, 0.2);
+		
 		//Change colour randomly
 		//Green
-		if (num > 5)
+		if (num>5)
 		{
+			
 			col = dis(gen);
-			material = Material(glm::vec3(0.25, 0.25 , 0.25 ), glm::vec3(0.184+col, 0.4392f+col, 0.105f+col), glm::vec3(0.2f, 0.2f, 0.2f), 12.0f);
+			material = Material(glm::vec3(0.1, 0.25 + col, 0.09), glm::vec3(col, col,  col), glm::vec3(0.1f, 0.1f, 0.1f), 0.04f);
 		}
-		//red
+		//Purple
 		else
 		{
 
 			col = dis(gen);
-			material = Material(glm::vec3(0.407f + col, 0.05f + col, 0.098f), glm::vec3(0.78f, 0.10f, 0.172f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+			material = Material(glm::vec3(0.294 , 0.086 , 0.219), glm::vec3(col, col, col), glm::vec3(0.1f, 0.1f, 0.1f), 0.04f);
 		}
 	}
 	//Render type 1 seaweed
@@ -21662,21 +21667,10 @@ Seaweed::Seaweed(glm::vec3 position)
 		std::uniform_real_distribution<> dis(0.01, 0.05);
 		//Change colour randomly
 		//Orange
-		if (num>5)
-		{
-
+	
 			col = dis(gen);
-			material = Material(glm::vec3(0.76f + col, 0.47f + col, 0.105f), glm::vec3(0.921f, 0.64f, 0.29f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
+			material = Material(glm::vec3(0.49, 0.45 + col, 0.078), glm::vec3(col, col, col), glm::vec3(0.2f, 0.2f, 0.2f), 0.04f);
 
-		}
-		//Yellow
-		else
-		{
-
-			col = dis(gen);
-			material = Material(glm::vec3(0.78f + col, 0.78f + col, 0.12f), glm::vec3(0.96f, 0.76f, 0.2f), glm::vec3(0.5f, 0.5f, 0.5f), 12.0f);
-
-		}
 
 	}
 	amount++;
