@@ -30,7 +30,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
-#define NR_POINT_LIGHTS 4  
+#define NR_POINT_LIGHTS 25  
 
 
 // Spot lights
@@ -53,7 +53,9 @@ struct SpotLight {
 
 in vec3 FragPos;  
 in vec3 Normal;  
-  
+in float Opacity;  
+in float DistanceFromView;
+
 out vec4 color;
  
 
@@ -64,6 +66,7 @@ uniform PointLight pointLights[NR_POINT_LIGHTS];
 uniform SpotLight spotLight;
 uniform Material material;
 
+uniform float viewDistance;
 
 //Function prototypes
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir);  
@@ -76,15 +79,20 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
 
+	vec3 result=vec3(0.0, 0.0, 0.0);
     // Phase 1: Directional lighting
-    vec3 result = CalcDirLight(dirLight, norm, viewDir);
+    result += CalcDirLight(dirLight, norm, viewDir);
     // Phase 2: Point lights
-    //for(int i = 0; i < NR_POINT_LIGHTS; i++)
-     // result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
+    for(int i = 0; i < NR_POINT_LIGHTS; i++)
+      result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);    
     // Phase 3: Spot light
-    //result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
+    result += CalcSpotLight(spotLight, norm, FragPos, viewDir);    
     
-    color = vec4(result, 1.0);
+	result= pow(result, vec3(1.0/0.8));
+
+	float ratio = min(1.0f,(1.0f-(max(0.0f, DistanceFromView-(viewDistance/2))/(viewDistance/2))));
+	vec4 fog = vec4((2.0f/255.0f), (34.0f/255.0f), (134.0f/255.0f), 1.0f);
+	color = mix(vec4(result, 1.0f), fog, min(1.0f,(1-ratio)));
 }
 
 
@@ -147,8 +155,8 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
     float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
     // Combine results
     vec3 ambient = light.ambient * material.ambient;
-    vec3 diffuse = light.diffuse * (diff * material.diffuse);
-    vec3 specular = light.specular * (spec * material.specular);
+    vec3 diffuse = light.diffuse * ( diff * material.diffuse);
+    vec3 specular = light.specular *  (spec * material.specular);
     ambient *= attenuation * intensity;
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;

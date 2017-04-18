@@ -1,7 +1,12 @@
 #version 330 core
 out vec4 color;
 
+in float DistanceFromView;
+
+uniform float viewDistance;
+
 void main()
 {
-    color = vec4(1.0f); // Set all 4 vector values to 1.0f
+	vec3 result = vec3(1.0f-(DistanceFromView/viewDistance)*0.2f);
+    color = vec4(result,1.0f); 
 }

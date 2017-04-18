@@ -7,7 +7,7 @@
 #include "Fish.h"
 
 
-Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), totalTime(0.0f)
+Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), totalTime(0.0f), yawTotal(0.0f)
 {
 	GLfloat vertices[] = {
 		-0.4, 0, 0, 0.242251, 0.0484502, 0.969003,
@@ -167,15 +167,17 @@ Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), 
 	// Random devices and distributions
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::poisson_distribution<> p(1000);
+	std::poisson_distribution<> p(10);
 	std::uniform_real_distribution<> u(0, 1);
 	std::uniform_real_distribution<> u1(0.5, 1.5);
 	std::uniform_real_distribution<> u2(1.0, 3.0);
 
 	// Pseudorandomize animation and scale variables
-	float pRand = float(p(gen)) / 1000.0f;
+	float pRand = float(p(gen)) / 10.0f;
+	float pRand2 = float(p(gen)) / 8.0f;
 
-	scale = glm::vec3(pRand * u2(gen) * 1.5, pRand * u2(gen), pRand * u2(gen) *1.5);
+
+	scale = pRand2 * glm::vec3(pRand * u2(gen) * 1.5, pRand * u2(gen), pRand * u2(gen) *1.5);
 	velocity = pRand * u2(gen) * 3.0f;
 	initYaw = u(gen) * 360.0f;
 	oscRate = u1(gen);
@@ -186,10 +188,14 @@ Fish::Fish(glm::vec3 position) :	position(position),	pitch(0.0f), yawOsc(0.0f), 
 	// Update orientation vectors
 	updateVectors();
 
-
+	// Random devices and distributions
+	std::uniform_real_distribution<> randColor(0.0, 1.0);
+	std::uniform_real_distribution<> v(-0.1, 0.1);
+	float baseColor = v(gen);
+	glm::vec3 color = glm::vec3(randColor(gen) + baseColor, randColor(gen) + baseColor, randColor(gen) + baseColor);
 
 	// Assign material 
-	material = Material(glm::vec3(0.28f, 0.24f, 0.545f), glm::vec3(0.75f,0.75f, 0.75f), glm::vec3(0.5f, 0.5f, 0.5f), 64.0f);
+	material = Material(0.5f *color, 0.5f * color, glm::vec3(0.5f), 1.0f);
 
 
 }
@@ -230,31 +236,123 @@ void Fish::render(Shader* shader)
 
 
 
-void Fish::animate(float deltaTime)
+void Fish::animate(float deltaTime, Terrain * terrain)
 {
 	
 	totalTime += deltaTime;
+
+	
+
 
 	// Short swimming yaw oscillation
 	yawOsc = sin((totalTime*2.5 + oscOffset)*oscRate) * 25.0f;
 
 	// Long trajectory yaw oscillation
-	yawDir = 180*sin((totalTime*0.1 + oscOffset)*oscRate) + initYaw;
+	yawDir = 180 * sin((totalTime*0.1 + oscOffset)*oscRate) + initYaw;
 
-	yaw = yawOsc + yawDir;
+	yawTotal = yawOsc + yawDir + yawTurn1 + yawTurn2;
+
+	pitchOsc = sin((totalTime + oscOffset)*oscRate) * 20.0f;
+
 
 	// Short pitch oscillation
-	pitch = sin((totalTime + oscOffset)*oscRate) * 20.0f;
+	pitch = pitchOsc + pitchTotal;
 	updateVectors();
 	position += front * velocity * deltaTime;
 
 	// Model transformations
 	glm::mat4 tempModel = glm::translate(glm::mat4(1.0f), position);
 
-	tempModel = glm::rotate(tempModel, glm::radians(-yaw), glm::vec3(0.0f, 1.0f, 0.0f));
+	tempModel = glm::rotate(tempModel, glm::radians(-yawTotal), glm::vec3(0.0f, 1.0f, 0.0f));
 	tempModel = glm::rotate(tempModel, glm::radians(pitch), glm::vec3(0.0f, 0.0f, 1.0f));
 
+
+	float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk() - 1);
+
+
+
+	if (belowTerrain && !turnedAround)
+	{
+		yawTurn1 += 3.0f;
+	}
+
+	if (yawTurn1 >= lastYawTotal + 180.0f)
+	{
+		turnedAround = true;
+	}
+
+
+	if (ascending && pitchTotal < 20.0f)
+	{
+		pitchTotal += 1.0f;
+	}
+
+	if (descending && pitchTotal > -20.0f)
+	{
+		pitchTotal -= 1.0f;
+	}
+
+	if (levelingOut)
+	{
+		if (pitchTotal > 0.0f)
+			pitchTotal -= 1.0f;
+		if (pitchTotal < 0.0f);
+			pitchTotal += 1.0f;
+		if (pitchTotal == 0.0f)
+			levelingOut = false;
+	}
+
+	// Below terrain
+	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 6.0f)) && (belowTerrain == false))
+	{
+		belowTerrain = true;
+		descending = false;
+		ascending = true;
+		turnedAround = false;
+		lastYawTotal = yawTotal;
+	}
+
+	// Above terrain
+	if ((position.y >(terrain->getHeightAt((int)position.x, (int)position.z) + 8.0f)) && (belowTerrain == true))
+	{
+		belowTerrain = false;
+		levelingOut = true;
+	}
+
+	// Above surface
+	if ((position.y > (terrain->getHeightAt((int)position.x, (int)position.z) + 20.0f)) && (aboveSurface == false))
+	{
+		aboveSurface = true;
+		ascending = false;
+		descending = true;
+	}
+
+	// Below surface
+	if ((position.y < (terrain->getHeightAt((int)position.x, (int)position.z) + 10.0f)) && (aboveSurface == true))
+	{
+		aboveSurface = false;
+		levelingOut = true;
+	}
+
+	// Outside terrain
+	if ((position.x < 0.0f || position.z < 0.0f || position.x > terrainSize || position.z > terrainSize) && (outsideTerrain == false))
+	{
+		outsideTerrain = true;
+		yawTurn2 += 180.0f;
+	}
+
+	// Inside terrain
+	if (!(position.x < 0.0f || position.z < 0.0f || position.x > terrainSize || position.z > terrainSize) && (outsideTerrain == true))
+	{
+		outsideTerrain = false;
+	}
+
+
+
+
 	tempModel = glm::scale(tempModel, scale);
+
+
 
 	model = tempModel;
 
@@ -266,9 +364,9 @@ void Fish::updateVectors()
 {
 	// Same as LearnOpenGL camera
 	glm::vec3 tempFront;
-	tempFront.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	tempFront.x = cos(glm::radians(-yawTotal)) * cos(glm::radians(pitch));
 	tempFront.y = sin(glm::radians(pitch));
-	tempFront.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	tempFront.z = sin(glm::radians(yawTotal)) * cos(glm::radians(pitch));
 
 	front = glm::normalize(tempFront);
 	right = glm::normalize(glm::cross(front, glm::vec3(0.0f, 1.0f, 0.0f)));

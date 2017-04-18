@@ -13,7 +13,7 @@ class Skybox
 {
 public:
 	Skybox();
-	void render(glm::mat4 view, glm::mat4 projection);
+	void render(Shader* shader);
 	static GLuint loadCubemap(std::vector<const GLchar*> faces);
 
 	GLuint VAO;
@@ -24,8 +24,6 @@ public:
 	std::vector<GLuint> indices;
 
 	glm::mat4 model;
-
-	Shader * shader;
 private:
 
 };

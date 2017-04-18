@@ -27,9 +27,9 @@ enum CameraMovement
 };
 
 
-const GLfloat SPEED = 14.0f;
+const GLfloat SPEED = 5* 7.0f;
 const GLfloat SENSITIVITY = 0.0025f;
-const GLfloat ROLL_SPEED = 1.5f;
+const GLfloat ROLL_SPEED = 1.0f;
 const GLfloat ZOOM = 45.0f;
 
 
@@ -54,21 +54,21 @@ class Camera
     {
         return position;
     }
-
-	void setPosition(glm::vec3 position)
-	{
-		this->position = position;
-	}
+    
+    void setPosition(glm::vec3 position)
+    {
+        this->position = position;
+    }
     
     glm::mat4 getViewMatrix() 
     {
         return viewMatrix;
         
     }
-
-	glm::vec3 getFront()
+    
+    glm::vec3 getFront()
     {
-		return front;
+        return front;
     }
     
     
@@ -225,6 +225,20 @@ class Camera
         return this->zoom;
     }
     
+    GLfloat getMovementSpeed()
+    {
+        return movementSpeed;
+    }
+    
+    glm::vec3 getRight()
+    {
+        return right;
+    }
+    
+    glm::vec3 getUp()
+    {
+        return up;
+    }
     
     private:
     
