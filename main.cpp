@@ -49,7 +49,6 @@ std::vector<Cube*> cubes;
 Skybox* skybox;
 DirectionalLight sun;
 SpotLight spotLight;
-std::vector<PointLight> pointLights;
 Terrain* terrain;
 Shader* lightingShader;
 Shader* lightSourceShader;
@@ -145,26 +144,21 @@ int main()
     
     // ____________________________ CREATING SCENE ____________________________
     
-    
+	// Create Shaders
+	lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
+	lightSourceShader = new Shader("res/shaders/lightsource.vs", "res/shaders/lightsource.fs");
+	skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
+
     // Generate skybox
-    Timer::start("skybox");
-    skybox = new Skybox();
-    Timer::stop("Skybox");
+    /*Timer::start("skybox");*/
+	/*skybox = new Skybox();
+    Timer::stop("Skybox");*/
     
-    
-    // Create Shaders
-    lightingShader = new Shader("res/shaders/mainlit.vs", "res/shaders/mainlit.fs");
-    lightSourceShader = new Shader("res/shaders/lightsource.vs", "res/shaders/lightsource.fs");
-    skyboxShader = new Shader("res/shaders/skybox.vs", "res/shaders/skybox.fs");
-    
-	sun = DirectionalLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.3f, 0.3f, 0.7f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
-    //sun = DirectionalLight(glm::vec3(0.1f,0.1f,0.3f),glm::vec3(0.0f,0.0f,0.3f), glm::vec3(0.0f,0.0f,0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
+    sun = DirectionalLight(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.2f, 0.2f, 0.5f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(-0.2f, -1.0f, -0.3f));
     
     terrainThread.join();
     
     float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk()-1);    
-    
-    
     
     //Randomize fish locations
     std::random_device rd;
@@ -255,6 +249,7 @@ int main()
     camera->setPosition(glm::vec3(-float(terrainSize / 2), -(terrain->getHeightAt(terrainSize / 2,terrainSize/2)+5), -float(terrainSize / 2)));
     terrain->updateChunks(camera->getPosition());
     
+	// Create spotlight at camnera position
     spotLight = SpotLight(glm::vec3(0.5f, 0.5f, 0.2f), glm::vec3(0.3f, 0.3f, 0.05f), glm::vec3(1.0f, 1.0f, 1.0f),
                           camera->getPosition(), camera->getFront(), glm::cos(glm::radians(15.5f)), glm::cos(glm::radians(25.0f)), 1.0f, 0.0014f, 0.000007f);
     
@@ -281,20 +276,19 @@ int main()
         glClearColor((2.0f/255.0f), (34.0f / 255.0f), (134.0f/255.0f), 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        
+		////Skybox
         // Remove translation component of the view matrix for skybox 
-        glm::mat4 skybox_view = glm::mat4(glm::mat3(view));
-        
-        //Skybox
-        skyboxShader->use();
-        
-        glUniform1f(glGetUniformLocation(skyboxShader->program, "viewDistance"), viewDistance);
-        glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
-        glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
+        //glm::mat4 skybox_view = glm::mat4(glm::mat3(view));
+        //skyboxShader->use();
+        //
+        //glUniform1f(glGetUniformLocation(skyboxShader->program, "viewDistance"), viewDistance);
+        //glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "view"), 1, GL_FALSE, glm::value_ptr(skybox_view));
+        //glUniformMatrix4fv(glGetUniformLocation(skyboxShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
         //skybox->render(skyboxShader);
         
-        //Terrain/fish/rocks
+        //Terrain/fish/rocks/coral
         lightingShader->use();
+
         glUniform1f(glGetUniformLocation(lightingShader->program, "viewDistance"), viewDistance);
         glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightingShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
@@ -351,14 +345,11 @@ int main()
             harpoon->render(lightingShader);
         }
         
-        //Glowfish
+        // Render Glowfish as white
         lightSourceShader->use();
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "view"), 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader->program, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
-        
         glUniform1f(glGetUniformLocation(lightSourceShader->program, "viewDistance"),  viewDistance);
-        
-        
         glUniform3f(glGetUniformLocation(lightingShader->program, "viewPos"), -camera->getPosition().x, -camera->getPosition().y, -camera->getPosition().z);
         
         //Render glowfish
@@ -398,7 +389,6 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
         glfwSetWindowShouldClose(window, GL_TRUE);
         
     }
-    
     
     
     if (key >= 0 && key < 1024)

@@ -20,7 +20,7 @@ PointLight::PointLight(glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular,
 	this->quadratic = quadratic;
 }
 
-PointLight::PointLight(glm::vec3 position) : Light()
+PointLight::PointLight(glm::vec3 position) : Light(glm::vec3(0.5f,0.5f,0.5f),glm::vec3(0.5f,0.5f,0.5f), glm::vec3(0.2f,0.2f,0.2f))
 {
 	this->position = position;
 	this->constant = 1.0f;

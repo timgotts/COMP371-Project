@@ -3,6 +3,7 @@
 #include <soil\soil.h>
 Skybox::Skybox()
 {
+	//Define skybox vertices
     vertices = { glm::vec3(-1.0f,  1.0f, -1.0f),
         glm::vec3(-1.0f, -1.0f, -1.0f),
         glm::vec3(1.0f, -1.0f, -1.0f),
@@ -46,19 +47,15 @@ Skybox::Skybox()
         glm::vec3(1.0f, -1.0f,  1.0f)
     };
     
-    //std::vector<glm::vec3> skybox_normals;
-    //std::vector<glm::vec2> skybox_UVs;
-    //loadOBJ(".\\res\\models\\cube.obj", vertices, skybox_normals, skybox_UVs);
-    
+
+	// Set up VAO/VBO for rendering
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
-    
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices.front(), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
     glEnableVertexAttribArray(0);
-    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     
@@ -74,28 +71,31 @@ Skybox::Skybox()
     
     glActiveTexture(GL_TEXTURE1);
     
+	// Create cubemap
     GLuint skyboxTexture = loadCubemap(faces);
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
-    //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
     
 }
 
-void Skybox::render(Shader* shader)
+void Skybox::render(Shader* shader) const
 {
-    shader->use();
-
+	// Setup skybox uniform
     glUniform1i(glGetUniformLocation(shader->program, "skyboxTexture"), 1);
     
-    glDepthMask(GL_FALSE);
-    // skybox cube
+	//Disable depth mask for skybox rendering
+	glDepthMask(GL_FALSE);
+
     glBindVertexArray(VAO);
     
+	//Render skybox
     glDrawArrays(GL_TRIANGLES, 0, vertices.size());
     
+	//Unbind VAO
     glBindVertexArray(0);
-    
-    glDepthMask(GL_TRUE); // Set depth function back to default
+	
+	// Set depth function back to default
+    glDepthMask(GL_TRUE); 
     
 }
 

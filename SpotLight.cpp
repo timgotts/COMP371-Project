@@ -6,8 +6,8 @@ SpotLight::SpotLight(): Light()
 {
 	this->position = glm::vec3(0.0f, 0.0f, 0.0f);
 	this->direction = glm::vec3(0.0f, 0.0f, 1.0f);
-	this->cutOff = glm::cos(glm::radians(12.5f));
-	this->outerCutOff = glm::cos(glm::radians(15.0f));
+	this->cutOff = glm::cos(glm::radians(5.5f));
+	this->outerCutOff = glm::cos(glm::radians(17.5f));
 	this->constant = 1.0f;
 	this->linear = 0.0014f;
 	this->quadratic = 0.000007f;
