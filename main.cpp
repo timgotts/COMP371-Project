@@ -325,8 +325,12 @@ int main()
         animateHarpoon(deltaTime);
         for (auto harpoon : harpoons)
         {
-            harpoon->render(lightingShader);
+			if (!harpoon->isOutside)
+			{
+				harpoon->render(lightingShader);
+			}
         }
+
         
         // Render Glowfish as white
         lightSourceShader->use();

@@ -11,7 +11,8 @@ class Harpoon : public Renderable
 {
     public:
     
-    Harpoon(glm::vec3 position, glm::vec3 cameraFront);
+	Harpoon(glm::vec3 position, glm::vec3 cameraFront);
+	~Harpoon() {};
 
     glm::vec3 calculateNormal(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3);
     
@@ -22,12 +23,15 @@ class Harpoon : public Renderable
     /*bool load();
     void unload();*/
    
+	// test if the harpoon is outside of the terrain
+	bool isOutside = false;
    
 
 protected:
 
 	// determine whether harpoon is stuck or not
 	bool isStuck = false;
+
 
 	// Harpoon movement speed
 	GLfloat velocity = 60.0f;
@@ -39,8 +43,6 @@ protected:
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::mat4 rotationMatrix;
-
-
 
 
 	// Variables for periodic animations

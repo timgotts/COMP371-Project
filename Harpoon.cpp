@@ -263,15 +263,25 @@ void Harpoon::render(Shader * shader)
 // animate the harpoon over time to move it through the scene
 void Harpoon::animate(float deltaTime, Terrain * terrain)
 {
+	// detect collision
     glm::vec3 checkPosition = position + front * velocity * deltaTime;
     if (!(terrain->isPositionValid(checkPosition)) && (isStuck == false))
     {
         isStuck = true;
     }
     
-    // if the harpoon is stuck
-    if(isStuck)
-        return;
+	// get terrain size to test bounds
+	float terrainSize = (terrain->getSize()) * (terrain->getPointsPerChunk() - 1);
+
+	// if the harpoon is shot out of the world
+	if (position.x < 5.0f || position.z < 5.0f || position.x > terrainSize-5.0 || position.z > terrainSize-5.0)
+	{
+		isOutside = true;
+		return;
+	}
+    // if the harpoon is stuck stop animating
+	else if (isStuck)
+		return;
     
     // Calculate model rotation to match front vector
     glm::vec3 initial = glm::vec3(1.0f, 0.0f, 0.0f);
